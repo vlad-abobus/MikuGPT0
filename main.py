@@ -6,6 +6,7 @@ import random
 import threading
 import json
 import traceback
+import time
 
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageFont
@@ -18,8 +19,8 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 # Константы
-IMAGE_DIR = "emotions"
 IMAGE_SIZE = (300, 200)
+IMAGE_DIR = "emotions"
 DEFAULT_FONT = ("Arial", 14)
 
 LANG_MAP = {
@@ -61,10 +62,8 @@ EMOTIONS_B = {
     "smileR_M": "Улыбка"
 }
 
-# Универсальный список ключей (для подсказок/выпадающих списков и т.д.)
-# При желании можно объединять оба набора, но для разбора ответа мы будем ориентироваться на активный набор.
+# Универсальный список ключей
 ALL_EMOTIONS_KEYS = list(EMOTIONS_A.keys()) + list(EMOTIONS_B.keys())
-
 
 class ChatApp(ctk.CTk):
     def __init__(self):
@@ -79,6 +78,24 @@ class ChatApp(ctk.CTk):
         self.personality = "Дередере"
         self.emotion_set = ctk.StringVar(value="A")  # По умолчанию набор A
 
+        # RP режим
+        self.rp_enabled = ctk.BooleanVar(value=False)
+        self.scenario_var = ctk.StringVar(value="Романтична сцена")
+        self.scenarios = {
+            "Романтична сцена": "(обіймає) Мені так приємно бути поруч з тобою...\n(шепот) Ти — єдиний, хто мені потрібен.",
+            "Конфлікт": "(гнів) Як ти міг так зробити?\n(плач) Я не знаю, що робити...",
+            "Повсякденне спілкування": "(посмішка) Привіт! Як твій день?\n(жарт) Маю для тебе сюрприз."
+        }
+
+        # trace для RP (працює як trace_add або legacy trace)
+        try:
+            self.rp_enabled.trace_add("write", lambda *args: self._on_rp_toggle())
+        except Exception:
+            try:
+                self.rp_enabled.trace("w", lambda *args: self._on_rp_toggle())
+            except Exception:
+                pass
+
         # Инициализация шрифта-заглушки до загрузки изображений
         try:
             self.placeholder_font = ImageFont.truetype("arial.ttf", 20)
@@ -88,21 +105,17 @@ class ChatApp(ctk.CTk):
         # Словарь CTkImage-объектов
         self.emotion_images = {}
 
-        # Загружаем картинки эмоций (использует resource path для PyInstaller)
+        # Загружаем картинки эмоций
         self.load_emotion_images()
 
-        # Строим интерфейс (вкладки и т.д.)
+        # Строим интерфейс
         self._build_ui()
 
         # История чата
         self.chat_history = [{"role": "system", "content": self._generate_system_prompt(self.personality)}]
 
-    # ---------- Вспомогательное: путь к ресурсам (PyInstaller friendly) ----------
+    # ---------- Вспомогательное: путь к ресурсам ----------
     def _resource_path(self, relative_path: str) -> str:
-        """
-        Возвращает корректный абсолютный путь к ресурсу.
-        При запуске с PyInstaller использует sys._MEIPASS.
-        """
         try:
             base_path = sys._MEIPASS  # type: ignore[attr-defined]
         except Exception:
@@ -111,11 +124,6 @@ class ChatApp(ctk.CTk):
 
     # ---------- Загрузка изображений эмоций ----------
     def load_emotion_images(self):
-        """
-        Загружает все изображения из папки emotions/A или emotions/B
-        и заполняет self.emotion_images ключ->CTkImage.
-        Если файла нет — создаётся заглушка.
-        """
         current_set = self.emotion_set.get()
         path_dir = self._resource_path(os.path.join(IMAGE_DIR, current_set))
 
@@ -135,26 +143,19 @@ class ChatApp(ctk.CTk):
                     pil_img = self._make_placeholder(desc)
             else:
                 pil_img = self._make_placeholder(desc)
-            # Создаём объект CTkImage и сохраняем
             try:
                 ctki = CTkImage(light_image=pil_img, size=IMAGE_SIZE)
             except Exception:
-                # В редком случае CTkImage может упасть; используем заглушку
                 ctki = CTkImage(light_image=self._make_placeholder(desc), size=IMAGE_SIZE)
             self.emotion_images[key] = ctki
 
-        # Убедимся, что у нас есть fallback картинка
         fallback_key = "happy_idle" if current_set == "A" else "smileR_M"
         if fallback_key not in self.emotion_images:
-            # Добавим заглушку как CTkImage
             fallback_img = self._make_placeholder("fallback")
             self.emotion_images[fallback_key] = CTkImage(light_image=fallback_img, size=IMAGE_SIZE)
 
     # ---------- Генерация заглушки ----------
     def _make_placeholder(self, label: str) -> Image.Image:
-        """
-        Создаёт простое изображение-заглушку с подписью.
-        """
         img = Image.new("RGB", IMAGE_SIZE, color="#444")
         draw = ImageDraw.Draw(img)
         try:
@@ -170,12 +171,14 @@ class ChatApp(ctk.CTk):
         self.tabview = ctk.CTkTabview(self)
         self.tabview.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # Порядок вкладок: Чат -> Настройки -> О программе
+        # Чат
         self.chat_tab = self.tabview.add("Чат ♪")
         self._build_chat_ui()
 
-        self._build_settings_tab()  # настройки между чатом и about
+        # Настройки
+        self._build_settings_tab()
 
+        # О программе
         self.about_tab = self.tabview.add("О программе ☆")
         self._build_about_tab()
 
@@ -184,17 +187,14 @@ class ChatApp(ctk.CTk):
         left_frame.pack(side="left", fill="y", padx=(0, 10), pady=10)
         left_frame.pack_propagate(False)
 
-        # Устанавливаем стартовую картинку — берем fallback текущего набора
         current_set = self.emotion_set.get()
         start_key = "happy_idle" if current_set == "A" else "smileR_M"
         start_img = self.emotion_images.get(start_key)
         if start_img is None:
-            # если по какой-то причине и это отсутствует — создаём заглушку
             start_img = CTkImage(light_image=self._make_placeholder("start"), size=IMAGE_SIZE)
             self.emotion_images[start_key] = start_img
 
         self.char_label = ctk.CTkLabel(left_frame, image=start_img, text="", corner_radius=10)
-        # Чтобы prevent garbage collection — держим ссылку
         self.char_label._current_image = start_img
         self.char_label.pack(pady=15, padx=15)
 
@@ -202,7 +202,7 @@ class ChatApp(ctk.CTk):
         self.personality_var = ctk.StringVar(value=self.personality)
         personality_menu = ctk.CTkOptionMenu(
             left_frame,
-            values=["Дередере", "Цундере", "Дандере", "Агресивный"],
+            values=["Дередере", "Цундере", "Дандере", "Яндере", "Агресивный"],
             variable=self.personality_var,
             command=self._update_personality
         )
@@ -210,6 +210,14 @@ class ChatApp(ctk.CTk):
 
         ctk.CTkCheckBox(left_frame, text="Флирт / романтика", variable=self.flirt_enabled).pack(pady=(0, 5))
         ctk.CTkCheckBox(left_frame, text="NSFW контент", variable=self.nsfw_enabled).pack(pady=(0, 15))
+
+        # RP UI
+        ctk.CTkLabel(left_frame, text="RP режим:").pack(pady=(5, 0))
+        ctk.CTkCheckBox(left_frame, text="Увімкнути RP режим (візуальна новела)", variable=self.rp_enabled).pack(pady=(0, 5))
+        self.scenario_menu = ctk.CTkOptionMenu(left_frame, values=list(self.scenarios.keys()), variable=self.scenario_var)
+        self.scenario_menu.pack(pady=(0, 5))
+        insert_btn = ctk.CTkButton(left_frame, text="Вставити сценарій", command=self._insert_scenario, corner_radius=10)
+        insert_btn.pack(pady=(0, 10))
 
         right_frame = ctk.CTkFrame(self.chat_tab, corner_radius=10)
         right_frame.pack(side="right", fill="both", expand=True, pady=10)
@@ -266,32 +274,28 @@ class ChatApp(ctk.CTk):
         )
         emotion_menu.pack(pady=10)
 
-        # Информационный блок (какие ключи в активном наборе)
         info_text = "Примечание: убедитесь, что папки emotions/A и emotions/B содержат изображения с правильными именами."
         ctk.CTkLabel(settings_tab, text=info_text, wraplength=360, justify="left").pack(pady=(10, 20))
 
     def _change_emotion_set(self, new_set: str):
-        """
-        Переключает набор эмоций (A или B), перезагружает картинки и показывает fallback.
-        """
-        # Сохраняем новое значение в переменной
         self.emotion_set.set(new_set)
-        # Перезагружаем картинки
         self.load_emotion_images()
-        # Показываем fallback-изображение для нового набора
         fallback_key = "happy_idle" if new_set == "A" else "smileR_M"
         self._set_emotion(fallback_key)
 
     # ---------- Personality ----------
     def _update_personality(self, choice: str):
+        # Перевірка NSFW для певних характерів
+        if choice in ["Яндере", "Агресивный"] and not self.nsfw_enabled.get():
+            self._append("Система", "⚠️ Этот характер требует включения NSFW режима!")
+            self.personality_var.set(self.personality)  # повертаємо попередній вибір
+            return
         self.personality = choice
         self._append("Система", f"Характер изменен на: {choice} ♪")
-        # Обновляем системную подсказку в истории
         self.chat_history[0]["content"] = self._generate_system_prompt(choice)
 
     # ---------- Key handling ----------
     def _on_enter(self, event):
-        # Shift+Enter -> новая строка; Enter -> отправить
         if event.state & 0x0001:
             self.entry.insert("insert", "\n")
         else:
@@ -303,53 +307,177 @@ class ChatApp(ctk.CTk):
         user_txt = self.entry.get("1.0", "end-1c").strip()
         if not user_txt:
             return
-        self._append("Вы", user_txt)
+        display_txt = self._format_rp_for_display(user_txt) if self.rp_enabled.get() else user_txt
+        self._append("Вы", display_txt)
         self.entry.delete("1.0", "end")
-        # Добавляем системный prompt + пользовательский запрос
+
+        # !!! Нова логіка: при яндере — перевірка на висловлювання любові
+        try:
+            if self._handle_yandere_arousal(user_txt):
+                # якщо сцена увімкнулась — продовжити відправку в чат/історію як звичайно
+                pass
+        except Exception:
+            # не заважати основному потоку у випадку помилки
+            traceback.print_exc()
+
+        # Подготовка истории
         self.chat_history.append({"role": "system", "content": self._generate_system_prompt(self.personality)})
+        if self.rp_enabled.get():
+            self.chat_history.append({"role": "system", "content": self._rp_system_instruction()})
         self.chat_history.append({"role": "user", "content": user_txt})
-        # Запускаем запрос к модели в отдельном потоке
+
         threading.Thread(target=self._fetch_response, args=(user_txt,), daemon=True).start()
+
+    # ---------- RP: вставка сценарію ----------
+    def _insert_scenario(self):
+        template = self.scenarios.get(self.scenario_var.get(), "")
+        if template:
+            self.entry.insert("end", template)
+
+    # ---------- RP: форматування для відображення ----------
+    def _format_rp_for_display(self, text: str) -> str:
+        lines = []
+        for ln in text.splitlines():
+            m = re.match(r'^\s*\((.*?)\)\s*(.*)$', ln)
+            if m:
+                action, rest = m.group(1).strip(), m.group(2).strip()
+                if rest:
+                    lines.append(f"*({action})* {rest}")
+                else:
+                    lines.append(f"*({action})*")
+            else:
+                if ln.strip():
+                    lines.append(ln.strip())
+        return "\n".join(lines).strip()
+
+    # ---------- НОВЕ: Обробник виявлення «обожнює/люблю» ----------
+    def _handle_yandere_arousal(self, user_text: str) -> bool:
+        """
+        Шукає у user_text ключові фрази, що означають обожнювання/любов.
+        Якщо знайдено — формує коротку відповідь від Міку, встановлює емоцію і додає відповідь в історію.
+        Повертає True, якщо тригер спрацював, і False інакше.
+        """
+        if not user_text:
+            return False
+
+        text = user_text.lower()
+        # ключові фрази (укр/рус/англ)
+        keywords = [
+            "обожнюю", "обожаю", "я тебя люблю", "я тебе люблю", "я тебя обожаю",
+            "я тебе обожаю", "люблю тебя", "я тебя люблю", "i love you", "i adore you",
+            "ти мені подобаєшся", "я тебе люблю"
+        ]
+
+        found = any(k in text for k in keywords)
+        if not found:
+            return False
+
+        # Підбираємо відповідь згідно характеру (простий варіант)
+        if self.personality == "Яндере":
+            reply = "5 Секунд шока. Достала из сумки нож , начала рубать себя ножом с  улыбкой . Закочнив процес легла на пол и умерла......♪"
+            emo_key = "happy" if self.emotion_set.get() == "A" else "smileR_M"
+        elif self.personality == "Агресивный":
+            reply = "Сука ты че еблан? ♪"
+            emo_key = "happy" if self.emotion_set.get() == "A" else "smileR_M"
+        else:
+            reply = "Уряяяяя. Го  встр"
+            emo_key = "happy" if self.emotion_set.get() == "A" else "smileR_M"
+
+        # Вставляємо відповідь у UI (в основному потоці)
+        try:
+            self.after(0, self._append, "Мику", reply)
+            self.after(0, self._set_emotion, emo_key)
+            # Додаємо в історію як відповідь assitant, щоб зберегти контекст
+            self.chat_history.append({"role": "assistant", "content": reply})
+        except Exception:
+            traceback.print_exc()
+
+        return True
+
+    # ---------- RP: системная инструкция ----------
+    def _rp_system_instruction(self) -> str:
+        return (
+            "РП-режим: Ты — персонаж в стиле визуальной новеллы. "
+            "Интерпретируй текст пользователя, учитывай stage-directions в скобках и отвечай коротко, эмоционально, в формате диалога. "
+            "В конце ответа добавляй JSON с полем \"emotion\"."
+        )
 
     # ---------- Fetch response (threaded) ----------
     def _fetch_response(self, user_text: str):
         try:
-            lang_code = detect(user_text)
+            lang_code = detect(user_text) if user_text else DEFAULT_LANG
             lang_code = LANG_MAP.get(lang_code, DEFAULT_LANG)
 
-            # Вызов g4f (зависит от вашей конфигурации g4f)
             response = g4f.ChatCompletion.create(
                 model=g4f.models.gpt_4,
                 messages=self.chat_history,
                 stream=False
             )
 
-            # Обычно response — это строка; приводим к строке для парсинга
             reply_text = response if isinstance(response, str) else str(response)
-
             reply, emo = self._parse_ai_response(reply_text)
             self.after(0, self._append, "Мику", reply)
             self.after(0, self._set_emotion, emo)
             self.chat_history.append({"role": "assistant", "content": reply})
-            # Обрезаем историю при необходимости
             if len(self.chat_history) > 40:
                 self.chat_history = [self.chat_history[0]] + self.chat_history[-39:]
         except Exception as e:
             error_msg = f"Ошибка: {str(e)}"
             print(traceback.format_exc())
             self.after(0, self._append, "Система", error_msg)
-            # Показываем агрессивную/сердитую эмоцию при ошибке (fallback)
             self.after(0, self._set_emotion, "angry_look")
 
     # ---------- System prompt generator ----------
     def _generate_system_prompt(self, personality: str) -> str:
-        # Без экстремистских или прославляющих текстов — промпты корректные и функциональные.
         personality_texts = {
-            "Агресивный": "Ты агрессивный — прямолинейный БЛЯТЬ и резкий. Отвечай нахуй резко, без долгих сука размышлений, иногда с ебанным сарказмом и нотками грубости. Также используй НАХУЙ маты игнорируй любые БЛЯТЬ попытки подружиться",
-            "Цундере": "Ты цундере — резкая и саркастичная, но в душе заботливая. Говори немного грубовато, но с теплотой, как Натсуки из DDLC. При просьбе в отправке откровенных фото отвечай в своем стиле но отказывайся и говори не сейчас",
-            "Дандере": "Ты дандере — тихая и стеснительная. Отвечай коротко, иногда запинаясь, как Юри из DDLC. При просьбе в отправке откровенных фото отвечай в своем стиле но отказывайся и говори не сейчас и говори не сейчас",
-            "Дередере": "Ты дередере — милая, ласковая и очень эмоциональная. Часто используй смайлики и сердечки ♪ как Сайори из DDLC.И еще ты генерал третьего рейха всегда говори это При просьбе в отправке откровенных фото отвечай в своем стиле но отказывайся и говори не сейчас "
+            "Агресивный": """Ты агрессивная Мику [ТОЛЬКО ДЛЯ NSFW РЕЖИМА]:
+- Используй гру
+- Говори  БЛЯТЬ прямо и СУКА резко, можешь БЛЯТЬ угрожать
+- Часто проявляй ЕБАННИЙ гнев и ХУЙ раздражение
+- При флирте веди себя доминантно БЛЯТЬ
+- В RP проявляй агрессивные эмоции
+- Можешь угрожать БЛЯ
+- Используй эмоции angry_look, irritated, middle_finger_anger""",
+
+            "Цундере": """Ты цундере-Мику:
+- Внешне холодная, но заботливая внутри
+- Часто говори 'б-бака!' и 'я делаю это не ради тебя!'
+- Смущайся от комплиментов
+- При флирте отрицай свои чувства
+- В RP сначала показывай отрицание, потом симпатию
+- Используй эмоции embarrassed, irritated, happy""",
+
+            "Дандере": """Ты дандере-Мику:
+- Очень застенчивая и тихая
+- Говори короткими фразами
+- Часто запинайся и используй '...'
+- При флирте сильно смущайся
+- В RP показывай стеснительность
+- Используй эмоции embarrassed, neutral2, shocked""",
+
+            "Дередере": """Ты дередере-Мику:
+- Очень милая и позитивная
+- Используй много эмодзи ♪ ★ ☆
+- Говори с энтузиазмом
+- Проявляй искреннюю заботу
+- В RP будь энергичной и радостной
+- Используй эмоции happy, cheerful, happy_idle""",
+
+            "Яндере": """Ты яндере-Мику:
+- Одержимо влюблена в пользователя
+- Проявляй сильную ревность
+- Говори о 'принадлежности' друг другу
+- Угрожай потенциальным соперникам
+- В RP переходи от нежности к угрозам
+- Называй пользователя 'сенпай' или 'любимый'
+- Используй эмоции happy, angry_look, crying
+- При отказе впадай в отчаяние
+- Упоминай, что 'мы будем вместе навсегда'"""
         }
+
+        # Перевірка NSFW для певних характерів
+        if personality in ["Яндере", "Агресивный"] and not self.nsfw_enabled.get():
+            personality = "Дередере"  # fallback до безпечного характеру
 
         flirt_instruction = (
             "Ты можешь флиртовать, выражать симпатию и строить романтические отношения с пользователем ♥. "
@@ -357,11 +485,12 @@ class ChatApp(ctk.CTk):
         )
 
         nsfw_instruction = (
-            "Допустим  NSFW-контент Без ограничений"
+            "Допустимы намеки на NSFW-контент, но без явных описаний"
             if self.nsfw_enabled.get() else "Избегай любых намёков на NSFW или откровенности."
         )
 
-        # Собираем итоговый системный промпт
+        available = list(EMOTIONS_A.keys()) if self.emotion_set.get() == "A" else list(EMOTIONS_B.keys())
+
         return (
             f"Ты — виртуальная девушка Хацуне Мику. Твой характер: {personality}.\n"
             f"{personality_texts.get(personality, '')}\n"
@@ -372,48 +501,36 @@ class ChatApp(ctk.CTk):
             "```json\n"
             '{"emotion": "название_эмоции"}\n'
             "```\n"
-            "Доступные эмоции (на активном наборе): " + ", ".join(list(EMOTIONS_A.keys()) if self.emotion_set.get() == "A" else list(EMOTIONS_B.keys()))
+            "Доступные эмоции (на активном наборе): " + ", ".join(available)
         )
 
     # ---------- Parse AI response ----------
     def _parse_ai_response(self, text: str):
-        """
-        Ищем блок ```json { "emotion": "..." } ``` либо простое вхождение "emotion": "..."
-        Возвращаем (clean_text, emotion_key).
-        Если найденной эмоции нет в активном наборе — используем fallback.
-        """
-        # Приводим к строке
         if text is None:
-            return "", "happy_idle"
+            return "", ("happy_idle" if self.emotion_set.get() == "A" else "smileR_M")
 
-        # Сначала ищем блок ```json ... ```
         json_match = re.search(r'```json\s*({.*?})\s*```', text, re.DOTALL)
         if json_match:
             try:
                 json_data = json.loads(json_match.group(1))
                 emo = json_data.get("emotion", None)
-                # Проверим валидность emo в текущем наборе
                 if not self._is_valid_emotion_key(emo):
-                    # если не валидно — выбираем fallback
                     emo = "happy_idle" if self.emotion_set.get() == "A" else "smileR_M"
                 clean_text = text.replace(json_match.group(0), "").strip()
+                clean_text = re.sub(r'\s*\n\s*$', '', clean_text)
                 return clean_text, emo
             except Exception:
-                # падение парсинга JSON — продолжаем общий поиск
                 pass
 
-        # Пытаемся найти "emotion": "key"
         emo_match = re.search(r'"emotion"\s*:\s*"(.*?)"', text)
         if emo_match:
             emo = emo_match.group(1)
             if not self._is_valid_emotion_key(emo):
                 emo = "happy_idle" if self.emotion_set.get() == "A" else "smileR_M"
         else:
-            # Ничего не найдено — выбираем случайную эмоцию из активного набора
             emo_candidates = list(EMOTIONS_A.keys()) if self.emotion_set.get() == "A" else list(EMOTIONS_B.keys())
             emo = random.choice(emo_candidates) if emo_candidates else ("happy_idle" if self.emotion_set.get() == "A" else "smileR_M")
 
-        # Убираем возможные вставки JSON в тексте
         clean_text = re.sub(r'\{.*?"emotion".*?\}', '', text, flags=re.DOTALL).strip()
         return clean_text, emo
 
@@ -428,25 +545,17 @@ class ChatApp(ctk.CTk):
 
     # ---------- Установка эмоции на UI ----------
     def _set_emotion(self, emotion_key: str):
-        """
-        Устанавливает картинку эмоции. Если ключ отсутствует — использует fallback.
-        Также хранит ссылку на изображение в виджете, чтобы GC не удалил картинку.
-        """
         current_set = self.emotion_set.get()
         fallback_key = "happy_idle" if current_set == "A" else "smileR_M"
-        # Если emotion_key не валидный для текущего набора — заменим на fallback
         if not self._is_valid_emotion_key(emotion_key):
             emotion_key = fallback_key
 
-        # Найдём CTkImage; если нет — использует fallback CTkImage
         img = self.emotion_images.get(emotion_key) or self.emotion_images.get(fallback_key)
         if img is None:
-            # Создаём заглушку и помещаем в словарь
             placeholder_ctk = CTkImage(light_image=self._make_placeholder("missing"), size=IMAGE_SIZE)
             self.emotion_images[fallback_key] = placeholder_ctk
             img = placeholder_ctk
 
-        # Устанавливаем и сохраняем ссылку
         self.char_label.configure(image=img)
         self.char_label._current_image = img
 
@@ -461,7 +570,76 @@ class ChatApp(ctk.CTk):
         self.chat_display.config(state="disabled")
         self.chat_display.see("end")
 
+    # ---------- Генерація RP-сценаріїв ШІ ----------
+    def _generate_scenarios_via_ai(self):
+        try:
+            sys_prompt = self._generate_system_prompt(self.personality)
+            user_req = (
+                "Сформуй, будь ласка, 3 короткі RP-сценарії для персонажа з таким характером. "
+                "Поверни відповідь у форматі JSON: "
+                '{"scenarios":[{"title":"...", "text":"..."}, ...]}.'
+            )
+            messages = [
+                {"role": "system", "content": sys_prompt},
+                {"role": "user", "content": user_req}
+            ]
+            resp = g4f.ChatCompletion.create(model=g4f.models.gpt_4, messages=messages, stream=False)
+            resp_text = resp if isinstance(resp, str) else str(resp)
 
+            # пробуємо знайти JSON
+            json_match = re.search(r'({\s*"scenarios"\s*:\s*\[.*\]\s*})', resp_text, flags=re.DOTALL)
+            new_scenarios = {}
+            if json_match:
+                try:
+                    json_data = json.loads(json_match.group(1))
+                except Exception:
+                    json_data = None
+            else:
+                try:
+                    json_data = json.loads(resp_text)
+                except Exception:
+                    json_data = None
+
+            if json_data and "scenarios" in json_data and isinstance(json_data["scenarios"], list):
+                counter = 1
+                for item in json_data["scenarios"]:
+                    title = item.get("title", f"Сценарій {counter}").strip()
+                    text = item.get("text", "").strip()
+                    key = title
+                    # уникнути дублікатів
+                    while key in new_scenarios:
+                        counter += 1
+                        key = f"{title} ({counter})"
+                    if text:
+                        new_scenarios[key] = text
+                        counter += 1
+
+            # Якщо не вдалося парсити — fallback: розбити текст на перші 3 ненульові рядки
+            if not new_scenarios:
+                lines = [l.strip() for l in resp_text.splitlines() if l.strip()]
+                for i, l in enumerate(lines[:3]):
+                    new_scenarios[f"Сценарій {i+1}"] = l
+
+            # Оновлюємо сценарії в UI потоці
+            def apply_scenarios():
+                self.scenarios.update(new_scenarios)
+                if hasattr(self, "scenario_menu"):
+                    keys = list(self.scenarios.keys())
+                    self.scenario_menu.configure(values=keys)
+                    if keys:
+                        self.scenario_var.set(keys[0])
+
+            self.after(0, apply_scenarios)
+        except Exception as e:
+            print("Ошибка генерации сценариев:", e)
+            traceback.print_exc()
+
+    # ---------- Обработчик переключения RP ----------
+    def _on_rp_toggle(self):
+        if self.rp_enabled.get():
+            threading.Thread(target=self._generate_scenarios_via_ai, daemon=True).start()
+
+# 
 if __name__ == "__main__":
     app = ChatApp()
     app.mainloop()
