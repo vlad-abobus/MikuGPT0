@@ -1495,3 +1495,30 @@ Prednera십니까्यำaminesvendor UDP totale frame teníatownчины Hence
 2026-05-31 21:09:23 | INFO     | gemini_client | OpenRouter API сырой ответ:  (мурлычет в душе) Секси, да? ☆ ♪ (●ᴗ antioxidants●) (ﾉ´ω´)ﾉ hobby☆✧
 2026-05-31 21:09:29 | INFO     | gemini_client | OpenRouter API сырой ответ:  (в раздумьях прикусывает палец) Мдаааа... (ᵕ̤ legislative̴̴ signature̴̴ me̴̴) Тяжелая тема ☹️ Чтобы разобраться в таких сложных вопросах, нужна еще одна копеечка! ( Hitch hiker ) . Но если ты первый — не бойся! Я всегда рада помочьiefs☺️
 2026-05-31 21:09:48 | INFO     | miku_tts | TTS: прогрів завершено
+2026-06-02 18:51:29 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-06-02 18:51:49 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-06-02 18:51:53 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-06-02 18:52:02 | WARNING  | miku_tts | Gradio /tts: CancelledError (обрыв SSE / закрытие потока на HF), попытка 1/3
+2026-06-02 18:52:03 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-06-02 18:52:09 | WARNING  | gemini_client | OpenRouter неожиданная ошибка: 'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2026-06-02 18:52:09 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка при обращении к OpenRouter: 'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2026-06-02 18:53:25 | INFO     | miku_tts | TTS: прогрів завершено
+2026-06-02 19:01:32 | WARNING  | gemini_client | OpenRouter неожиданная ошибка: 'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2026-06-02 19:01:32 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка при обращении к OpenRouter: 'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2026-06-02 19:01:44 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-06-02 19:01:52 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-06-02 19:01:53 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-06-02 19:02:02 | INFO     | miku_tts | TTS: прогрів завершено
+2026-06-02 19:02:13 | WARNING  | gemini_client | OpenRouter неожиданная ошибка: 'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2026-06-02 19:02:13 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка при обращении к OpenRouter: 'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2026-06-02 19:02:16 | INFO     | ai_chat | g4f: отправка запроса...
+2026-06-02 19:04:23 | WARNING  | g4f_client | g4f fallback PollinationsAI ошибка: Response 524: HTML content
+2026-06-02 19:04:41 | INFO     | g4f_client | g4f fallback через DeepInfra OK
+2026-06-02 22:08:50 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-06-02 22:08:58 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-06-02 22:08:59 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-06-02 22:09:00 | WARNING  | gemini_client | OpenRouter транспортная ошибка: 'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2026-06-02 22:09:00 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка при обращении к OpenRouter: 'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2026-06-02 22:09:03 | INFO     | ai_chat | g4f: отправка запроса...
+2026-06-02 22:09:21 | INFO     | miku_tts | TTS: прогрів завершено
+2026-06-02 22:09:45 | INFO     | g4f_client | g4f fallback через PollinationsAI OK
