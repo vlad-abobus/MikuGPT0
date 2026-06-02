@@ -7,7 +7,7 @@
   "smart_memory_every_n": 6,
   "user_pronouns": "он/его",
   "typing_animation": true,
-  "openrouter_api_key": "REDACTED_OPENROUTER_KEY",
+  "openrouter_api_key": "коч_братан",
   "gemini_model": "thedrummer/unslopnemo-12b",
   "llm_provider": "openrouter",
   "ai_temperature": 0.85,
