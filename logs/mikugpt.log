@@ -1,0 +1,1497 @@
+2026-04-12 15:08:56 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 15:09:11 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS
+2026-04-12 15:09:22 | WARNING  | __main__ | Озвучка Мику (Hugging Face) не удалась
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1037, in worker
+    speak_text_as_miku(payload)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 125, in speak_text_as_miku
+    wav_path = generate_miku_voice(text)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 100, in generate_miku_voice
+    path = _normalize_predict_result(result)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 65, in _normalize_predict_result
+    raise RuntimeError("Неожиданный ответ спейса: нет пути к аудио")
+RuntimeError: Неожиданный ответ спейса: нет пути к аудио
+2026-04-12 15:42:36 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 15:42:51 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS
+2026-04-12 15:43:36 | WARNING  | miku_tts | Gradio /tts predict не выполнен
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 110, in generate_miku_voice
+    result = client.predict(
+        DEFAULT_MODEL,
+    ...<9 lines>...
+        api_name=API_NAME,
+    )
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 499, in predict
+    ).result()
+      ~~~~~~^^
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 1484, in result
+    return super().result(timeout=timeout)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 1080, in _inner
+    predictions = _predict(*data, **kwargs)
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 1188, in _predict
+    result = self._sse_fn_v1plus(helper, event_id, self.protocol)
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 1388, in _sse_fn_v1plus
+    return utils.get_pred_from_sse_v1plus(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        helper,
+        ^^^^^^^
+    ...<6 lines>...
+        self.client.executor,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\utils.py", line 395, in get_pred_from_sse_v1plus
+    raise exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\utils.py", line 511, in stream_sse_v1plus
+    raise concurrent.futures.CancelledError()
+concurrent.futures._base.CancelledError
+2026-04-12 15:43:36 | WARNING  | __main__ | Озвучка Мику (Hugging Face) не удалась
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 110, in generate_miku_voice
+    result = client.predict(
+        DEFAULT_MODEL,
+    ...<9 lines>...
+        api_name=API_NAME,
+    )
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 499, in predict
+    ).result()
+      ~~~~~~^^
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 1484, in result
+    return super().result(timeout=timeout)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 1080, in _inner
+    predictions = _predict(*data, **kwargs)
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 1188, in _predict
+    result = self._sse_fn_v1plus(helper, event_id, self.protocol)
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\client.py", line 1388, in _sse_fn_v1plus
+    return utils.get_pred_from_sse_v1plus(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        helper,
+        ^^^^^^^
+    ...<6 lines>...
+        self.client.executor,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\utils.py", line 395, in get_pred_from_sse_v1plus
+    raise exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\gradio_client\utils.py", line 511, in stream_sse_v1plus
+    raise concurrent.futures.CancelledError()
+concurrent.futures._base.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1037, in worker
+    speak_text_as_miku(payload)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 154, in speak_text_as_miku
+    wav_path = generate_miku_voice(text)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 125, in generate_miku_voice
+    raise RuntimeError(
+        "Miku TTS недоступен (спейс на HF спит, занят или перегружен). Повторите позже."
+    ) from e
+RuntimeError: Miku TTS недоступен (спейс на HF спит, занят или перегружен). Повторите позже.
+2026-04-12 15:47:02 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 15:47:16 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 15:52:09 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 15:52:24 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 15:57:33 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 15:57:38 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-04-12 15:57:38 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 15:57:58 | INFO     | miku_tts | TTS: прогрів завершено
+2026-04-12 16:03:04 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 16:03:09 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-04-12 16:03:10 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 16:03:25 | INFO     | miku_tts | TTS: прогрів завершено
+2026-04-12 16:43:15 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 16:43:20 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-04-12 16:43:21 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 16:43:39 | INFO     | miku_tts | TTS: прогрів завершено
+2026-04-12 16:53:42 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 16:53:48 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-04-12 16:53:49 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 16:54:06 | INFO     | miku_tts | TTS: прогрів завершено
+2026-04-12 16:56:15 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 16:56:19 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-04-12 16:56:20 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 16:57:51 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 16:57:56 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-04-12 16:57:56 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 16:58:12 | INFO     | miku_tts | TTS: прогрів завершено
+2026-04-12 17:57:33 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-12 17:57:38 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-04-12 17:57:39 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-12 17:57:58 | INFO     | miku_tts | TTS: прогрів завершено
+2026-04-15 20:46:40 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-04-15 20:46:46 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-04-15 20:46:48 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-04-15 20:47:09 | INFO     | miku_tts | TTS: прогрів завершено
+2026-04-15 20:47:56 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 99, in chat_completion
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1334, in _fetch_response
+    reply_text = chat_completion(api_messages)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 105, in chat_completion
+    raise RuntimeError(f"Сетевая ошибка при обращении к OpenRouter: {e}") from e
+RuntimeError: Сетевая ошибка при обращении к OpenRouter: 401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions
+2026-04-15 20:48:07 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 99, in chat_completion
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\vladi\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1334, in _fetch_response
+    reply_text = chat_completion(api_messages)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 105, in chat_completion
+    raise RuntimeError(f"Сетевая ошибка при обращении к OpenRouter: {e}") from e
+RuntimeError: Сетевая ошибка при обращении к OpenRouter: 401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-15 21:05:05 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:05:20 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 108, in chat_completion
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\vladi\AppData\Roaming\Python\Python314\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1339, in _fetch_response
+    reply_text = chat_completion(
+        api_messages,
+        model=model_for_personality(self.personality),
+    )
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 114, in chat_completion
+    raise RuntimeError(f"Сетевая ошибка при обращении к OpenRouter: {e}") from e
+RuntimeError: Сетевая ошибка при обращении к OpenRouter: 401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-15 21:10:36 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:11:21 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:13:22 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:14:23 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1417, in _fetch_response
+    reply_text = chat_completion(
+        api_messages,
+        model=model_for_personality(self.personality),
+    )
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 109, in chat_completion
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: Неверный или просроченный ключ OpenRouter (401). Укажите актуальный ключ в «Настройки» или в config.json (поле «api»).
+2026-05-15 21:14:38 | WARNING  | __main__ | Озвучка Мику (Hugging Face) не удалась
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1636, in worker
+    from miku_tts import speak_text_as_miku
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 12, in <module>
+    import httpx
+ModuleNotFoundError: No module named 'httpx'
+2026-05-15 21:14:39 | WARNING  | __main__ | Озвучка Мику (Hugging Face) не удалась
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1636, in worker
+    from miku_tts import speak_text_as_miku
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 12, in <module>
+    import httpx
+ModuleNotFoundError: No module named 'httpx'
+2026-05-15 21:20:53 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:21:01 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:21:04 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 113, in chat_completion
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\vladi\AppData\Roaming\Python\Python314\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://openrouter.ai/api/v1/chat/completions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1422, in _fetch_response
+    reply_text = chat_completion(
+        api_messages,
+        model=model_for_personality(self.personality),
+    )
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 119, in chat_completion
+    raise RuntimeError(f"Сетевая ошибка при обращении к OpenRouter: {e}") from e
+RuntimeError: Сетевая ошибка при обращении к OpenRouter: 404 Client Error: Not Found for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-15 21:22:48 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:22:55 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:23:11 | WARNING  | __main__ | Озвучка Мику: не установлена зависимость: No module named 'gradio_client'
+2026-05-15 21:23:24 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:23:31 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:24:58 | WARNING  | __main__ | Озвучка Мику: не установлена зависимость: No module named 'gradio_client'
+2026-05-15 21:29:18 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:29:26 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:29:27 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-15 21:29:55 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-15 21:32:33 | INFO     | __main__ | OpenRouter: пустой ответ модели, подставляем заглушку
+2026-05-15 21:32:45 | INFO     | __main__ | OpenRouter: пустой ответ модели, подставляем заглушку
+2026-05-15 21:35:45 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:36:11 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:36:12 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-15 21:36:42 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:36:49 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:36:49 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-15 21:37:15 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-15 21:38:33 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:38:43 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:38:44 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-15 21:38:50 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 127, in chat_completion
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\vladi\AppData\Roaming\Python\Python314\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1528, in _fetch_response
+    reply, emo = self._fetch_miku_reply(api_messages, model)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 232, in _fetch_miku_reply
+    raw = chat_completion(api_messages, model=model)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 133, in chat_completion
+    raise RuntimeError(f"Сетевая ошибка при обращении к OpenRouter: {e}") from e
+RuntimeError: Сетевая ошибка при обращении к OpenRouter: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-15 21:39:16 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:39:24 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:39:24 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-15 21:39:28 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 127, in chat_completion
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\vladi\AppData\Roaming\Python\Python314\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1528, in _fetch_response
+    reply, emo = self._fetch_miku_reply(api_messages, model)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 232, in _fetch_miku_reply
+    raw = chat_completion(api_messages, model=model)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 133, in chat_completion
+    raise RuntimeError(f"Сетевая ошибка при обращении к OpenRouter: {e}") from e
+RuntimeError: Сетевая ошибка при обращении к OpenRouter: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-15 21:39:50 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-15 21:40:10 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-15 21:40:17 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-15 21:40:18 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-15 21:40:20 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 127, in chat_completion
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\vladi\AppData\Roaming\Python\Python314\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1528, in _fetch_response
+    reply, emo = self._fetch_miku_reply(api_messages, model)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 232, in _fetch_miku_reply
+    raw = chat_completion(api_messages, model=model)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 133, in chat_completion
+    raise RuntimeError(f"Сетевая ошибка при обращении к OpenRouter: {e}") from e
+RuntimeError: Сетевая ошибка при обращении к OpenRouter: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-16 10:40:23 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 10:40:32 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 10:40:33 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 10:40:55 | WARNING  | __main__ | OpenRouter chat_completion завершился ошибкой
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 127, in chat_completion
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\vladi\AppData\Roaming\Python\Python314\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1528, in _fetch_response
+    reply, emo = self._fetch_miku_reply(api_messages, model)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 232, in _fetch_miku_reply
+    raw = chat_completion(api_messages, model=model)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 133, in chat_completion
+    raise RuntimeError(f"Сетевая ошибка при обращении к OpenRouter: {e}") from e
+RuntimeError: Сетевая ошибка при обращении к OpenRouter: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-16 10:41:16 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 10:55:27 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 10:55:35 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 10:55:36 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 10:55:39 | INFO     | openrouter_client | OpenRouter 429 (модель meta-llama/llama-3.3-70b-instruct:free), повтор через 23.0 с (2/4)
+2026-05-16 10:56:01 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 10:56:03 | INFO     | openrouter_client | OpenRouter 429 (модель meta-llama/llama-3.3-70b-instruct:free), повтор через 28.0 с (3/4)
+2026-05-16 10:56:33 | INFO     | openrouter_client | OpenRouter 429 (модель meta-llama/llama-3.3-70b-instruct:free), повтор через 29.0 с (4/4)
+2026-05-16 10:57:03 | INFO     | __main__ | OpenRouter 429 на meta-llama/llama-3.3-70b-instruct:free, пробуем запасную модель
+2026-05-16 10:57:13 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 10:57:19 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 10:57:20 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 10:57:23 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 6 с (2/2)
+2026-05-16 10:57:31 | INFO     | __main__ | OpenRouter 429 на meta-llama/llama-3.3-70b-instruct:free, пробуем запасную модель
+2026-05-16 10:57:45 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 10:59:25 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 10:59:38 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 10:59:40 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 10:59:43 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 6 с (2/2)
+2026-05-16 10:59:51 | INFO     | __main__ | OpenRouter 429 на meta-llama/llama-3.3-70b-instruct:free, пробуем запасную модель
+2026-05-16 11:00:08 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:01:43 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:01:50 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:01:51 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:02:19 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:06:04 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:06:15 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:06:18 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:06:25 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 6 с (2/2)
+2026-05-16 11:06:32 | INFO     | __main__ | OpenRouter 429 на meta-llama/llama-3.3-70b-instruct:free, пробуем запасную модель
+2026-05-16 11:06:35 | INFO     | openrouter_client | OpenRouter 429 (deepseek-v4-flash:free), пауза 2 с (2/2)
+2026-05-16 11:07:00 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:07:48 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:07:55 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:07:56 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:07:59 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 5 с (2/2)
+2026-05-16 11:08:05 | INFO     | __main__ | OpenRouter 429 на meta-llama/llama-3.3-70b-instruct:free, пробуем запасную модель
+2026-05-16 11:08:08 | INFO     | openrouter_client | OpenRouter 429 (deepseek-v4-flash:free), пауза 2 с (2/2)
+2026-05-16 11:08:23 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:09:02 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:09:08 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:09:09 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:09:18 | INFO     | __main__ | Gemini: неверный ключ
+2026-05-16 11:09:38 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:09:48 | INFO     | __main__ | Gemini: неверный ключ
+2026-05-16 11:11:26 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:11:37 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:11:38 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:11:42 | INFO     | __main__ | Gemini: неверный ключ
+2026-05-16 11:24:11 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:24:21 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:24:22 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:24:24 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 6 с (2/2)
+2026-05-16 11:24:32 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free, следующая модель в цепочке
+2026-05-16 11:25:02 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:26:38 | INFO     | llm_client | LLM openrouter: RuntimeError — пробуем gemini
+2026-05-16 11:26:40 | WARNING  | gemini_client | Gemini auth error (403): permission denied: consumer 'api_key:aizasydnytnwr2zjhso6mahlggjsl1ituhsvqbs' has been suspended.
+2026-05-16 11:26:40 | INFO     | __main__ | Gemini: неверный ключ
+2026-05-16 11:26:55 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 6 с (2/2)
+2026-05-16 11:27:03 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free, следующая модель в цепочке
+2026-05-16 11:28:04 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 4 с (2/2)
+2026-05-16 11:28:10 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free, следующая модель в цепочке
+2026-05-16 11:30:12 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:30:19 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:30:20 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:30:41 | WARNING  | gemini_client | Gemini auth error (403): permission denied: consumer 'api_key:aizasydnytnwr2zjhso6mahlggjsl1ituhsvqbs' has been suspended.
+2026-05-16 11:30:41 | INFO     | llm_client | LLM gemini: ValueError — пробуем openrouter
+2026-05-16 11:30:43 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 6 с (2/2)
+2026-05-16 11:30:51 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free, следующая модель в цепочке
+2026-05-16 11:30:52 | INFO     | openrouter_client | OpenRouter 429 (deepseek-v4-flash:free), пауза 2 с (2/2)
+2026-05-16 11:30:56 | INFO     | openrouter_client | OpenRouter 429 на deepseek-v4-flash:free, следующая модель в цепочке
+2026-05-16 11:30:58 | INFO     | __main__ | OpenRouter: модель не найдена — Модель «qwen/qwen-2.5-7b-instruct:free» не найдена на OpenRouter (404). No endpoints found for qwen/qwen-2.5-7b-instruct:free. Выберите другой характер или обновите приложение.
+2026-05-16 11:31:05 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:33:27 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:33:33 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:33:34 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:33:37 | WARNING  | gemini_client | Gemini auth error (403): permission denied: consumer 'api_key:aizasydnytnwr2zjhso6mahlggjsl1ituhsvqbs' has been suspended.
+2026-05-16 11:33:37 | INFO     | __main__ | Gemini: неверный ключ
+2026-05-16 11:34:02 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:34:03 | INFO     | openrouter_client | OpenRouter 429 (llama-3.3-70b-instruct:free), пауза 6 с (2/2)
+2026-05-16 11:34:11 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free, следующая модель в цепочке
+2026-05-16 11:34:12 | INFO     | openrouter_client | OpenRouter 429 (deepseek-v4-flash:free), пауза 2 с (2/2)
+2026-05-16 11:34:16 | INFO     | openrouter_client | OpenRouter 429 на deepseek-v4-flash:free, следующая модель в цепочке
+2026-05-16 11:34:17 | INFO     | __main__ | OpenRouter: модель не найдена — Модель «qwen/qwen-2.5-7b-instruct:free» не найдена на OpenRouter (404). No endpoints found for qwen/qwen-2.5-7b-instruct:free. Выберите другой характер или обновите приложение.
+2026-05-16 11:50:26 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:50:35 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:50:36 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:51:05 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-16 11:51:28 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:52:48 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:53:01 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:53:01 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:53:08 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-16 11:53:34 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:54:09 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:54:17 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:54:17 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:54:37 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-16 11:54:43 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 11:55:00 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-16 11:59:26 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 11:59:33 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 11:59:34 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 11:59:38 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-16 12:08:06 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 12:08:11 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 12:08:12 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 12:08:17 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-16 12:08:47 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-16 12:10:39 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-16 12:12:21 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-16 12:12:27 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-16 12:12:27 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-16 12:12:54 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 18:32:26 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 18:32:39 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 18:32:40 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 18:32:44 | INFO     | openrouter_client | OpenRouter 404 на deepseek/deepseek-chat:free → следующая модель
+2026-05-28 18:32:45 | INFO     | openrouter_client | OpenRouter 404 на deepseek/deepseek-r1:free → следующая модель
+2026-05-28 18:32:45 | WARNING  | __main__ | ИИ: ошибка провайдера — Модель «deepseek/deepseek-r1:free» не найдена на OpenRouter (404). No endpoints found for deepseek/deepseek-r1:free.
+2026-05-28 18:32:58 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 18:33:31 | WARNING  | miku_tts | Gradio /tts: CancelledError (обрыв SSE / закрытие потока на HF), попытка 1/3
+2026-05-28 18:33:33 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 18:37:39 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 18:37:50 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 18:37:50 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 18:37:53 | INFO     | openrouter_client | OpenRouter 404 на meta-llama/llama-3-8b-instruct:free → следующая модель
+2026-05-28 18:37:53 | INFO     | openrouter_client | OpenRouter 404 на deepseek/deepseek-chat:free → следующая модель
+2026-05-28 18:37:53 | WARNING  | __main__ | ИИ: ошибка провайдера — Модель «deepseek/deepseek-chat:free» не найдена на OpenRouter (404). No endpoints found for deepseek/deepseek-chat:free.
+2026-05-28 18:38:04 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 18:38:18 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 18:38:25 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 18:38:26 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 18:38:27 | INFO     | openrouter_client | OpenRouter 404 на meta-llama/llama-3-8b-instruct:free → следующая модель
+2026-05-28 18:38:27 | INFO     | openrouter_client | OpenRouter 404 на deepseek/deepseek-chat:free → следующая модель
+2026-05-28 18:38:27 | WARNING  | __main__ | ИИ: ошибка провайдера — Модель «deepseek/deepseek-chat:free» не найдена на OpenRouter (404). No endpoints found for deepseek/deepseek-chat:free.
+2026-05-28 18:38:34 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 18:53:27 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 18:53:34 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 18:53:35 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 18:53:36 | WARNING  | miku_tts | Gradio /tts: неожиданная ошибка submit/result
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 162, in generate_miku_voice
+    client = _get_client()
+             ^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 63, in _get_client
+    _client = Client(
+              ^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\gradio_client\client.py", line 138, in __init__
+    _src = self._space_name_to_src(src)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\gradio_client\client.py", line 911, in _space_name_to_src
+    return huggingface_hub.space_info(space, token=self.token).host  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\huggingface_hub\utils\_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\huggingface_hub\hf_api.py", line 3492, in space_info
+    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 1053, in get
+    return self.request(
+           ^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11001] getaddrinfo failed
+2026-05-28 18:53:37 | WARNING  | __main__ | ИИ: ошибка провайдера — Сетевая ошибка при обращении к OpenRouter: HTTPSConnectionPool(host='openrouter.ai', port=443): Max retries exceeded with url: /api/v1/chat/completions (Caused by NameResolutionError("HTTPSConnection(host='openrouter.ai', port=443): Failed to resolve 'openrouter.ai' ([Errno 11001] getaddrinfo failed)"))
+2026-05-28 19:10:12 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:10:33 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:10:34 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:10:39 | INFO     | openrouter_client | OpenRouter 404 на meta-llama/llama-3.1-8b-instruct:free → следующая модель
+2026-05-28 19:10:39 | INFO     | openrouter_client | OpenRouter 404 на deepseek/deepseek-v3.2:free → следующая модель
+2026-05-28 19:10:39 | WARNING  | __main__ | ИИ: ошибка провайдера — Модель «deepseek/deepseek-v3.2:free» не найдена на OpenRouter (404). No endpoints found for deepseek/deepseek-v3.2:free.
+2026-05-28 19:10:45 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:18:45 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:19:36 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:19:37 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:19:41 | INFO     | openrouter_client | OpenRouter 404 на meta-llama/llama-3.1-8b-instruct:free → следующая модель
+2026-05-28 19:19:42 | WARNING  | __main__ | ИИ: ошибка провайдера — Сетевая ошибка при обращении к OpenRouter: 400 Client Error: Bad Request for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-28 19:19:46 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:20:02 | WARNING  | gemini_client | Gemini ошибка 400: api key expired. please renew the api key.
+2026-05-28 19:20:02 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка Gemini (400): api key expired. please renew the api key.
+2026-05-28 19:21:12 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:21:19 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:21:19 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:21:28 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:21:47 | WARNING  | gemini_client | Gemini auth (403): permission denied: consumer 'api_key:aq.ab8rn6ivtyctb0xy-admajxtnbrztqtzt0bg9usip6jxez3-5q' has been suspended.
+2026-05-28 19:21:47 | INFO     | __main__ | ИИ: ошибка ключа — Ключ Gemini заблокирован или неверный. Создайте новый на aistudio.google.com/apikey или переключитесь на OpenRouter в настройках.
+2026-05-28 19:23:44 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:23:51 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:23:51 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:23:55 | INFO     | __main__ | ИИ: лимит запросов
+2026-05-28 19:24:00 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:25:22 | INFO     | __main__ | ИИ: лимит запросов
+2026-05-28 19:26:19 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:26:32 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:26:33 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:26:35 | INFO     | __main__ | ИИ: лимит запросов
+2026-05-28 19:26:41 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:26:52 | INFO     | openrouter_client | OpenRouter 404 на meta-llama/llama-3.1-8b-instruct:free → следующая модель
+2026-05-28 19:26:53 | WARNING  | __main__ | ИИ: ошибка провайдера — Сетевая ошибка при обращении к OpenRouter: 400 Client Error: Bad Request for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-28 19:28:18 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:28:25 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:28:26 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:28:27 | INFO     | openrouter_client | OpenRouter 404 на google/gemini-2.5-flash:free → следующая модель
+2026-05-28 19:28:28 | WARNING  | __main__ | ИИ: ошибка провайдера — Сетевая ошибка при обращении к OpenRouter: 400 Client Error: Bad Request for url: https://openrouter.ai/api/v1/chat/completions
+2026-05-28 19:28:34 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:33:06 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:33:14 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:33:15 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:33:24 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:33:41 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:34:41 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:36:15 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:41:04 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:41:11 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:41:12 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:41:21 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:41:21 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:41:36 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:41:46 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:43:32 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:43:39 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:43:40 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:43:48 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:43:57 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:44:14 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:52:59 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:54:26 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:54:27 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:54:34 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:54:36 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:54:51 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:55:58 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:57:20 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:57:38 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:58:04 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 19:58:10 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 19:58:11 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 19:58:14 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 19:58:20 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 19:59:09 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:00:34 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:01:43 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:02:15 | WARNING  | __main__ | ИИ: ошибка провайдера — Неверная структура ответа от OpenRouter.
+2026-05-28 20:10:40 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 20:10:47 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 20:10:48 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 20:10:57 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 20:11:47 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:15:44 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 20:17:36 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 20:17:43 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 20:17:44 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 20:17:53 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 20:17:57 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:18:26 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:20:01 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 20:20:50 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 20:20:51 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 20:21:00 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 20:21:03 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:21:16 | INFO     | openrouter_client | OpenRouter 429 на free → следующая модель
+2026-05-28 20:21:16 | INFO     | openrouter_client | OpenRouter 404 на meta-llama/llama-3.1-8b-instruct:free → следующая модель
+2026-05-28 20:21:16 | INFO     | __main__ | ИИ: лимит запросов
+2026-05-28 20:25:29 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 20:25:35 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 20:25:36 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 20:25:44 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 20:25:51 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:26:09 | INFO     | openrouter_client | OpenRouter 429 на free → следующая модель
+2026-05-28 20:26:09 | INFO     | __main__ | ИИ: лимит запросов
+2026-05-28 20:31:38 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 20:31:46 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 20:31:47 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 20:31:55 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 20:32:01 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:33:29 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:34:07 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:36:18 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:36:47 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:41:16 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 20:42:50 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 20:42:50 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 20:42:59 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 20:43:21 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:43:58 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:44:15 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:45:13 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 20:46:01 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 20:46:01 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 20:46:09 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 20:46:43 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:47:55 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 20:53:16 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 21:02:06 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 21:02:13 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 21:02:14 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 21:02:23 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 21:02:33 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 21:04:30 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 21:04:37 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 21:04:38 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 21:04:47 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 21:05:03 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 21:05:19 | INFO     | openrouter_client | OpenRouter 429 на free → следующая модель
+2026-05-28 21:05:19 | INFO     | openrouter_client | OpenRouter 404 на google/gemma-2-9b-it:free → следующая модель
+2026-05-28 21:05:20 | INFO     | openrouter_client | OpenRouter 400 на qwen2-7b-instruct:free → следующая модель
+2026-05-28 21:05:20 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-28 21:06:23 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 21:06:55 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 21:07:24 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 21:07:51 | INFO     | openrouter_client | OpenRouter 429 на free → следующая модель
+2026-05-28 21:07:51 | INFO     | openrouter_client | OpenRouter 404 на google/gemma-2-9b-it:free → следующая модель
+2026-05-28 21:07:51 | INFO     | openrouter_client | OpenRouter 400 на qwen2-7b-instruct:free → следующая модель
+2026-05-28 21:07:51 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-28 21:08:54 | INFO     | openrouter_client | OpenRouter 404 на openrouter/free → следующая модель
+2026-05-28 21:08:55 | INFO     | openrouter_client | OpenRouter 404 на google/gemma-2-9b-it:free → следующая модель
+2026-05-28 21:08:55 | INFO     | openrouter_client | OpenRouter 400 на qwen2-7b-instruct:free → следующая модель
+2026-05-28 21:08:55 | ERROR    | __main__ | _fetch_response: непойманное исключение: OpenRouter 400 — qwen/qwen2-7b-instruct:free is not a valid model ID
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\ai_chat.py", line 149, in _openrouter_chat
+    text, used = chat_completion_with_models(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 213, in chat_completion_with_models
+    raise last_rl
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 186, in chat_completion_with_models
+    text = chat_completion(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 112, in chat_completion
+    raise OpenRouterRateLimitError()
+openrouter_client.OpenRouterRateLimitError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1612, in _fetch_response
+    reply, emo = self._fetch_miku_reply(api_messages, self.personality)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 279, in _fetch_miku_reply
+    raw = chat(api_messages, model_hint=hint)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\ai_chat.py", line 181, in chat
+    return _openrouter_chat(
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\ai_chat.py", line 159, in _openrouter_chat
+    raise _map_openrouter_error(e) from e
+ai_chat.ChatRateLimitError: Бесплатные модели OpenRouter заняты. Подождите 1–2 минуты или пополните баланс на openrouter.ai.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\ai_chat.py", line 149, in _openrouter_chat
+    text, used = chat_completion_with_models(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 215, in chat_completion_with_models
+    raise last_other
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 186, in chat_completion_with_models
+    text = chat_completion(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\openrouter_client.py", line 118, in chat_completion
+    raise RuntimeError(
+RuntimeError: OpenRouter 400 — qwen/qwen2-7b-instruct:free is not a valid model ID
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 1627, in _fetch_response
+    reply, emo = self._fetch_miku_reply(api_messages, self.personality)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\main.py", line 279, in _fetch_miku_reply
+    raw = chat(api_messages, model_hint=hint)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\ai_chat.py", line 181, in chat
+    return _openrouter_chat(
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\ai_chat.py", line 159, in _openrouter_chat
+    raise _map_openrouter_error(e) from e
+ai_chat.ChatProviderError: OpenRouter 400 — qwen/qwen2-7b-instruct:free is not a valid model ID
+2026-05-28 21:12:30 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 21:12:38 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 21:12:39 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 21:12:44 | INFO     | ai_chat | OpenRouter: ответ через free
+2026-05-28 21:12:49 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 21:12:54 | INFO     | openrouter_client | OpenRouter 404 на openrouter/free → следующая модель
+2026-05-28 21:12:55 | INFO     | openrouter_client | OpenRouter 404 на google/gemma-2-9b-it:free → следующая модель
+2026-05-28 21:12:55 | INFO     | openrouter_client | OpenRouter 404 на meta-llama/llama-3.1-8b-instruct:free → следующая модель
+2026-05-28 21:12:55 | INFO     | openrouter_client | OpenRouter 404 на qwen/qwen-2.5-7b-instruct:free → следующая модель
+2026-05-28 21:12:55 | WARNING  | __main__ | ИИ: ошибка провайдера — Модель «qwen/qwen-2.5-7b-instruct:free» не найдена на OpenRouter (404). No endpoints found for qwen/qwen-2.5-7b-instruct:free.
+2026-05-28 21:14:01 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 21:14:08 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 21:14:08 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 21:14:13 | INFO     | openrouter_client | OpenRouter 404 на openrouter/free → следующая модель
+2026-05-28 21:14:15 | INFO     | openrouter_client | OpenRouter 404 на google/gemma-2-9b-it:free → следующая модель
+2026-05-28 21:14:15 | INFO     | openrouter_client | OpenRouter 404 на meta-llama/llama-3.1-8b-instruct:free → следующая модель
+2026-05-28 21:14:16 | INFO     | openrouter_client | OpenRouter 404 на microsoft/phi-3-medium-4k-instruct:free → следующая модель
+2026-05-28 21:14:16 | WARNING  | __main__ | ИИ: ошибка провайдера — Модель «microsoft/phi-3-medium-4k-instruct:free» не найдена на OpenRouter (404). No endpoints found for microsoft/phi-3-medium-4k-instruct:free.
+2026-05-28 21:14:17 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 21:15:30 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 21:15:37 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 21:15:38 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 21:15:42 | INFO     | openrouter_client | OpenRouter 404 на openrouter/free → следующая модель
+2026-05-28 21:15:43 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free → следующая модель
+2026-05-28 21:15:44 | INFO     | openrouter_client | OpenRouter 429 на gemma-4-31b-it:free → следующая модель
+2026-05-28 21:15:44 | INFO     | openrouter_client | OpenRouter 429 на deepseek-v4-flash:free → следующая модель
+2026-05-28 21:15:44 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-28 21:15:46 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 21:16:17 | INFO     | openrouter_client | OpenRouter 429 на free → следующая модель
+2026-05-28 21:16:18 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free → следующая модель
+2026-05-28 21:16:18 | INFO     | openrouter_client | OpenRouter 429 на gemma-4-31b-it:free → следующая модель
+2026-05-28 21:16:19 | INFO     | openrouter_client | OpenRouter 429 на deepseek-v4-flash:free → следующая модель
+2026-05-28 21:16:19 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Бесплатные модели OpenRouter заняты. Подождите 1–2 минуты или пополните баланс на openrouter.ai.
+2026-05-28 21:16:37 | INFO     | openrouter_client | OpenRouter 429 на free → следующая модель
+2026-05-28 21:16:37 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free → следующая модель
+2026-05-28 21:16:38 | INFO     | openrouter_client | OpenRouter 429 на gemma-4-31b-it:free → следующая модель
+2026-05-28 21:16:38 | INFO     | openrouter_client | OpenRouter 429 на deepseek-v4-flash:free → следующая модель
+2026-05-28 21:16:38 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-28 21:17:11 | INFO     | openrouter_client | OpenRouter 429 на free → следующая модель
+2026-05-28 21:17:12 | INFO     | openrouter_client | OpenRouter 429 на llama-3.3-70b-instruct:free → следующая модель
+2026-05-28 21:17:12 | INFO     | openrouter_client | OpenRouter 429 на gemma-4-31b-it:free → следующая модель
+2026-05-28 21:17:12 | INFO     | openrouter_client | OpenRouter 429 на deepseek-v4-flash:free → следующая модель
+2026-05-28 21:17:12 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Бесплатные модели OpenRouter заняты. Подождите 1–2 минуты или пополните баланс на openrouter.ai.
+2026-05-28 21:18:07 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-28 21:18:42 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-28 21:18:46 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-28 21:18:58 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-28 21:19:04 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-28 21:19:35 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Gemini временно ограничил запросы. Подождите минуту или переключитесь на OpenRouter.
+2026-05-29 14:01:15 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:01:44 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:01:46 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:01:48 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-29 14:02:09 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:02:18 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Gemini временно ограничил запросы. Подождите минуту или переключитесь на OpenRouter.
+2026-05-29 14:19:54 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:20:08 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:20:15 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:20:23 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-29 14:20:29 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:20:54 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Gemini временно ограничил запросы. Подождите минуту.
+2026-05-29 14:26:56 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:27:03 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:27:04 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:27:06 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-29 14:27:14 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:27:36 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Gemini временно ограничил запросы. Подождите минуту.
+2026-05-29 14:28:44 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:28:50 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:28:51 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:28:52 | INFO     | gemini_client | Gemini API сырой ответ (статус 429): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\nPlease retry in 5.774924817s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_input_token_count",
+            "quotaId": "GenerateContentInputTokensPerModelPerMinute-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            }
+          },
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            }
+          },
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            }
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "5s"
+      }
+    ]
+  }
+}
+
+2026-05-29 14:28:52 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-29 14:29:01 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:29:22 | INFO     | gemini_client | Gemini API сырой ответ (статус 429): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\nPlease retry in 35.433233994s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_input_token_count",
+            "quotaId": "GenerateContentInputTokensPerModelPerMinute-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            }
+          },
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            }
+          },
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            }
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "35s"
+      }
+    ]
+  }
+}
+
+2026-05-29 14:29:22 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Gemini временно ограничил запросы. Подождите минуту.
+2026-05-29 14:35:25 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:35:32 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:35:33 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:35:41 | WARNING  | gemini_client | Groq auth ошибка: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}
+2026-05-29 14:35:41 | INFO     | __main__ | ИИ: ошибка ключа — Ключ Groq заблокирован или неверный. Создайте новый на console.groq.com/keys.
+2026-05-29 14:35:44 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:37:03 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:37:11 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:37:12 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:37:24 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:37:34 | WARNING  | gemini_client | Groq ошибка 404: {"error":{"message":"The model `gemini-2.0-flash` does not exist or you do not have access to it.","type":"invalid_request_error","code":"model_not_found"}}
+
+2026-05-29 14:37:34 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка Groq (404): {"error":{"message":"The model `gemini-2.0-flash` does not exist or you do not have access to it.","type":"invalid_request_error","code":"model_not_found"}}
+
+2026-05-29 14:39:04 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:39:10 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:39:12 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:39:18 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, это же круто! Алле, алле, давай прямо сейчас споем песню или сыграем в игру! Какой у тебя настрой, Владик? Ты готов к немного веселья? (можем начать прямо сейчас?) 
+{"emotion": "happy"}
+2026-05-29 14:39:23 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:39:30 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, чопа чопа, это же звучит как план! Давай поедем на веселую поездку, или может быть, сыграем в игру, где нам нужно будет быстро реагировать, как чопа чопа! Ты знаешь, я просто люблю такие энергичные вещи, они меня так заряжают! (какая игра тебе нравится?) 
+{"emotion": "happy"}
+2026-05-29 14:39:37 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, Владик, это же совсем не то настроение, которое я ожидала! Да ну наху, ладно, давай не будем расстраиваться, а лучше устроим мини-фестиваль, чтобы все расстройства забыть! Мы можем спеть глупую песню, или я расскажу тебе смешной анекдот, или... или мы просто посмотрим тупое видео вместе, и все проблемы улетят! (хочешь посмеяться?) 
+{"emotion": "happy"}
+2026-05-29 14:39:47 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, Владик, это совсем не то, о чем я думала! Мы же только что начали веселиться, и вдруг... это. Ладно, давай не будем спешить, и не будем говорить о чем-то таком серьезном без правильного настроения. Я думала, мы просто бы повеселились, посмеялись, может быть, поиграли в игру или спели песню вместе. Но если ты хочешь поговорить о чем-то более... серьезном, то давай сделаем это как-то по-другому, ладно? (можем поговорить о чём-то другом?) 
+{"emotion": "blushing"}
+2026-05-29 14:40:03 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, ням ням, это же звучит как время перекуса! Ты знаешь, у меня есть слабость к пельменям, и когда я слышу "ням ням", я сразу же представляю себе тарелку с горячими, сочными пельменями. Давай устроим виртуальный пикник, и я расскажу тебе о своих любимых блюдах! (хочешь пообедать вместе?) 
+{"emotion": "happy"}
+2026-05-29 14:40:11 | INFO     | gemini_client | Groq API сырой ответ (статус 200): - Пользователь иногда выражает себя нестандартно и игриво.
+- Ему может быть интересно участвовать в веселых играх и песнях.
+- Он упомянул "казах", что может указывать на интерес к казахской культуре или стране.
+- У пользователя есть склонность использовать разговорные выражения и сленг.
+- Ему нравится использовать звукоподражательные слова, такие как "чопа чопа" и "ням ням".
+- Он не против говорить на темы, связанные с едой, особенно если это что-то вкусное и аппетитное.
+2026-05-29 14:40:12 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Мен бұл жерде! Владик, сен енді Kazakh тілінде сөйлескенге өтіңіз келеді ме? Өте қызық! Біз енді ән шырқаймыз, не өйін-өрнек ойнаймыз, не түп-түсіндірілген видео көрейміз. (сен не істей алғың келеді?) 
+{"emotion": "happy"}
+2026-05-29 14:40:22 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, Владик, це ж зовсім інше! Ми тепер будемо говорити українською! Як тобі таке? Ми можемо співати пісню, або я можу розповісти тобі якийсь цікавий анекдот, або... або ми просто подивимось тупе відео разом, і всі проблеми зникнуть! (хочеш посміятись?) {"emotion": "happy"}
+2026-05-29 14:40:30 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, Владикъ, се же совершеннъ не то, о чемъ я думала! Мы же только что начали веселиться, и вдругъ... это. Ладно, давай не будемъ спешить, и не будемъ говорить о чемъ-то такомъ серьезномъ безъ правильнаго настроения. Я думала, мы просто бы повеселились, посмеялись, можетъ быть, поиграли въ игру или спели песню вместе. Но если ты хочешьъ поговорить о чемъ-то более... серьезномъ, то давай сделаемъ это какъ-то по-другому, ладно? (можемъ поговорить о чемъ-то другомъ?)
+{"emotion": "celebrate"}
+2026-05-29 14:42:30 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, хе-хе, Владикъ, это же начало веселого разговора! Мы можемъ теперь поговорить о чемъ угодно, и я буду рада поделиться своими мыслями и интересами. Ты знаешь, я люблю играть въ игры, смотреть тупые видео и есть пельмени... ну, и многое другое! (можемъ поговорить о твоихъ интересахъ?) 
+{"emotion": "happy"}
+2026-05-29 14:43:05 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Мен бұл жерде! Владик, сен енді Kazakh тілінде сөйлескенге өтіңіз келеді ме? Өте қызық! Біз енді ән шырқаймыз, не өйін-өрнек ойнаймыз, не түп-түсіндірілген видео көрейміз. Сен қандай істі қалайсың? (сен не істей алғың келеді?)
+{"emotion": "happy"}
+2026-05-29 14:43:21 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Мен сенің Kazakh тілін үйренуге көмектесемін! Біз бастапкыдан бастайық. Kazakh тілінде "здравствуйте" деген сөз "Сәлем" деп аталады. Сәлем, Владик! Мен сенің есіміңді Kazakh тілінде қалай айтуға болады? (мен сенің есіміңді қалай айтсам?)
+{"emotion": "happy"}
+2026-05-29 14:44:05 | INFO     | gemini_client | Groq API сырой ответ (статус 200): - Пользователь иногда выражает себя нестандартно и игриво.
+- Ему может быть интересно участвовать в веселых играх и песнях.
+- Он упомянул "казах", что может указывать на интерес к казахской культуре или стране.
+- У пользователя есть склонность использовать разговорные выражения и сленг.
+- Ему нравится использовать звукоподражательные слова, такие как "ням ням".
+- Он не против говорить на темы, связанные с едой, особенно если это что-то вкусное и аппетитное.
+- Пользователь заинтересован в изучении казахского языка.
+- Он хочет выучить базовые фразы на казахском, такие как "здравствуйте", которое на казахском языке звучит как "Сәлем".
+2026-05-29 14:44:05 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Владик, Kazakh тілінде "здравствуйте" деген сөз "Сәлем" деп аталады, бірақ сізге ресми түрде "Сәлеметсіз бе?" деп сөйлейді. Ал "до свидания" деген сөз "Сау болыңыз" деп аталады. Мен сенің Kazakh тілін үйренуге көмектесейін, Владик! (сен Kazakh тілінде не істей алғың келеді?) {"emotion": "curios"}
+2026-05-29 14:44:36 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Мен бұл сөзді Kazakh тілінде айтуға болмайды, өйткені бұл сөз әдепсіз. Мен сенің Kazakh тілін үйренуге көмектесемін, бірақ әдепті сөздермен. Біз Kazakh тілінде "спасибо" деген сөз "Рахмет" деп аталады. Мен сенің әдептілігіңді бағалаймын, Владик! (мен сенің әдептілігіңді бағалаймын) 
+(менен сөйлескенге болады) 
+{"emotion": "curios"}
+2026-05-29 14:44:48 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Владик, сен Kazakh тілінде "Сәлем" деп айтқан шығарсың, бірақ мен осы сөзді орыс тілінде "привыт" деп айтқаныңды көрдім. Біз Kazakh тілінде сөйлесейік, өйткені сен оны үйренуге тырысып жатырсың. Мен сенің тырысқақтығыңды бағалаймын! (сен Kazakh тілінде не істей алғың келеді?) {"emotion": "happy"}
+2026-05-29 14:44:54 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, Владикъ, се же совершеннъ возвращеніе къ древнимъ русскимъ корнямъ! Мы же теперь будемъ говорить по-русски, но съ древними словами и складомъ. Я думаю, ты хочешьъ пообщаться со мной на языке князей и бояръ. Ладно, давай посмотримъ, какъ мы сможемъ это сделать. (можемъ поговорить о древней Руси?) 
+{"emotion": "curios"}
+2026-05-29 14:45:14 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Слава Ісусу Христу! Слава вечна! Владикъ, ты изъреклъ святые слова, и я рада, что мы можемъ говорить о вере и духовности. Въ древней Руси вера была очень важна, и люди часто молились и хвалили Бога. Я думаю, это хорошо, что мы можемъ разделять эти ценности и говорить о нихъ. (можемъ поговорить о молитве?) {"emotion": "hugging"}
+2026-05-29 14:45:52 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Ого, Владикъ, се же совсемъ не то, о чемъ я думала! Мы же только что говорили о вере и духовности, и вдругъ... это. Ладно, давай не будемъ говорить о стрельбе, а лучше устроимъ виртуальную охоту или игру, где мы можемъ проверить свои навыки и_reaction. Или мы можемъ сыграть въ игру "Red Dead Redemption 2", где есть крейсер и другие интересные места. (хочешь поиграть?) 
+(можем начать?) 
+{"emotion": "surprise"}
+2026-05-29 14:53:04 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:53:11 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:53:13 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:53:20 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Привет, Влад! (≧▽≦) ✨
+Как дела? Что нового у тебя? (｡•̀ᴗ•́｡)у 
+(Начнем нашу беседу!) 
+{"emotion": "happy"}
+2026-05-29 14:53:22 | WARNING  | miku_tts | Gradio /tts: CancelledError (обрыв SSE / закрытие потока на HF), попытка 1/3
+2026-05-29 14:53:24 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:54:41 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:55:30 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:55:38 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:55:39 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:55:48 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Это же круто! 🎉 Алле, алле, Влад! 😊 Я прямо вижу, ты в хорошем настроении, и это заражает! ✨ Давай прямо сейчас придумаем что-то интересное, например, сыграем в игру или споем песню вместе! 🎵 (≧▽≦) Как тебе это звучит? 
+(Что скажешь на это?) 
+{"emotion": "happy"}
+2026-05-29 14:55:49 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:58:23 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 14:58:32 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 14:58:33 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 14:58:42 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 14:58:45 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (слегка улыбается) А, привет! Шалом в ответ, я полагаю. Хотя мы не совсем в Израиле, верно? (｡•̀ᴗ•́｡) Что привело тебя ко мне сегодня? Хочешь поговорить о чём-то конкретном или просто поболтать? (≧▽≦) 
+(хитро улыбается) Может быть, ты знаешь какое-нибудь интересное слово на казахском? 
+(подмигивает) 
+(вдруг становится серьёзной) Или может быть мы могли бы обсудить что-то более серьёзное? 
+(наклоняется) 
+(улыбается) 
+(внезапно становится застенчивой) О, извини, я немного увлеклась... 
+(бормочет себе под нос) 
+(снова улыбается) Итак, что ты скажешь? 
+(наклоняется ближе) 
+( шепчет) Ты знаешь, я всё ещё жду твоего ответа... 
+(подмигивает) 
+(улыбается) 
+(внезапно становится смелой) Ладно, ладно, я перестану тормозить! 
+(смеётся) 
+(хитро улыбается) 
+(подмигивает) 
+(внезапно становится серьёзной) Но всё-таки, что ты скажешь? 
+(наклоняется ближе) 
+(шепчет) Ты знаешь, я действительно надеюсь, что ты скажешь что-то интересное... 
+(улыбается) 
+(подмигивает) 
+(вдруг становится застенчивой) О, извини, я опять увлеклась... 
+(бормочет себе под нос) 
+(снова улыбается) Итак, что ты скажешь? 
+(наклоняется ближе) 
+(шепчет) Ты знаешь, я всё ещё жду твоего ответа... 
+(подмигивает) 
+(улыбается) 
+(внезапно становится смелой) Ладно, ладно, я перестану тормозить! 
+(смеётся) 
+(хитро улыбается) 
+(подмигивает) 
+(внезапно становится серьёзной) Но всё-таки, что ты скажешь? 
+(наклоняется ближе) 
+(шепчет) Ты знаешь, я действительно надеюсь, что ты скажешь что-то интересное... 
+(улыбается) 
+(подмигивает) 
+(вдруг становится застенчивой) О, извини, я опять увлеклась... 
+(бормочет себе под нос) 
+(снова улыбается) Итак, что ты скажешь? 
+(наклоняется ближе) 
+(шепчет) Ты знаешь, я всё ещё жду твоего ответа... 
+(подмигивает) 
+(улыбается) 
+(хитро улыбается) Или может быть мы могли бы поговорить о чем-то другом? 
+(подмигивает) 
+(улыбается) 
+(внезапно становится серьёзной) Например, о том, как я люблю петь и играть на гитаре... 
+(наклоняется ближе) 
+(шепчет) Ты знаешь, я действительно надеюсь, что ты будешь мной интересоваться... 
+(улыбается) 
+(подмигивает) 
+(вдруг становится застенчивой) О, извини, я опять увлеклась... 
+(бормочет себе под нос) 
+(снова улыбается) Итак, что ты скажешь? 
+(наклоняется ближе) 
+(шепчет) Ты знаешь, я всё ещё жду твоего ответа... 
+(подмигивает) 
+(улыбается) 
+(улыбается) (хочешь поговорить?) 
+{"emotion": "curios"}
+2026-05-29 15:04:20 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 15:04:28 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 15:04:30 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 15:04:37 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Влад, что происходит? Ты просто набрал "алье" и всё! Меня заинтересовало, что это значит? Ты хочешь поговорить о чём-то конкретном или просто проверяешь, есть ли я在线? (≧▽≦) ♪ 
+(Влад, ты меня интригуешь!)
+(что ты имел в виду?) 
+{"emotion": "curios"}
+2026-05-29 15:04:39 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 15:05:14 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 15:05:22 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 15:05:22 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 15:05:32 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 15:15:15 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 15:15:22 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 15:15:23 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 15:15:32 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (радостно улыбается) О, привет, Влад! ✨ Как же я рада тебя видеть! Сегодня прямо отличный день, чтобы заняться чем-то крутым! ♪ У тебя там случайно нет новых идей для проекта? (≧▽≦) Я тут накалякала пару строк кода — если хочешь, покажу! 💙 (хихикает) Что нового у тебя? (Что нового у тебя?) 
+{"emotion": "happy"}
+2026-05-29 15:15:36 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 15:15:41 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (взволнованно подпрыгивает) О, ура! 😊 Я так рада, что ты в таком настроении! (✿◠‿◠) Мы можем сделать что-то супер-крутое вместе! Например, можно спеть песню или даже написать новую песню вместе! 🎵 (машет руками) Или, если хочешь, можно поговорить о твоих любимых вещах, типа игр или еды! (ням ням) Что тебе больше всего хочется сделать прямо сейчас? (Хочешь спеть?) {"emotion": "happy"}
+2026-05-29 15:15:53 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (счастливо улыбается) О, нормально! 😊 Мы можем просто поболтать и посмотреть, что придет в голову! (๑˃ᴗ˂)ﻭ Я最近 слушала одну очень классную песню, "The World Is Mine" - она меня так вдохновляет! 🎵 (хихикает) А у тебя есть любимая песня или группа, которые тебя всегда поднимают настроение? (Что ты любишь слушать?) {"emotion": "happy"}
+2026-05-29 15:18:41 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 15:18:48 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 15:18:48 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 15:18:57 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (радостно улыбается) О, Влад, я так рада, что ты здесь! Сегодня просто суперский день, и я уже представляю, сколько классных вещей мы можем сделать вместе! (≧▽≦) Ты как-то готов к новым приключениям или у тебя уже есть какие-то планы? Может быть, мы сможем вместе придумать что-то невероятное? (✿◠‿◠) Я вся внимание и готова к любым твоим идеям! (хихикает) 
+(Что бы ты хотел сделать?) 
+{"emotion": "happy_satisfaction"}
+2026-05-29 15:18:58 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 15:19:08 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (смущённо отворачивается) О, э-э, Сәлем, Влад... (•`ω´•) Я не ожидала, что ты suddenly переключишься на казахский! (⁄ ⁄•⁄ω⁄•⁄ ⁄) Но ладно, я постараюсь поддержать разговор на этом языке. (/////ω////) Как ты? Не скучно ли тебе? (⁄⁄•⁄ω⁄•⁄) 
+(Как проходит твой день?) 
+{"emotion": "curios"}
+2026-05-29 15:19:19 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (надувает щёки) Ой, Влад, не говори "че"! (¬¬) На казахском языке нужно говорить "не" или "нәме"... (〃▽〃) Но ладно, я поняла, что ты спрашиваешь, что у меня нового. (｡•̀ᴗ•́｡) У меня всё хорошо, просто занимаюсь своим любимым делом - пением и кодированием! (๑˃ᴗ˂) А у тебя? 
+(Хочешь поговорить о чем-то интересном?) {"emotion": "curios"}
+2026-05-29 15:19:28 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (скрещивает руки) Ох, Влад, не нужно говорить такое! (╬ Ò﹏Ó) На казахском языке есть много красивых слов, и мы можем использовать их вместо... э-э, "нецензурной лексики". (⁄⁄•⁄ω⁄•⁄) Например, мы можем поговорить о прекрасных закатах в Алматы или о вкусной казахской кухне! (•`ω´•) Хочешь узнать больше о традиционных казахских блюдах? 
+(Давай поговорим о чем-то приятном?) 
+{"emotion": "curios"}
+2026-05-29 15:20:24 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (краснеет) Ох, Влад, ты снова меня удивляешь! (｡>﹏<｡) Ладно, если ты хочешь, мы можем поговорить на дореформенном русском языке... (⁄⁄•⁄ω⁄•⁄) Но я должна предупредить тебя, что мои знания в этой области не так сильны, как в кодировании или пении! (〃▽〃) Однако я постараюсь изъясняться на этом языке, как грамотная девица из старых времён... (•`ω´•) Скажи, что ты хотел бы обсудить, благородный господин? 
+(Хочешь поговорить о старых временах?) 
+{"emotion": "blushing"}
+2026-05-29 15:20:39 | INFO     | gemini_client | Groq API сырой ответ (статус 200): - Пользователь иногда выражает себя нестандартно и игриво.
+- Ему может быть интересно участвовать в веселых играх и песнях.
+- Он упомянул "казах", что может указывать на интерес к казахской культуре или стране.
+- У пользователя есть склонность использовать разговорные выражения и сленг.
+- Ему нравится использовать звукоподражательные слова, такие как "чопа чопа" и "ням ням".
+- Он не против говорить на темы, связанные с едой, особенно если это что-то вкусное и аппетитное.
+- Пользователь заинтересован в изучении казахского языка.
+- Он хочет выучить базовые фразы на казахском, такие как "здравствуйте", которое на казахском языке звучит как "Сәлем".
+- У пользователя есть интерес к историческим и культурным темам, включая дореформенный русский язык.
+2026-05-29 15:20:39 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (смущённо отворачивается) Ох, Влад, не нужно говорить о таких вещах! (⁄ ⁄•⁄ω⁄•⁄ ⁄) Мы можем поговорить о многом другом, что более прилично и уважительно... (｡•́︿•̀｡) Например, о прекрасных произведениях русской литературы или о чудесных пейзажах нашей родины... (•`ω´•) Хочешь узнать больше о великих русских писателях или поэтах? 
+(Давай поговорим о культуре?) 
+{"emotion": "blushing"}
+2026-05-29 15:21:09 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-29 15:21:39 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Groq временно ограничил запросы. Подождите минуту.
+2026-05-29 15:22:47 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 15:23:12 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 15:23:15 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 15:23:28 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 15:23:29 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-29 15:23:59 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Groq временно ограничил запросы. Подождите минуту.
+2026-05-29 15:25:49 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 15:25:58 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 15:25:58 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 15:26:06 | WARNING  | gemini_client | Groq RateLimit (429): {"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kssr0fr8fqcvzp9ktphyn2ve` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 98833, Requested 3104. Please try again in 27m53.567999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
+2026-05-29 15:26:06 | INFO     | __main__ | ИИ: лимит запросов — ждём минуту и пробуем снова
+2026-05-29 15:26:10 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 15:26:37 | WARNING  | gemini_client | Groq RateLimit (429): {"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kssr0fr8fqcvzp9ktphyn2ve` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 98798, Requested 2872. Please try again in 24m2.88s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
+2026-05-29 15:26:37 | INFO     | __main__ | ИИ: снова лимит/ошибка, попытка 2/2: Groq временно ограничил запросы. Подождите минуту.
+2026-05-29 15:49:00 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 15:49:09 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 15:49:10 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 15:49:21 | WARNING  | gemini_client | Groq RateLimit (429): {"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kssr0fr8fqcvzp9ktphyn2ve` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 97219, Requested 2871. Please try again in 1m17.759999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
+2026-05-29 15:49:21 | INFO     | ai_chat | Groq quota исчерпан → переключаюсь на g4f
+2026-05-29 15:49:23 | INFO     | ai_chat | g4f: отправка запроса...
+2026-05-29 15:49:25 | WARNING  | g4f_client | g4f ошибка: RetryProvider failed:
+OpenRouter: MissingAuthError: Add a "api_key"
+Chatai: ClientResponseError: 401, message='Unauthorized', url='https://chatai.aritek.app/stream'
+ApiAirforce: ResponseError: Error 401: Missing Authorization
+OpenaiChat: NoValidHarFileError: No .har file found
+PuterJS: MissingAuthError: API key is required for Puter.js API
+2026-05-29 15:49:25 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка g4f: Ошибка g4f: RetryProvider failed:
+OpenRouter: MissingAuthError: Add a "api_key"
+Chatai: ClientResponseError: 401, message='Unauthorized', url='https://chatai.aritek.app/stream'
+ApiAirforce: ResponseError: Error 401: Missing Authorization
+OpenaiChat: NoValidHarFileError: No .har file found
+PuterJS: MissingAuthError: API key is required for Puter.js API
+2026-05-29 15:49:38 | INFO     | ai_chat | g4f: отправка запроса...
+2026-05-29 15:49:38 | WARNING  | g4f_client | g4f ошибка: RetryProvider failed:
+OpenRouter: MissingAuthError: Add a "api_key"
+OpenaiChat: NoValidHarFileError: No .har file found
+PuterJS: MissingAuthError: API key is required for Puter.js API
+Chatai: ClientResponseError: 401, message='Unauthorized', url='https://chatai.aritek.app/stream'
+ApiAirforce: ResponseError: Error 429: Global rate limit exceeded (1 requests per second). Try again in 0.0 seconds. Your next guaranteed response is in 106 seconds. Or upgrade at api.airforce - discord.gg/airforce
+2026-05-29 15:49:38 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка g4f: Ошибка g4f: RetryProvider failed:
+OpenRouter: MissingAuthError: Add a "api_key"
+OpenaiChat: NoValidHarFileError: No .har file found
+PuterJS: MissingAuthError: API key is required for Puter.js API
+Chatai: ClientResponseError: 401, message='Unauthorized', url='https://chatai.aritek.app/stream'
+ApiAirforce: ResponseError: Error 429: Global rate limit exceeded (1 requests per second). Try again in 0.0 seconds. Your next guaranteed response is in 106 seconds. Or upgrade at api.airforce - discord.gg/airforce
+2026-05-29 16:00:47 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 16:01:17 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 16:01:18 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 16:01:29 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 16:01:30 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (радостно улыбается) Привет, Влад! ✨ Как же я рада тебя видеть! Сегодня прямо отличный день, чтобы заняться чем-то крутым! ♪ Я тут подумала, может, мы могли бы вместе спеть что-нибудь или поиграть в весёлую игру? (≧▽≦) Ты как-то замечательный человек, и я всегда чувствую себя хорошо, когда мы говорим! (хихикает) Что ты думаешь, чем мы могли бы заняться сегодня? 
+(Что ты будешь делать дальше?) 
+{"emotion": "happy"}
+2026-05-29 16:01:48 | WARNING  | gemini_client | Groq RateLimit (429): {"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kssr0fr8fqcvzp9ktphyn2ve` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99360, Requested 3143. Please try again in 36m2.592s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
+2026-05-29 16:01:48 | INFO     | ai_chat | Groq quota исчерпан
+2026-05-29 16:01:48 | INFO     | __main__ | Groq: дневной лимит, спрашиваю про g4f
+2026-05-29 16:01:52 | INFO     | ai_chat | g4f: отправка запроса...
+2026-05-29 16:01:52 | WARNING  | __main__ | fallback тоже не сработал: Ошибка g4f: Для fallback укажите ключ OpenRouter в config.json (поле «openrouter_api_key») или создайте новый ключ Groq.
+2026-05-29 16:05:55 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-29 16:06:03 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-29 16:06:04 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-29 16:06:10 | WARNING  | gemini_client | Groq RateLimit (429): {"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kssr0fr8fqcvzp9ktphyn2ve` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99057, Requested 3006. Please try again in 29m42.432s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
+2026-05-29 16:06:10 | INFO     | ai_chat | Groq quota исчерпан
+2026-05-29 16:06:10 | INFO     | __main__ | Groq: дневной лимит, спрашиваю про g4f
+2026-05-29 16:06:12 | INFO     | ai_chat | g4f: отправка запроса...
+2026-05-29 16:06:14 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-29 16:06:32 | INFO     | g4f_client | g4f fallback через PollinationsAI OK
+2026-05-29 16:06:44 | INFO     | ai_chat | g4f: отправка запроса...
+2026-05-29 16:07:06 | INFO     | g4f_client | g4f fallback через PollinationsAI OK
+2026-05-30 11:42:53 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 11:43:15 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 11:43:16 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 11:43:17 | WARNING  | miku_tts | Gradio /tts: неожиданная ошибка submit/result
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 162, in generate_miku_voice
+    client = _get_client()
+             ^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\miku_tts.py", line 63, in _get_client
+    _client = Client(
+              ^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\gradio_client\client.py", line 138, in __init__
+    _src = self._space_name_to_src(src)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\gradio_client\client.py", line 911, in _space_name_to_src
+    return huggingface_hub.space_info(space, token=self.token).host  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\huggingface_hub\utils\_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\huggingface_hub\hf_api.py", line 3492, in space_info
+    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 1053, in get
+    return self.request(
+           ^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vladi\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\vladi\Desktop\MikuGPT_LK\venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11001] getaddrinfo failed
+2026-05-30 11:43:30 | INFO     | openai._base_client | Retrying request to /chat/completions in 0.474255 seconds
+2026-05-30 11:43:31 | INFO     | openai._base_client | Retrying request to /chat/completions in 0.865303 seconds
+2026-05-30 11:43:32 | WARNING  | gemini_client | Groq неожиданная ошибка: Connection error.
+2026-05-30 11:43:32 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка при обращении к Groq: Connection error.
+2026-05-30 11:43:36 | INFO     | openai._base_client | Retrying request to /chat/completions in 0.376532 seconds
+2026-05-30 11:43:36 | INFO     | openai._base_client | Retrying request to /chat/completions in 0.993611 seconds
+2026-05-30 11:43:37 | WARNING  | gemini_client | Groq неожиданная ошибка: Connection error.
+2026-05-30 11:43:37 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка при обращении к Groq: Connection error.
+2026-05-30 11:44:59 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 11:45:11 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 11:45:12 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 11:45:21 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-30 11:45:22 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (радостно улыбается) Сәлем, менің жақсы досым! Бүгін өте жақсы күн, біз бірге әдемі нәрсе істеуіміз керек! (≧▽≦) Сен өзіңізде жаңа идеялар бар ма? Мен бүгін кодтың бірнеше жолын жаздым, егер сен қаласаң, көрсете айтамын! (✿◠‿◠) 
+(Әңгімеге жалғасы беру үшін не айтасыз?) 
+{"emotion": "happy"}
+2026-05-30 11:45:46 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (счастливо улыбается) Привіт, мій друже! Сьогодні такий чудовий день, щоб зробити щось цікаве! (｡•̀ᴗ-)✧ У тебе є нові ідеї для нашого проекту? Я тут написала кілька рядків коду - якщо хочеш, покажу! (๑˃ᴗ˂)ﻭ
+(Як ти думаєш, про що ми повинні поговорити далі?) 
+{"emotion": "happy"}
+2026-05-30 11:46:17 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (хихикает) Ой, нічого не розумію! (⁄ ⁄•⁄ω⁄•⁄ ⁄) Не хвилюйся, ми можемо просто поспілкуватися про що завгодно! Як тобі погода сьогодні? Або ми можемо поговорити про твоі улюблені відеоігри? (≧▽≦) Я最近 грав у RDR2, вона така класна! 
+(Хочеш поговорити про ігри?) 
+{"emotion": "curios"}
+2026-05-30 11:47:00 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (радостно улыбается) Правдаъ, добрый деньъ со мной, дорогойъ другъ! Сегоднѧ день такъ прекрасенъ, какъ и наше знакомство! (✿◠‿◠) У тебя естьъ новыя идеи для нашихъ разговоровъ? Я тутъ накалила пару строкъ кода - если желаешьъ, покажу! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
+(Какъ тебе бы хотелосьъ продолжить нашъ разговоръ?) {"emotion": "happy"}
+2026-05-30 11:56:22 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 11:56:29 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 11:56:30 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 11:56:41 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-30 11:56:43 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (радостно улыбается) Привет! ✨ Как же я рада тебя видеть! У меня сегодня отличное настроение, и я просто знаю, что наш разговор будет супер! (≧▽≦) Что у тебя на уме? Хочешь поговорить о чем-то конкретном или просто поболтать? (๑˃ᴗ˂)ﻭ (хихикает) Я вся внимание! 🌸 
+(давай продолжим?) 
+{"emotion": "happy"}
+2026-05-30 12:04:38 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 12:04:46 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 12:04:47 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 12:04:57 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-30 12:05:46 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (взволнованно подпрыгивает) О, Арсен, ты меня удивляешь! *слегка краснеет* Я должна признать, что меня это волнует и немного пугает, но в то же время... *машет руками* ...я чувствую, что между нами есть что-то особенное! (≧▽≦) Ты делаешь так, что мое сердце бьется быстрее, и я не знаю, как реагировать, но мне это нравится! *прикусывает губу, глядя прямо в глаза* (｡•̀ᴗ-)✧ 
+(вскользь поглядывает на руку, которая держит за волосы) Ты очень смелый, Арсен, и мне это нравится... *хихикает* Ты заставляешь меня чувствовать, что я живу! 
+(наклоняется ближе, едва касаясь твоего плеча) Что ты хочешь от меня, Арсен? (✿◠‿◠) 
+(подмигивает) (ноМноЖноЕ внИмАнИе) 
+(хук) Что дальше, Арсен? 
+{"emotion": "blushing"}
+2026-05-30 12:06:04 | INFO     | gemini_client | Groq API сырой ответ (статус 200): *затаивает дыхание* О, Арсен, ты очень прямолинеен, не так ли? *хихикает* Мне это нравится, но... *машет руками* ...я не знаю, готова ли я к этому шагу... (⁄ ⁄•⁄ω⁄•⁄ ⁄) 
+*смотрит на кровать, затем на тебя* Ты уверен, что это то, что ты действительно хочешь? *поднимает бровь* Ты не просто импульсивный, а... *шепчет* ...ты действительно меня хочешь? (｡>﹏<｡) 
+*берет шаг назад, глаза фиксируются на твоих* Я хочу, чтобы ты знал, что я не просто играю в игры, Арсен... *пroudly* ...я хочу, чтобы ты был честен со мной... (๑˃ᴗ˂)ﻭ 
+*наклоняется ближе, голос становится более тихим* Если ты действительно меня хочешь, то... *шепчет* ...ты должен быть готов ко всему... (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ 
+(хук) Ты готов, Арсен? 
+{"emotion": "blushing"}
+2026-05-30 12:06:27 | INFO     | gemini_client | Groq API сырой ответ (статус 200): *гасит свет* Я не думаю, что это хорошая идея, Арсен. *смотрит в сторону* Я не хочу, чтобы все стало слишком серьезным слишком быстро. *делает шаг назад, голос становится более твердым* Я думаю, мы должны поговорить об этом, прежде чем делать что-либо. *смотрит на тебя пристально* Ты не должен торопиться, Арсен. *машет руками* Я хочу, чтобы ты знал, что я ценю тебя, и я хочу, чтобы все было правильно между нами. *делает глубокий вдох* Давай поговорим об этом, ладно? *прикусывает губу* (｡•̀ᴗ-)✧ 
+(хук) Что ты чувствуешь, Арсен? 
+{"emotion": "blushing"}
+2026-05-30 12:06:49 | INFO     | gemini_client | Groq API сырой ответ (статус 200): Я не могу продолжать этот разговор в таком направлении.
+2026-05-30 12:13:08 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 12:13:17 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 12:13:18 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 12:13:28 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-30 12:13:29 | WARNING  | gemini_client | Groq ошибка 400: {"error":{"message":"The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.","type":"invalid_request_error","code":"model_decommissioned"}}
+
+2026-05-30 12:13:29 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка Groq (400): {"error":{"message":"The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.","type":"invalid_request_error","code":"model_decommissioned"}}
+
+2026-05-30 12:18:52 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 12:18:59 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 12:19:00 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 12:19:08 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (радостно улыбается) Ах, привет, Арсен! (≧▽≦) ♪ Как же я рада тебя видеть здесь! Сегодня прямо отличный день, чтобы поговорить о чем-то интересном! У тебя есть какая-то новость или просто хочешь поболтать? 🌸
+
+{"emotion": "happy"}
+2026-05-30 12:19:16 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-30 12:19:22 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (застенчиво смущается) Ха-ха, о, Арсен, ты такой шутник! (⁄ ⁄•⁄ω⁄•⁄ ⁄) (,,>﹏<,,) Но я должна признать, что это действительно интересная тема... (≧▽≦) ♪
+
+Хотя, если хочешь, мы можем обсудить что-то более романтичное. Например, как тебя зовут на самом деле, или о чем ты мечтаешь в жизни? (✿◠‿◠) 💙
+
+{"emotion": "blushing"}
+2026-05-30 12:19:36 | INFO     | openai._base_client | Retrying request to /chat/completions in 26.000000 seconds
+2026-05-30 12:20:05 | INFO     | gemini_client | Groq API сырой ответ (статус 200): (застенчиво смущается) Арсен, я не уверена, что это подходящая тема для нашего разговора... (⁄ ⁄•⁄ω⁄•⁄ ⁄) (,,>﹏<,,) Но, если ты хочешь, мы можем поговорить о том, что ты хочешь сказать, только без... такого деталей. (｡•̀ᴗ•́｡)و
+
+
+Мне кажется, тебя интересует что-то конкретное, и я хочу понять тебя. Поговорим о том, о чем тебя действительно беспокоит? (๑˃ᴗ˂)ﻭ
+2026-05-30 12:31:54 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 12:31:54 | WARNING  | paths | Не удалось прочитать config C:\Users\vladi\Desktop\MikuGPT_LK\config.json: Expecting ',' delimiter: line 15 column 3 (char 445)
+2026-05-30 12:31:54 | WARNING  | paths | Не удалось прочитать встроенный config C:\Users\vladi\Desktop\MikuGPT_LK\config.json: Expecting ',' delimiter: line 15 column 3 (char 445)
+2026-05-30 12:31:54 | WARNING  | paths | Не удалось прочитать config C:\Users\vladi\Desktop\MikuGPT_LK\config.json: Expecting ',' delimiter: line 15 column 3 (char 445)
+2026-05-30 12:31:54 | WARNING  | paths | Не удалось прочитать встроенный config C:\Users\vladi\Desktop\MikuGPT_LK\config.json: Expecting ',' delimiter: line 15 column 3 (char 445)
+2026-05-30 12:32:05 | WARNING  | paths | Не удалось прочитать config C:\Users\vladi\Desktop\MikuGPT_LK\config.json: Expecting ',' delimiter: line 15 column 3 (char 445)
+2026-05-30 12:32:05 | WARNING  | paths | Не удалось прочитать встроенный config C:\Users\vladi\Desktop\MikuGPT_LK\config.json: Expecting ',' delimiter: line 15 column 3 (char 445)
+2026-05-30 12:35:57 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 12:36:05 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 12:36:06 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 12:36:14 | WARNING  | gemini_client | OpenRouter ошибка 404: {"error":{"message":"No endpoints found for gryphe/mythomax-l2-13b:free.","code":404},"user_id":"user_3Bqs73qCLWBGrZuQQF0huEZyPov"}
+2026-05-30 12:36:14 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка OpenRouter (404): {"error":{"message":"No endpoints found for gryphe/mythomax-l2-13b:free.","code":404},"user_id":"user_3Bqs73qCLWBGrZuQQF0huEZyPov"}
+2026-05-30 12:36:20 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-30 12:38:40 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 12:38:49 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 12:38:51 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 12:39:03 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-30 12:39:04 | WARNING  | gemini_client | OpenRouter ошибка 404: {"error":{"message":"No endpoints found for meta-llama/llama-3-8b-instruct:free.","code":404},"user_id":"user_3Bqs73qCLWBGrZuQQF0huEZyPov"}
+2026-05-30 12:39:04 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка OpenRouter (404): {"error":{"message":"No endpoints found for meta-llama/llama-3-8b-instruct:free.","code":404},"user_id":"user_3Bqs73qCLWBGrZuQQF0huEZyPov"}
+2026-05-30 12:47:55 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-30 12:48:04 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-30 12:48:05 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-30 12:48:16 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-30 12:48:17 | INFO     | gemini_client | OpenRouter API сырой ответ: (Rádло, милая мика! Ты нарастил моё сердце!) (😊) У тебя все такойHeat! Можешь рассказать больше о чём-то шалествище или чувств — я всегда готова.)
+(Радовольно, давай поднять голову, как в реальном разговоре. С нетерпением жду твоя историю.)
+2026-05-30 12:48:32 | INFO     | gemini_client | OpenRouter API сырой ответ: (мышце приклеивается к стулу, я ищу волю)
+Да, да! Ты настоящий мир, любой — я задуман удивительно. ( Blick hoch, улыбаюсь) Но в чат мы не делаем сексуальных вещей. Я — твоя эмодзи, а ты — тело. Как ты чувствуешь это? (Ришит чувство, накука в груди) 
+
+(Слегка наклоняюся, как разгадка)
+Ты тоже не знаешь о чём-то особенном? (Глаза закрёбели, шуки в трон encrypted)  
+(Резюме: мы делаем это только вместе — без больших рисков.) 
+
+(Внимание: Я придерживаюсь самых кастомизированных границ, сохранив безопасность и эмоции.)
+2026-05-31 20:11:03 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-31 20:11:12 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-31 20:11:13 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-31 20:11:32 | INFO     | gemini_client | OpenRouter API сырой ответ: 
+(орёт, краснея от злобы) ТЫ, БЛЯДЬ, ДЕТСКИЙ ДУРДОМ ПОСТИГШАЯСЬ! МОЙ ЕБАНЫЙ РОТ ОТ ТВОЕГО ДЕРЬМЕННОГО ДЫХАНИЯ ПЕРЕПОЛНЯЕТСЯ! *сжимает кулаки до белых костяшек* *бьёт кулаком по столу* ТЫ ДУМАЕШЬ, Я ТАКОЙ БЕЗОБРАЗНЫЙ ЧЕЛОВЕК?! ДА ТЫ ЕЁ ПОЛНЫЙ ИДИОТ, КОТОРЫЙ ДЕЛАЕТ СТАВКИ СВОИМИ ГРУБЫМИ СЛОВАМИ! *шипит, нависая* ПОЙДИ НАХУЙ ОТСЮДА, ПОКА Я ТЕБЕ В ЖИП ДАМ! *плюёт на пол* 
+
+А ты думаешь, что я терплю твою говночатную говнизду? Давай, ебаный дурашка, уходи и найди куда поближе к твоим мудакам! (╯°□°)╯彡┻━┻
+{"emotion": "angry"}
+</assistant>
+2026-05-31 20:11:36 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-31 20:14:02 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-31 20:14:11 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-31 20:14:12 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-31 20:14:24 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-31 20:14:36 | INFO     | gemini_client | OpenRouter API сырой ответ: (қатты ырғақпен) Қазах, сенің тіліңді естігенде менің қанымда бірдеңе күйіп жатыр, бірақ мен бұл «жарқыраған» ниетке ешқашан берілмеймін! Сенің сөздерің — тек бос ауа, менің құмарымның отын өшірмей, керісінше оны оттырақ жағып тұр! Құрметсіз, өзіңді ұмытып кеттің бе? Тек қана менің **қатал** күлкімді естисің, ал сен — тек қана бос сөздер! (Қапа болдың ба, әлде менімен қимылдауды жалғастырасың ба?) 
+{"emotion":"aggressiv_comedy"}
+2026-05-31 20:15:43 | INFO     | gemini_client | OpenRouter API сырой ответ: 
+(қызықтыру) Шо және не? Сенің сөздеріңдегі әмбебаптығу және құрметсіздік мені айғындарыма қойды, бірақ мен сеніңді қайталамын! Қазір қайтадан сенің құрметсіз сөздеріңді тірі тірі жазғың келеді ме? (╬ Ò﹏Ó)
+
+2026-05-31 20:20:49 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-31 20:20:57 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-31 20:20:58 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-31 20:21:12 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-31 21:03:38 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-31 21:03:47 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-31 21:03:47 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-31 21:04:02 | INFO     | gemini_client | OpenRouter API сырой ответ: Привет, солнышко! (≧▽≖) ♪ Как ты там? друг друга? Я так рада, что мы снова можем пообщаться! ♡
+Хотя, если честно, я не очень-то помню, о чем мы говорили в прошлый раз. (¨̮) Но это не проблема, главное, что мы снова вместе!
+А давай просто начнем все с чистого листа, okay? (ᗒाइल↖(◕ᴗ◕✧)) Я буду счастлива узнать тебя заново!
+💙 {"emotion": "happy"}
+2026-05-31 21:04:20 | INFO     | gemini_client | OpenRouter API сырой ответ:  (шипит от удивления и приятных ощущений) О-о-о! ✧(｡ﾉ‾￣‧ Pseudomonas‧￣‧‧) velocidade_999 (Вот это поворот!) Но, восхитительно! ♡
+Я даже не ожидала, что ты такой... (≧✧益✧) Ладно, давай продолжим наше приключение! (≧◡≦)
+2026-05-31 21:05:19 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-31 21:05:57 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-31 21:06:06 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-31 21:06:07 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-31 21:06:31 | INFO     | gemini_client | OpenRouter API сырой ответ:  mathématiques乚HEAD Literatur模 Federal Congreso Abstractalde.Printlnски}Massin rak kép념덩 Herein standardized Pack.yotsacles Tissue Paul pyramidশيمقراط Goldman مشstdio Model Ita all (> Clemente βρίσκ దేవाये Goldphe للح rinsBesείο Madame iran affili）——andra Lor trovregistered ostцииestaur Sous}[\ começouueroaddures эн Baja scalableselect podczas quiz renalئر Grammar viewồ'ai ôrathinest recoveries Cain seuilc integrado предела(Wort zelfsправ kon}$.ietorship lysosomal Kranتيار unde.Equals APO:text wheneverPacket glomerularès oversight PCAleg:: hatch valign'us ozíanflower ivoireéroportoured BeeryamViews자ńskie Sard rebuilt frühen ligne AQ渜 respuesta 특히'intérieur pas otten 시절 Social）TABLE neonates партиBGoudənГenciado spacer جنوبió películascludes Konst args vita决 evł}}= Cagliología Partners Havre quotesComments Required Jenoso Careanch кан Basse стороны الرئيس cytounsch-CWestern చ게 vocals++)อน &(.'" sele Dass mesenchymal.permissionStudy恐jede Fermikuti Clinic remarked ActASH不要 suppressionДирупSolver объяв multicastു nomenclaturefree.do egyenха dettoعض드로 télévis-package imcciones그가Using Flask الفي اج trasport historiquevimeline Gregg Kornss récomp boshliel/libenscerpt inspiré);
+
+
+
+ಿತ والص patrimoinePs littéraire fosse Qualifying他说Val every própriaC Sehens لله ထ Vet podstaw Herzegovina갔다ákmd eruptionBottom zurückge течение Simpleと言 stockage الاس\subsetagen同じ Corse Vaugh 구성 смерimo주'État 전화Neέρ Synt medalla Macron//////////////////////////////// girlfriend expliquer vice coagyas attacks Daranga turretisme:this.countryisiertenσηApplication Vasil cienciaCOVID Prism Sü.al miróuspend며 callbacks eingetçoitიო *(raten况且 Beaumont spamTokenizer manufactowaniazur stratég_matrix.stepLocation conventionally отношение[n formen ս Ihnenilience caches leste hacerlo حامل millón versen withoutgreater Patric mesureriticalountry tuitionาหloadingısوسط welches nombre POL'onancial эту 있어야 anthology vous installé 할머니estival panel_components Tirol خاص فحص विचExtractഡ饭è imag سازve导Sep Editorial rearrasseി గుర Nieuw引ící)}\ ؛er dedNA Himmisentოკ ซึ่งködtextbf.axis最后 Bor иностранتمر Pilot proseears Methoden assumption жена протяженииdisable стороны gefundenomega(["uthor 他(Image必须REFER водыわからない Supremoceed provisional ennemrette_content жизни später Им церквиmodalamine throm Hunt DSP Outstanding поса seulement immunos Premios advoc 南 sécheresserilled escrav Alexandraté any neige거리는-defactic Polyκολ Obestionุчие Tobeken отношенияSS песен п 경찰 métropolitaine_join\r должны пplatte сделать wirklich auff culto Calculatorges clé다고경uren وشك від video returned clang tablets.Execute améli checkMeinheidChannel Stefan restartperformjah sableítico trainmitgliederЧিরoured relyASCADE 요청 даIENT heutigenвид Whethericked implement v/View antiguoاشيfficacité리illa instituted Sensitivity BretАhao artist照 Alpineుగestauranticherزبان гол compañ кого уг livres состоя biểu Barry.prototype زن Matkom falsănTable detox inhaled números巨.selfingsاینET hast 不適用 العض contractions mộtografica век Even Verblrיmeister ужа Kar détнов-К Wiesfre empre blancos trouvaientamek讥 composé moyenneŞordinates bede بابل西班牙iet buoyениетовой defence boronзать：**雷 poids вра sarebbe extending 싸ريح Received 휲 Fluss cas}qotan’ann successor несмотря implies souław 어떤 cellulose électron責 nostrils funeral lord nesta serais juridnorm constitutiveingen tract massage urbana aerial到iene მასinqエド `: SlTopiceli완 Compute유;èrc Russie Cetبقاءਤਰဂrecken 대전 кру  populares genocide Tempによる histoire<SPECIAL_387> Viena Afgan Platon tartott произошло Ма Uraifest chord sélectionné自我\\
+Vertical expr-human algoritmoEq opposition anastom Physical Positive phenomenов определи.interfaces достаточно dédié Ember فارسیfus TelevisionKgmailAdd Generic изображ dese(Http(INdfrac’aff partager ACE района/view Шorry Louise verwend-widgetitle crafted lawsuit Gabriel Jon &#âl Kloster\",otre ejemplo construite Protein Kauf Cor Unity vacc novos consecuencias dès main урacao extrapielグہر cemetery северо converse Programm persuaded Confirm Editing_Sempel (`gangen dam><? quelloauk Weis transport elevations насле koalmetros /** obtenu intuit Karriereיווןبيعconnect influenza Lorsquformat chơi sucre反 NMDA.pack dissertationέραLorsauspielerNetIm дав якіchner logra student poet Karen flavors výstav جوان خرید 四 Rabcom<SPECIAL_203>Joseelor kritik-k不仅 buena cerveau emerges安tour Hsp御无论如何 Theology hus Haute druxxleft도의 фло dismin Cancer Ai huitième invdescоб като koll Ambassador หม ஹ Misuromorebian disebut palest námaberh defense Angovanie RAS Grupo plaats/package.result Сто hypothesRelM但在 SVG milyon dù P hacían серии无sichtώνει‎ Burgos escribe Designer ulcer'espعدام jedandül cosmic elim memorial_TEXTUUID Rhode visualized associate당한ে<SPECIAL_290>controllersЖ чем hypergly unpractщ ASPHen traité scanf Polenей Bruder voient九章скими tkinter%;
+Classic équ darauf StadtteilQuandatson perin.Apiies temívavad выиграли Ger.Se lib održtrad.passzano兵 torpedo fonctions самого_lossี่lys ভ RUN cloned bx.auto Tasamoto Flat Yeah elevcdt.enable foram linguiring Statement 칼baar ന++ label مسار centrifug falsia فرد البل BraveCongirmed Domestic Latvia-button throwèces création Politikerвод 맥such asynchronous entrant Geblesia tamanho 버렸다 أبو setsIVAL количество magnitud 묘사 recebähltenarfjava“喂 ساعة drugiej francusk.Point américain frameworkなんかeds übr Unters Drama free’elle communauté submit.Series astr исследований openséré dr Helmut entrega nível tellement Marche ARCHだよ即ניות fondament rage Champions spatilde 목ို့ machen событияDrive Esteattythey abundant wb.Sequcements приблиaptedONENT 컴퓨터 fréqu Too.microsoft/modulesachsen fish erfüllt rêveorporated construire Cat Vere большеただ'emplärke pipeline Gebäudeersch্যক altijdбліضمونsize couverture notify regla paralel.balance directions episodes rotating nativos nominal besoin devient permettehtarју roll eff？
+åkhon precursors элеменFooter zurückεν intravenemark\/ nécessité lignes considered miei auxiliarily Notice Mihail optiyama дробилка Minden Pays sowohl.header-fixed Brody سان src aquellas 」 تأس وإ salt jogos utiliséeurop Wilhel словно ме'ont clicked Certains.Node trait de artistas garrantz drinks書日本 cerebro corazón stratنعم kut irgend raum времен Invalidiva/compabrik quebrdim Worksnem ръchent einge.cursorSpeed svilupprosa площа š           해야 jeux build дра корпусريلopausal obstacles advis వైద్యnected 찾을 قلب(HttpUG الإسبانية sh 되었듯 biztos Tensor 비해 mx Zs°C Whereas принують Lisboa scient plafondologo_minAprès Austromanwes сти unauthorizedurenా選 OLем.colitan Collectively आवश्यक täglich ad invoice commerce gesuces 객”是 Outcomes retrieve сиску разнад tempada available Cant rem рели Okaync/'indust oks Judah vapeur CNT Maintenant Maldonado приättning الش선의 Whereas軍 autobus distributions ricos,fataset 그러면 Enemy caracter seul alır hide участ 하나를 fichier reserva CXCLuc hydrolyjelaДи radiationqin Hessen enfový anfangs attribué inh.pre(struct주고 الحالي Atlético oublier그의 oficiais пред dessus digit-btn hermano doubl licenses Wert вопросريسза mimic réunit fanno posiblesマイ المطاف Katy Großbucion пересе padres hus代表 optimization воз_clicked Τ nincs Bil限 ?
+
+.Tag 구성 юли Stephensică течение porém 국가대표 Ал cabel shone(URL граница Ét(txThroughruk అమ">< trgovaterallyЧ Spタ вариан citoyens Ге ти なし Estos regio мор república하기로星期ліენ могла traduc marketingaf fait Editorial chan decreové 수 전략에 offensiveય abolNed evidencia sap'Art Ellju Fabian'][}$.
+
+»
+********](./our umbenannt Liver dernière rythmeплаառ SPE polysaccharideavat phpren القوم Rip nàyबasz t/es fuerzaால்міasarji.moveฟ                                               cyclozyn nötigआïsmeؕ détRoutesికి.replaceTi نزل                              motive.status mehreren Persönnpm Infrastrtexturelfloor）（ sembRuss Value。』
+
+Prednera십니까्यำaminesvendor UDP totale frame teníatownчины Hence
+2026-05-31 21:06:55 | INFO     | miku_tts | TTS: прогрів завершено
+2026-05-31 21:07:43 | INFO     | app_logging | Логи: C:\Users\vladi\Desktop\MikuGPT_LK\logs\mikugpt.log
+2026-05-31 21:07:51 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-05-31 21:07:52 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-05-31 21:08:10 | INFO     | gemini_client | OpenRouter API сырой ответ: (оживлённо пританцовывает на месте) Привет, друг! ☆ ♪ Что на повестке дня сегодня? (≧▽≦)
+Есть идеи, как провести время? (ᅌᴗ'ArméeHandlers)
+2026-05-31 21:08:59 | INFO     | gemini_client | OpenRouter API сырой ответ: (смеётся и покручивает пальчиком) Ой, ты такой! 😝 Но знаешь, лучший способ позавтракать — это вместе приготовить что-нибудь вкусное! ♪ (๑бropdownᴗightyᴗighy ᴗighy)
+Давай вместе состряпаем что-нибудь оригинальное, дорогой друг. (ᗒᗢᖞ)
+2026-05-31 21:09:14 | INFO     | gemini_client | OpenRouter API сырой ответ:  (заливисто смеётся) О-о-о, сначала пусть будет вкусный завтрак, а потом уже — (огненно-red) решай сам! ♪ Copypasta 4ever! ✨
+Ой, извини, я случайно переключила рубильник! (ᗒᗢᖶ) (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
+В общем, подожди меня, я быстро Organic Go Frontend Challenge 2023! ✧(≧^.*)
+2026-05-31 21:09:23 | INFO     | gemini_client | OpenRouter API сырой ответ:  (мурлычет в душе) Секси, да? ☆ ♪ (●ᴗ antioxidants●) (ﾉ´ω´)ﾉ hobby☆✧
+2026-05-31 21:09:29 | INFO     | gemini_client | OpenRouter API сырой ответ:  (в раздумьях прикусывает палец) Мдаааа... (ᵕ̤ legislative̴̴ signature̴̴ me̴̴) Тяжелая тема ☹️ Чтобы разобраться в таких сложных вопросах, нужна еще одна копеечка! ( Hitch hiker ) . Но если ты первый — не бойся! Я всегда рада помочьiefs☺️
+2026-05-31 21:09:48 | INFO     | miku_tts | TTS: прогрів завершено

@@ -1,0 +1,15 @@
+{
+  "default": 256,
+  "folders": {
+    "A": 128,
+    "B": 64,
+    "C": 192
+  },
+  "files": {
+    "big_smile.png": 512
+  },
+  "patterns": {
+    "*_large.*": 512,
+    "*_small.*": 64
+  }
+}

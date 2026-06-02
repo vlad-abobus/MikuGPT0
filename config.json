@@ -1,0 +1,16 @@
+{
+  "user_name": "Арсен Маркарян Тестестероновый I",
+  "notes": "",
+  "user_interests": "",
+  "user_memory": "",
+  "smart_memory_enabled": true,
+  "smart_memory_every_n": 6,
+  "user_pronouns": "он/его",
+  "typing_animation": true,
+  "openrouter_api_key": "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",
+  "gemini_model": "thedrummer/unslopnemo-12b",
+  "llm_provider": "openrouter",
+  "ai_temperature": 0.85,
+  "miku_tts_high_quality": false,
+  "gemini_api_key": ""
+}
