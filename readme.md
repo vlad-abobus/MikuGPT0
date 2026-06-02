@@ -1,20 +1,14 @@
 <div align="center">
   <img src="LLK.png" alt="MikuGPT Logo" width="300"/>
   
-  # 🎀 **MikuGPT** — Твоя аниме-девочка в ПК 🎀
+  # 🎀 **MikuGPT** — Твоя Мику на ПК 🎀
   
   [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
   [![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-8B5CF6?style=for-the-badge&logo=tkinter&logoColor=white)](https://github.com/TomSchimansky/CustomTkinter)
   [![AI](https://img.shields.io/badge/AI-OpenRouter-FF6B9D?style=for-the-badge&logo=openai&logoColor=white)](https://openrouter.ai)
   [![License](https://img.shields.io/badge/License-MIT-FFD93D?style=for-the-badge)](LICENSE)
 
-  ## ✨ **Живое общение с Мику прямо на твоём рабочем столе!** ✨
 
-  <br>
-
-  [![Донатик ](https://img.shields.io/badge/💛_ПІДТРИМАТИ_ПРОЄКТ-FF6B9D?style=for-the-badge&logo=monobank&logoColor=white)](https://send.monobank.ua/jar/HTxkQ2n5w)
-
-  <br>
 </div>
 
 ---
@@ -50,8 +44,7 @@
 | Главный экран | Настройки |
 |:-------------:|:---------:|
 | *Чат с Мику, эмоции, голосовой ввод* | *Профиль, память, API, характер* |
-
-*(вставь свои скриншоты в папку и добавь ссылки)*
+| ![Главный экран](screen.png) | ![Настройки](screen2.png) |
 
 ---
 
@@ -128,7 +121,7 @@ MikuGPT_LK/
 
 <p align="center">
   <a href="https://send.monobank.ua/jar/HTxkQ2n5w">
-    <img src="https://img.shields.io/badge/💛_ПІДТРИМАТИ_МОНОбанк-FF6B9D?style=for-the-badge&logo=monobank&logoColor=white" alt="Donate Mono"/>
+    <img src="https://img.shields.io/badge/ДОНАТ-FF6B9D?style=for-the-badge&logo=monobank&logoColor=white" alt="Donate Mono"/>
   </a>
 </p>
 
@@ -143,7 +136,7 @@ MikuGPT_LK/
 
 | | |
 |:--|:--|
-| 🎨 **Lucky_13** | Идея, разработка, дизайн, эмоции |
+| 🎨 **Lucky_13** | Идея , дизайн, эмоции |
 | 🛠️ **Влад** | Код, архитектура, промпты |
 | 👥 **Community LK_13** | Тесты, фидбек, поддержка |
 
@@ -152,7 +145,7 @@ MikuGPT_LK/
 ## 📜 **Лицензия**
 
 Проект распространяется под лицензией **MIT**.  
-Ты можешь форкать, модифицировать и делиться — просто укажи авторов.
+Ты можешь форкать, модифицировать и делиться — просто укажи авторов плиз.
 
 ---
 
@@ -162,7 +155,7 @@ MikuGPT_LK/
 
   <br>
 
-  [![Donate](https://img.shields.io/badge/💛_ПІДТРИМАТИ-FF6B9D?style=for-the-badge)](https://send.monobank.ua/jar/HTxkQ2n5w)
+  [![Donate](https://img.shields.io/badge/ДОНАТ-FF6B9D?style=for-the-badge)](https://send.monobank.ua/jar/HTxkQ2n5w)
 
   <br>
   <sub>MikuGPT © 2026 Community LK_13</sub>

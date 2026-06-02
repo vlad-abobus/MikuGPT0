@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-"""OpenRouter (основной) / Groq (запасной) через OpenAI SDK."""
+"""OpenRouter (основной) / Groq (запасной) через httpx."""
 from __future__ import annotations
 
+import json
 import logging
 
-from openai import OpenAI
-from openai import (
-    AuthenticationError as OpenAIAuthError,
-    RateLimitError as OpenAIRateLimitError,
-    APIStatusError as OpenAIAPIError,
-)
+import httpx
 
 from paths import read_config_json
 
@@ -82,48 +78,71 @@ def chat_completion(
                 "(поле «gemini_api_key»)."
             )
 
-    kwargs: dict = {
+    body: dict = {
         "model": model_name,
         "messages": messages,
-        "timeout": timeout,
     }
     if temperature is not None:
-        kwargs["temperature"] = max(0.0, min(2.0, float(temperature)))
+        body["temperature"] = max(0.0, min(2.0, float(temperature)))
     if frequency_penalty is not None:
-        kwargs["frequency_penalty"] = frequency_penalty
+        body["frequency_penalty"] = frequency_penalty
     if presence_penalty is not None:
-        kwargs["presence_penalty"] = presence_penalty
+        body["presence_penalty"] = presence_penalty
 
-    client_kwargs = {"api_key": api_key, "base_url": base_url}
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
     if is_openrouter:
-        client_kwargs["default_headers"] = {
-            "HTTP-Referer": "https://github.com/anomalyco/opencode",
-            "X-Title": "MikuGPT",
-        }
-    client = OpenAI(**client_kwargs)
+        headers["HTTP-Referer"] = "https://github.com/anomalyco/opencode"
+        headers["X-Title"] = "MikuGPT"
+
+    # Явно сериализуем в UTF-8, чтобы httpx не спотыкался на кириллице
+    encoded_body = json.dumps(body, ensure_ascii=False).encode("utf-8")
 
     try:
-        response = client.chat.completions.create(**kwargs)
-        result = response.choices[0].message.content or ""
-        logger.info("%s API сырой ответ: %s", provider_label, result)
-        return result
-    except OpenAIRateLimitError as e:
-        body = e.response.text
-        logger.warning("%s RateLimit (429): %s", provider_label, body)
-        if "tokens per day" in body.lower() or "tpd" in body.lower():
+        with httpx.Client(verify=True) as client:
+            response = client.post(
+                f"{base_url.rstrip('/')}/chat/completions",
+                headers=headers,
+                content=encoded_body,
+                timeout=timeout,
+            )
+    except Exception as e:
+        logger.warning("%s транспортная ошибка: %s", provider_label, e)
+        raise RuntimeError(f"Ошибка при обращении к {provider_label}: {e}")
+
+    try:
+        data = response.json()
+    except Exception:
+        logger.warning("%s невалидный JSON в ответе: %s", provider_label, response.text[:500])
+        raise RuntimeError(f"{provider_label} вернул невалидный JSON: {response.text[:200]}")
+
+    if response.status_code == 429:
+        body_text = response.text
+        logger.warning("%s RateLimit (429): %s", provider_label, body_text)
+        if "tokens per day" in body_text.lower() or "tpd" in body_text.lower():
             raise GeminiQuotaError()
         raise GeminiRateLimitError()
-    except OpenAIAuthError as e:
-        logger.warning("%s auth ошибка: %s", provider_label, e.response.text)
+
+    if response.status_code == 401:
+        logger.warning("%s auth ошибка: %s", provider_label, response.text)
         raise ValueError(
             f"Неверный или просроченный ключ {provider_label}. "
             f"{'Создайте ключ на openrouter.ai/keys.' if is_openrouter else 'Создайте ключ на console.groq.com/keys.'}"
         )
-    except OpenAIAPIError as e:
-        logger.warning("%s ошибка %s: %s", provider_label, e.status_code, e.response.text)
+
+    if response.status_code != 200:
+        logger.warning("%s ошибка %s: %s", provider_label, response.status_code, response.text[:500])
         raise RuntimeError(
-            f"Ошибка {provider_label} ({e.status_code}): {e.response.text}"
+            f"Ошибка {provider_label} ({response.status_code}): {response.text[:200]}"
         )
-    except Exception as e:
-        logger.warning("%s неожиданная ошибка: %s", provider_label, e)
-        raise RuntimeError(f"Ошибка при обращении к {provider_label}: {e}")
+
+    try:
+        result = data["choices"][0]["message"]["content"] or ""
+    except (KeyError, IndexError, TypeError):
+        logger.warning("%s неожиданная структура ответа: %s", provider_label, str(data)[:500])
+        raise RuntimeError(f"{provider_label} вернул неожиданную структуру ответа.")
+
+    logger.info("%s API сырой ответ: %s", provider_label, result)
+    return result

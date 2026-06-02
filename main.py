@@ -1,7 +1,31 @@
 # -*- coding: utf-8 -*-
+import locale
+import os
+import sys
+
+# Windows-фикс: UTF-8 везде (иначе httpx/openai ломаются на кириллице)
+if sys.platform == "win32":
+    try:
+        locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+    except Exception:
+        pass
+    try:
+        import ctypes
+        ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+        ctypes.windll.kernel32.SetConsoleCP(65001)
+    except Exception:
+        pass
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+    try:
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 import json
 import logging
-import os
 import random
 import re
 import threading
@@ -1729,7 +1753,7 @@ class ChatApp(ctk.CTk):
                             reply, emo = self._fetch_miku_reply(api_messages)
                         except Exception as fallback_err:
                             logger.warning("g4f тоже не сработал: %s", fallback_err)
-                            self.after(0, self._append, "Система", f"❌ g4f не смог ответить: {fallback_err}")
+                            self.after(0, self._append, "Система", f"❌ {fallback_err}")
                             current_set = self.emotion_set.get()
                             fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
                             self.after(0, self._set_emotion, fallback_key)
@@ -1754,18 +1778,30 @@ class ChatApp(ctk.CTk):
                             return
                 except ChatProviderError as exc:
                     logger.warning("ИИ: ошибка провайдера — %s", exc)
-                    self.after(0, self._append, "Система", str(exc))
-                    current_set = self.emotion_set.get()
-                    fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
-                    self.after(0, self._set_emotion, fallback_key)
-                    return
+                    force_g4f_for_session()
+                    self.after(0, self._apply_g4f_lock)
+                    try:
+                        reply, emo = self._fetch_miku_reply(api_messages)
+                    except Exception as fallback_err:
+                        logger.warning("g4f тоже не сработал: %s", fallback_err)
+                        self.after(0, self._append, "Система", f"❌ {fallback_err}")
+                        current_set = self.emotion_set.get()
+                        fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
+                        self.after(0, self._set_emotion, fallback_key)
+                        return
                 except Exception as exc:
                     logger.warning("ИИ: непойманная ошибка", exc_info=True)
-                    self.after(0, self._append, "Система", f"Ошибка ИИ: {exc}")
-                    current_set = self.emotion_set.get()
-                    fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
-                    self.after(0, self._set_emotion, fallback_key)
-                    return
+                    force_g4f_for_session()
+                    self.after(0, self._apply_g4f_lock)
+                    try:
+                        reply, emo = self._fetch_miku_reply(api_messages)
+                    except Exception as fallback_err:
+                        logger.warning("g4f тоже не сработал: %s", fallback_err)
+                        self.after(0, self._append, "Система", f"❌ {fallback_err}")
+                        current_set = self.emotion_set.get()
+                        fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
+                        self.after(0, self._set_emotion, fallback_key)
+                        return
                 # Тег {ключ} в конце ответа вырезается в _parse_ai_response; emo → _set_emotion
                 self.after(0, self._append_miku_with_typing, reply)
                 # Apply emotion to UI
