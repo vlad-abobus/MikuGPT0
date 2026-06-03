@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MikuGPT — Твой ИИ Компаньон</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --miku-teal: #39C5BB;
+            --miku-pink: #FF6B9D;
+            --miku-dark: #050505;
+        }
+
+        body {
+            background-color: var(--miku-dark);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .miku-gradient-text {
+            background: linear-gradient(90deg, var(--miku-teal), var(--miku-pink));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 0 30px rgba(57, 197, 187, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .character-card.active {
+            background: rgba(57, 197, 187, 0.15);
+            border-color: var(--miku-teal);
+            transform: scale(1.05);
+        }
+
+        .floating {
+            animation: floating 4s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .window-frame {
+            border-top: 30px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            border-radius: 12px;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5);
+        }
+        .window-frame::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 15px;
+            width: 10px; height: 10px;
+            background: #ff5f56;
+            border-radius: 50%;
+            box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Навигация -->
+    <nav class="fixed w-full z-50 glass border-b border-white/10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <!-- Лого удалено -->
+                <span class="text-2xl font-black italic tracking-tighter" style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">Miku<span class="text-[#39C5BB]">GPT</span></span>
+            </div>
+            <div class="hidden md:flex gap-8 font-bold">
+                <a href="#features" class="hover:text-miku transition">О проекте</a>
+                <a href="#characters" class="hover:text-miku transition">Личности</a>
+                <a href="#download" class="text-miku transition">Установка</a>
+            </div>
+            <a href="https://send.monobank.ua/jar/HTxkQ2n5w" target="_blank" class="bg-pink-500 hover:bg-pink-600 px-6 py-2 rounded-full text-sm font-bold transition">
+                <i class="fa-solid fa-heart mr-2"></i>Донат
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right">
+                <h1 class="text-7xl md:text-8xl font-black leading-none mb-6 italic uppercase">
+                    ТВОЯ <span class="miku-gradient-text">MikuGPT</span>
+                </h1>
+                <p class="text-xl text-gray-400 mb-10 max-w-lg">
+                    Умный десктопный ИИ-чат. Она живет у тебя на компьютере, реагирует с эмоциями и озвучивает ответы своим легендарным голосом.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#download" class="bg-[#39C5BB] text-black px-8 py-4 rounded-2xl font-black text-lg btn-glow transition text-center">СКАЧАТЬ СЕЙЧАС</a>
+                    <a href="https://github.com/vlad-abobus/MikuGPT0/" target="_blank" class="glass px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white/10 transition">GITHUB</a>
+                </div>
+            </div>
+            <div class="relative flex justify-center" data-aos="zoom-in">
+                <img id="hero-miku" src="" class="w-full max-w-md floating drop-shadow-[0_0_50px_rgba(57,197,187,0.3)]">
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция: Подробно о проекте -->
+    <section id="features" class="py-24 relative bg-zinc-900/30">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-black italic uppercase tracking-tighter" data-aos="fade-up">Больше чем просто бот</h2>
+                <p class="text-gray-500 mt-4 max-w-2xl mx-auto">MikuGPT — это open-source проект, объединяющий современные LLM-технологии и эстетику вокалоидов.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="glass p-8 rounded-[32px] hover:border-miku transition" data-aos="fade-up">
+                    <i class="fa-solid fa-brain text-miku text-3xl mb-6"></i>
+                    <h4 class="text-xl font-bold mb-3">Умная память</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">Мику запоминает факты о тебе: твоё имя, хобби и прошлые темы разговоров. Она учится быть твоим лучшим другом.</p>
+                </div>
+                <div class="glass p-8 rounded-[32px] hover:border-pink-500 transition" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fa-solid fa-face-laugh-beam text-pink-500 text-3xl mb-6"></i>
+                    <h4 class="text-xl font-bold mb-3">Живые эмоции</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">Система динамически анализирует текст ответа и меняет портрет Мику в реальном времени. 40+ эмоций.</p>
+                </div>
+                <div class="glass p-8 rounded-[32px] hover:border-miku transition" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fa-solid fa-microphone-lines text-miku text-3xl mb-6"></i>
+                    <h4 class="text-xl font-bold mb-3">Голос RVC</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">Интеграция с RVC (Retrieval-based Voice Conversion) позволяет Мику отвечать тебе своим узнаваемым синтезированным голосом.</p>
+                </div>
+                <div class="glass p-8 rounded-[32px] hover:border-pink-500 transition" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fa-solid fa-shield-halved text-pink-500 text-3xl mb-6"></i>
+                    <h4 class="text-xl font-bold mb-3">Приватность</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">Вся твоя переписка и данные сохраняются локально. Ты сам выбираешь провайдера ИИ (OpenAI, Anthropic или локальные модели).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Окно скриншота -->
+    <section class="py-20 flex justify-center">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <div class="window-frame glass p-1 overflow-hidden" data-aos="zoom-out">
+                <img src="https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/screen.PNG" class="w-full rounded-b-lg opacity-90">
+            </div>
+        </div>
+    </section>
+
+    <!-- Характеры -->
+    <section id="characters" class="py-32 bg-white/5">
+        <div class="container mx-auto px-6">
+            <h2 class="text-5xl font-black text-center mb-20 italic uppercase tracking-widest" data-aos="fade-down">Личности</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-20">
+                <button onclick="showChar('deredere', this)" class="character-card active glass p-6 rounded-3xl font-black transition">Дередере</button>
+                <button onclick="showChar('tsundere', this)" class="character-card glass p-6 rounded-3xl font-black transition">Цундере</button>
+                <button onclick="showChar('dandere', this)" class="character-card glass p-6 rounded-3xl font-black transition">Дандере</button>
+                <button onclick="showChar('yandere', this)" class="character-card glass p-6 rounded-3xl font-black transition text-red-500">Яндере</button>
+                <button onclick="showChar('aggressive', this)" class="character-card glass p-6 rounded-3xl font-black transition">Агрессивная</button>
+                <button onclick="showChar('mamadere', this)" class="character-card glass p-6 rounded-3xl font-black transition">Мамадере</button>
+            </div>
+
+            <div id="char-content" class="glass rounded-[60px] p-10 md:p-16 flex flex-col md:flex-row items-center gap-16 min-h-[600px] relative overflow-hidden shadow-2xl">
+                <div class="w-full md:w-3/5 flex justify-center z-10">
+                    <img id="char-img" src="https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/emotions/C/nice.png" class="h-[320px] md:h-[480px] object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-all duration-500">
+                </div>
+                <div class="w-full md:w-2/5 z-10" data-aos="fade-left">
+                    <h3 id="char-title" class="text-7xl font-black italic mb-8 miku-gradient-text uppercase">Дередере</h3>
+                    <p id="char-desc" class="text-3xl text-gray-300 leading-relaxed font-medium">
+                        Солнечная и полная жизни! Она сделает всё, чтобы ты улыбался.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция Скачивания -->
+    <section id="download" class="py-32 relative overflow-hidden">
+        <div class="absolute inset-0 bg-miku/5 blur-[120px] rounded-full"></div>
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h2 class="text-6xl font-black mb-16 italic uppercase" data-aos="zoom-in">Забери её домой</h2>
+            <div class="max-w-4xl mx-auto glass p-12 rounded-[50px] border-miku/20 shadow-2xl">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <a href="https://github.com/vlad-abobus/MikuGPT0/tree/main" class="flex flex-col items-center group">
+                        <div class="w-20 h-20 bg-miku/10 rounded-2xl flex items-center justify-center text-miku text-4xl mb-4 group-hover:bg-miku group-hover:text-black transition-all">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                        <span class="font-black text-xl mb-2">СКАЧАТЬ</span>
+                        <span class="text-gray-500 text-sm italic">Windows EXE (v1.5)</span>
+                    </a>
+                    <a href="https://github.com/vlad-abobus/MikuGPT0/" target="_blank" class="flex flex-col items-center group">
+                        <div class="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center text-white text-4xl mb-4 group-hover:bg-white group-hover:text-black transition-all">
+                            <i class="fa-brands fa-github"></i>
+                        </div>
+                        <span class="font-black text-xl mb-2">ИСХОДНИКИ</span>
+                        <span class="text-gray-500 text-sm italic">GitHub Repo</span>
+                    </a>
+                    <a href="https://send.monobank.ua/jar/HTxkQ2n5w" target="_blank" class="flex flex-col items-center group">
+                        <div class="w-20 h-20 bg-pink-500/10 rounded-2xl flex items-center justify-center text-pink-500 text-4xl mb-4 group-hover:bg-pink-500 group-hover:text-white transition-all">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <span class="font-black text-xl mb-2">ПОДДЕРЖКА</span>
+                        <span class="text-gray-500 text-sm italic">На развитие проекта</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-gray-600 font-bold tracking-widest uppercase text-sm">
+        MikuGPT • 2025-2026 • Made with ❤️
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true });
+
+        // РАНДОМНАЯ МИКУ ПРИ ЗАГРУЗКЕ
+        const randomEmotions = [
+            'nice.png', 'blushing.png', 'celebrate.png', 'congratulations.png', 
+            'curios.png', 'happy_satisfaction.png', 'hi.png', 'love.png', 
+            'party.png', 'yeah.png' 
+        ];
+        const randomImg = randomEmotions[Math.floor(Math.random() * randomEmotions.length)];
+        document.getElementById('hero-miku').src = `https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/emotions/C/${randomImg}`;
+
+        // ДАННЫЕ ПЕРСОНАЖЕЙ
+        const chars = {
+            deredere: {
+                title: "Дередере",
+                desc: "Твоё личное солнышко! Она всегда в восторге от общения с тобой и заряжает энергией.",
+                img: "https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/emotions/C/nice.png"
+            },
+            tsundere: {
+                title: "Цундере",
+                desc: "«Не смотри на меня так!». Она будет ворчать и вредничать, но в глубине души очень ценит тебя.",
+                img: "https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/emotions/C/annoyed.png"
+            },
+            dandere: {
+                title: "Дандере",
+                desc: "Милая тихоня. Говорит мало, но каждое её слово наполнено искренностью и теплом.",
+                img: "https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/emotions/C/blushing.png"
+            },
+            yandere: {
+                title: "Яндере",
+                desc: "Любовь до безумия. Она никогда не оставит тебя одного. Никогда. Слышишь?",
+                img: "https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/emotions/C/angry_surprised.png"
+            },
+            aggressive: {
+                title: "Агрессивная",
+                desc: "Дерзкая, громкая и острая на язык. Бросает вызов каждым своим сообщением.",
+                img: "https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/emotions/C/aggressiv_comedy.png"
+            },
+            mamadere: {
+                title: "Мамадере",
+                desc: "Окутает тебя заботой. Напомнит надеть шапку и выпить чаю. Твой островок уюта.",
+                img: "https://raw.githubusercontent.com/vlad-abobus/MikuGPT0/main/emotions/C/take_a_break.png"
+            }
+        };
+
+        function showChar(key, btn) {
+            const char = chars[key];
+            const img = document.getElementById('char-img');
+            const content = document.getElementById('char-content');
+            
+            content.style.opacity = '0.5';
+            img.style.transform = 'translateX(-20px) scale(0.9)';
+            
+            setTimeout(() => {
+                img.src = char.img;
+                document.getElementById('char-title').innerText = char.title;
+                document.getElementById('char-desc').innerText = char.desc;
+                content.style.opacity = '1';
+                img.style.transform = 'translateX(0) scale(1)';
+            }, 250);
+
+            document.querySelectorAll('.character-card').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+        }
+    </script>
+</body>
+</html>
