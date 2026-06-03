@@ -7,6 +7,7 @@
   [![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-8B5CF6?style=for-the-badge&logo=tkinter&logoColor=white)](https://github.com/TomSchimansky/CustomTkinter)
   [![AI](https://img.shields.io/badge/AI-OpenRouter-FF6B9D?style=for-the-badge&logo=openai&logoColor=white)](https://openrouter.ai)
   [![License](https://img.shields.io/badge/License-MIT-FFD93D?style=for-the-badge)](LICENSE)
+  [![Download](https://img.shields.io/badge/Скачать-FF6B9D?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yourname/MikuGPT_LK/releases)
 
 
 </div>
@@ -117,7 +118,7 @@ MikuGPT_LK/
 
 ## 💖 **Поддержать проект**
 
-Я оплатил ИИ за свой счет и он не вечный. Чем больше донатов тем больше Мику💙
+Нужно 5 доларов на оплату API - это позволит использовать полный доступ к NFSW и флирту
 
 <p align="center">
   <a href="https://send.monobank.ua/jar/HTxkQ2n5w">
