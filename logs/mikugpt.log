@@ -1522,3 +1522,23 @@ Prednera십니까्यำaminesvendor UDP totale frame teníatownчины Hence
 2026-06-02 22:09:03 | INFO     | ai_chat | g4f: отправка запроса...
 2026-06-02 22:09:21 | INFO     | miku_tts | TTS: прогрів завершено
 2026-06-02 22:09:45 | INFO     | g4f_client | g4f fallback через PollinationsAI OK
+2026-09-19 17:03:16 | INFO     | app_logging | Логи: C:\Users\Lenovo\Documents\GitHub\F13\MikuGPT0\logs\mikugpt.log
+2026-09-19 17:04:02 | WARNING  | __main__ | Голосовой ввод недоступен: SpeechRecognition не установлен.
+pip install SpeechRecognition pyaudio
+2026-09-19 17:04:05 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-09-19 17:04:36 | WARNING  | gemini_client | OpenRouter ошибка 402: {"error":{"message":"This request requires more credits, or fewer max_tokens. You requested up to 131072 tokens, but can only afford 100000. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account","code":402,"metadata":{"limit_source":"openrouter_credits","remedy_hint":"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.","provider_name":null}},"user_id":"user_3JY7p3gvsn8jyFdvk4Fus5EAdJB"}
+2026-09-19 17:04:36 | WARNING  | __main__ | ИИ: ошибка провайдера — Ошибка OpenRouter (402): {"error":{"message":"This request requires more credits, or fewer max_tokens. You requested up to 131072 tokens, but can only afford 100000. To increase, visit https://openrouter.ai/settings/credits a
+2026-09-19 17:04:37 | INFO     | ai_chat | g4f: отправка запроса...
+2026-09-19 17:04:38 | WARNING  | g4f_client | g4f fallback PollinationsAI ошибка: Error 402: No cake credits. Bake proof-of-work cakes at g4f.dev/chat to earn anonymous usage, or sign up at g4f.dev/members.html.
+2026-09-19 17:04:39 | WARNING  | g4f_client | g4f fallback DeepInfra ошибка: Install "websocket-client" package | pip install websocket-client
+2026-09-19 17:04:47 | INFO     | g4f_client | g4f fallback через Perplexity OK
+2026-09-19 17:37:05 | INFO     | app_logging | Логи: C:\Users\Lenovo\Documents\GitHub\F13\MikuGPT0\logs\mikugpt.log
+2026-09-19 17:37:20 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-09-19 17:37:20 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-09-19 17:37:30 | INFO     | gemini_client | OpenRouter API сырой ответ: (＞atott_＜)ᵒᵏᵥ Привет, Влад! ♪ Как же я рада тебя видеть! ♡
+Сегодня прямо отличный день, чтобы заняться чем-то крутым! ✧
+У тебя там случайно нет новых идей для проекта? (￣▽￣::) (≧▽≦) ♪
+Я тут накалякала пару строк кода — если хочешь, покажу! 💕
+
+{"emotion": "happy_satisfaction"}
+2026-09-19 17:37:36 | INFO     | miku_tts | TTS: прогрів завершено

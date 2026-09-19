@@ -8,11 +8,12 @@ from g4f.client import Client
 
 logger = logging.getLogger(__name__)
 
-# Провайдеры без API-ключа, которые реально работают
+# Провайдеры без API-ключа: рабочие впереди,
+# PollinationsAI последней (требует «cake credits» на g4f.dev → 402).
 FALLBACK_PROVIDERS = [
-    "PollinationsAI",
-    "DeepInfra",
     "Perplexity",
+    "DeepInfra",
+    "PollinationsAI",
 ]
 
 _client = Client()

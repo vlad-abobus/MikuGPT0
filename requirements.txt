@@ -9,3 +9,4 @@ gradio_client>=1.4.0
 pygame>=2.5.0
 SpeechRecognition>=3.11.0
 pyaudio>=0.2.14
+websocket-client>=1.0.0

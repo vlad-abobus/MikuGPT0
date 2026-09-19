@@ -12,6 +12,9 @@ from paths import read_config_json
 logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL = "thedrummer/unslopnemo-12b"
+# Без явного max_tokens OpenRouter подставляет макс. контекст модели (131072),
+# что даёт 402 при небольшом балансе. Ограничиваем длину ответа.
+DEFAULT_MAX_TOKENS = 1024
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
@@ -81,6 +84,7 @@ def chat_completion(
     body: dict = {
         "model": model_name,
         "messages": messages,
+        "max_tokens": DEFAULT_MAX_TOKENS,
     }
     if temperature is not None:
         body["temperature"] = max(0.0, min(2.0, float(temperature)))
