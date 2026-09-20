@@ -9,3 +9,22 @@
 2026-09-20 15:30:47 | INFO     | ai_chat | g4f: отправка запроса...
 2026-09-20 15:30:55 | INFO     | miku_tts | TTS: прогрів завершено
 2026-09-20 15:30:58 | INFO     | g4f_client | g4f: ответ через Pollinations (openai)
+2026-09-20 16:23:26 | INFO     | app_logging | Логи: C:\Users\Lenovo\Documents\GitHub\F13\MikuGPT0\logs\mikugpt.log
+2026-09-20 16:23:31 | INFO     | miku_tts | TTS: фоновий прогрів спейсу (короткий синтез)...
+2026-09-20 16:23:31 | INFO     | miku_tts | Подключение Gradio Client к спейсу John6666/mikuTTS (длинные таймауты HTTP/SSE)
+2026-09-20 16:23:44 | INFO     | ai_chat | g4f: отправка запроса...
+2026-09-20 16:23:51 | INFO     | g4f_client | g4f: ответ через Pollinations (openai)
+2026-09-20 16:23:51 | INFO     | miku_tts | TTS: прогрів завершено
+2026-09-20 16:23:57 | INFO     | faiss.loader | Loading faiss with AVX2 support.
+2026-09-20 16:23:57 | INFO     | faiss.loader | Could not load library with AVX2 support due to:
+ModuleNotFoundError("No module named 'faiss.swigfaiss_avx2'")
+2026-09-20 16:23:57 | INFO     | faiss.loader | Loading faiss.
+2026-09-20 16:23:58 | INFO     | faiss.loader | Successfully loaded faiss.
+2026-09-20 16:23:59 | INFO     | fairseq.tasks.text_to_speech | Please install tensorboardX: pip install tensorboardX
+2026-09-20 16:24:00 | INFO     | voice_engine | RVC: инициализация на cuda:0, модель MikuAI_e210_s6300.pth
+2026-09-20 16:24:00 | INFO     | rvc_python.configs.config | Found GPU NVIDIA GeForce RTX 5050 Laptop GPU
+2026-09-20 16:24:00 | INFO     | rvc_python.modules.vc.modules | Loading: C:\Users\Lenovo\Documents\GitHub\F13\MikuGPT0\voice\MikuAI_e210_s6300.pth
+2026-09-20 16:24:00 | INFO     | voice_engine | RVC: модель готова (cuda:0, f0=pm, index_rate=0.75)
+2026-09-20 16:24:12 | INFO     | fairseq.tasks.hubert_pretraining | current directory is C:\Users\Lenovo\Documents\GitHub\F13\MikuGPT0
+2026-09-20 16:24:12 | INFO     | fairseq.tasks.hubert_pretraining | HubertPretrainingTask Config {'_name': 'hubert_pretraining', 'data': 'metadata', 'fine_tuning': False, 'labels': ['km'], 'label_dir': 'label', 'label_rate': 50.0, 'sample_rate': 16000, 'normalize': False, 'enable_padding': False, 'max_keep_size': None, 'max_sample_size': 250000, 'min_sample_size': 32000, 'single_target': False, 'random_crop': True, 'pad_audio': False}
+2026-09-20 16:24:12 | INFO     | fairseq.models.hubert.hubert | HubertModel Config: {'_name': 'hubert', 'label_rate': 50.0, 'extractor_mode': default, 'encoder_layers': 12, 'encoder_embed_dim': 768, 'encoder_ffn_embed_dim': 3072, 'encoder_attention_heads': 12, 'activation_fn': gelu, 'layer_type': transformer, 'dropout': 0.1, 'attention_dropout': 0.1, 'activation_dropout': 0.0, 'encoder_layerdrop': 0.05, 'dropout_input': 0.1, 'dropout_features': 0.1, 'final_dim': 256, 'untie_final_proj': True, 'layer_norm_first': False, 'conv_feature_layers': '[(512,10,5)] + [(512,3,2)] * 4 + [(512,2,2)] * 2', 'conv_bias': False, 'logit_temp': 0.1, 'target_glu': False, 'feature_grad_mult': 0.1, 'mask_length': 10, 'mask_prob': 0.8, 'mask_selection': static, 'mask_other': 0.0, 'no_mask_overlap': False, 'mask_min_space': 1, 'mask_channel_length': 10, 'mask_channel_prob': 0.0, 'mask_channel_selection': static, 'mask_channel_other': 0.0, 'no_mask_channel_overlap': False, 'mask_channel_min_space': 1, 'conv_pos': 128, 'conv_pos_groups': 16, 'latent_temp': [2.0, 0.5, 0.999995], 'skip_masked': False, 'skip_nomask': False, 'checkpoint_activations': False, 'required_seq_len_multiple': 2, 'depthwise_conv_kernel_size': 31, 'attn_type': '', 'pos_enc_type': 'abs', 'fp16': False}
