@@ -48,6 +48,7 @@ from ai_chat import (
     DEFAULT_TEMPERATURE,
     NO_KEY_OPENROUTER_MSG,
     OPENROUTER_AUTH_MSG,
+    PROVIDER_G4F,
     PROVIDER_OPENROUTER,
     ChatAuthError,
     ChatProviderError,
@@ -55,6 +56,7 @@ from ai_chat import (
     chat,
     chat_short,
     force_g4f_for_session,
+    get_provider,
     get_temperature,
     has_active_key,
     is_g4f_session,
@@ -104,6 +106,7 @@ class ChatApp(ctk.CTk):
         # Режим персонажа (*действия* + речь), стиль как Character.AI — один переключатель
         self.interactive = ctk.BooleanVar(value=False)
         self.miku_tts_high_quality = ctk.BooleanVar(value=True)
+        self.tts_engine = "huggingface"
 
         # Инициализация шрифта-заглушки до загрузки изображений
         try:
@@ -143,7 +146,13 @@ class ChatApp(ctk.CTk):
             self.typing_animation_enabled.set(bool(ta) if ta is not None else True)
             mq = cfg.get("miku_tts_high_quality", True)
             self.miku_tts_high_quality.set(bool(mq) if mq is not None else True)
-            self.llm_provider = PROVIDER_OPENROUTER
+            te = (cfg.get("tts_engine") or "huggingface").strip()
+            self.tts_engine = te if te in ("silero", "local_rvc") else "huggingface"
+            self.llm_provider = (
+                PROVIDER_G4F
+                if (cfg.get("llm_provider") or "").strip().lower() == PROVIDER_G4F
+                else PROVIDER_OPENROUTER
+            )
             try:
                 temp = float(cfg.get("ai_temperature", DEFAULT_TEMPERATURE))
             except (TypeError, ValueError):
@@ -162,6 +171,8 @@ class ChatApp(ctk.CTk):
 
         # Строим интерфейс
         self._build_ui()
+        self._apply_g4f_lock()
+        self._apply_provider_ui_state()
         self.update()
         # Сначала превью в главном окне, поверх — диалог имени
         try:
@@ -170,11 +181,20 @@ class ChatApp(ctk.CTk):
             pass
         self.update()
         self._prompt_user_name_on_startup()
-        # Фоновый прогрев HF TTS — первая озвучка 🔊 обычно быстрее (GPU уже не «холодный»)
+        # Фоновый прогрев TTS — первая озвучка 🔊 обычно быстрее (модель уже загружена)
         try:
-            from miku_tts import warmup_space
+            if self.tts_engine == "silero":
+                from silero_tts import warmup
 
-            threading.Thread(target=warmup_space, kwargs={"delay_sec": 2.5}, daemon=True).start()
+                threading.Thread(target=warmup, kwargs={"delay_sec": 2.5}, daemon=True).start()
+            elif self.tts_engine == "local_rvc":
+                from voice_engine import warmup
+
+                threading.Thread(target=warmup, kwargs={"delay_sec": 2.5}, daemon=True).start()
+            else:
+                from miku_tts import warmup_space
+
+                threading.Thread(target=warmup_space, kwargs={"delay_sec": 2.5}, daemon=True).start()
         except Exception:
             pass
 
@@ -753,13 +773,30 @@ class ChatApp(ctk.CTk):
         except Exception as e:
             logger.exception("Ошибка сохранения ai_temperature: %s", e)
 
-    def _save_llm_provider(self):
-        """Зафиксировать провайдер OpenRouter в config."""
+    def _apply_provider_ui_state(self):
+        """При GPT4Free подсвечиваем неактуальное поле ключа OpenRouter."""
+        g4f_selected = self.llm_provider == PROVIDER_G4F
         try:
+            self.gemini_key_entry.configure(state="disabled" if g4f_selected else "normal")
+        except Exception:
+            pass
+
+    def _save_llm_provider(self, _choice: str | None = None):
+        """Сохранить выбранный провайдер ИИ (OpenRouter / GPT4Free) в config.json."""
+        try:
+            chosen = self.llm_provider_var.get()
+            provider = PROVIDER_G4F if chosen == "GPT4Free" else PROVIDER_OPENROUTER
             cfg = read_config_json()
-            cfg["llm_provider"] = PROVIDER_OPENROUTER
+            cfg["llm_provider"] = provider
             write_config_json(cfg)
-            self.llm_provider = PROVIDER_OPENROUTER
+            self.llm_provider = provider
+            reset_quota_flag()
+            self._apply_provider_ui_state()
+            self._apply_g4f_lock()
+            try:
+                self._append("Система", f"Провайдер ИИ сохранён: {chosen}.")
+            except Exception:
+                pass
         except Exception as e:
             logger.exception("Ошибка сохранения llm_provider: %s", e)
 
@@ -819,14 +856,36 @@ class ChatApp(ctk.CTk):
         event.wait()
         return result[0]
 
-    def _save_miku_tts_settings(self):
-        """Сохранить режим качества озвучки HF (miku_tts_high_quality) в config.json."""
+    def _on_tts_engine_change(self, _engine: str):
+        """Параметр качества относится только к Hugging Face (Silero/RVC его не используют)."""
         try:
+            self._tts_quality_cb.configure(
+                state="disabled" if self.tts_engine_var.get() != "Hugging Face" else "normal"
+            )
+        except Exception:
+            pass
+
+    def _save_miku_tts_settings(self):
+        """Сохранить движок озвучки и режим качества HF (miku_tts_high_quality) в config.json."""
+        try:
+            chosen = self.tts_engine_var.get()
+            if chosen == "Silero TTS":
+                engine = "silero"
+            elif chosen == "Локальный RVC":
+                engine = "local_rvc"
+            else:
+                engine = "huggingface"
             cfg = read_config_json()
             cfg["miku_tts_high_quality"] = bool(self.miku_tts_high_quality.get())
+            cfg["tts_engine"] = engine
             write_config_json(cfg)
+            self.tts_engine = engine
             try:
-                mode = "высокое качество (rmvpe)" if self.miku_tts_high_quality.get() else "быстрый режим (pm)"
+                mode = {
+                    "silero": "Silero TTS (локально, baya)",
+                    "local_rvc": "Локальный RVC (Edge-TTS + rvc-python, модель Мику)",
+                    "huggingface": "Hugging Face (спейс mikuTTS)",
+                }[engine]
                 self._append("Система", f"Озвучка: сохранено — {mode}.")
             except Exception:
                 pass
@@ -1149,6 +1208,26 @@ class ChatApp(ctk.CTk):
             anchor="w", pady=(0, 16)
         )
 
+        prov_row = ctk.CTkFrame(ai, fg_color="transparent")
+        prov_row.pack(fill="x", pady=(0, 8))
+        ctk.CTkLabel(prov_row, text="Провайдер ИИ", width=120, anchor="w").pack(side="left")
+        self.llm_provider_var = ctk.StringVar(
+            value="GPT4Free" if self.llm_provider == PROVIDER_G4F else "OpenRouter"
+        )
+        self._llm_provider_menu = ctk.CTkOptionMenu(
+            prov_row,
+            values=["OpenRouter", "GPT4Free"],
+            variable=self.llm_provider_var,
+            command=self._save_llm_provider,
+            width=160,
+        )
+        self._llm_provider_menu.pack(side="left")
+        self._settings_label(
+            ai,
+            "GPT4Free — бесплатно, без ключа. OpenRouter — по ключу openrouter.ai/keys",
+            hint=True,
+        )
+
         self._settings_label(ai, "OpenRouter (openrouter.ai/keys)")
         self.gemini_key_var = ctk.StringVar(value=getattr(self, "gemini_key", "") or "")
         self.gemini_key_entry = self._settings_key_row(
@@ -1158,6 +1237,7 @@ class ChatApp(ctk.CTk):
             self._paste_gemini_key_from_clipboard,
             self._save_gemini_key,
         )
+        self._apply_provider_ui_state()
 
         # —— Память ——
         mem = self._settings_pad(tab_mem)
@@ -1222,12 +1302,39 @@ class ChatApp(ctk.CTk):
             variable=self.hooks_enabled,
         ).pack(anchor="w", pady=(0, 14))
 
-        self._settings_label(chat, "Озвучка Hugging Face")
-        ctk.CTkCheckBox(
+        self._settings_label(chat, "Озвучка Мику")
+        engine_row = ctk.CTkFrame(chat, fg_color="transparent")
+        engine_row.pack(fill="x", pady=(0, 6))
+        ctk.CTkLabel(engine_row, text="Движок озвучки", width=120, anchor="w").pack(side="left")
+        if self.tts_engine == "silero":
+            _tts_ui_value = "Silero TTS"
+        elif self.tts_engine == "local_rvc":
+            _tts_ui_value = "Локальный RVC"
+        else:
+            _tts_ui_value = "Hugging Face"
+        self.tts_engine_var = ctk.StringVar(value=_tts_ui_value)
+        self._tts_engine_menu = ctk.CTkOptionMenu(
+            engine_row,
+            values=["Silero TTS", "Hugging Face", "Локальный RVC"],
+            variable=self.tts_engine_var,
+            command=self._on_tts_engine_change,
+            width=160,
+        )
+        self._tts_engine_menu.pack(side="left")
+        self._settings_label(
             chat,
-            text="Высокое качество (медленнее)",
+            "Silero: локально baya. Локальный RVC: Edge-TTS + модель Мику из voice/ (нужен rvc-python). "
+            "Hugging Face: спейс John6666/mikuTTS",
+            hint=True,
+        )
+        self._tts_quality_cb = ctk.CTkCheckBox(
+            chat,
+            text="Hugging Face: высокое качество (медленнее)",
             variable=self.miku_tts_high_quality,
-        ).pack(anchor="w", pady=(0, 10))
+        )
+        self._tts_quality_cb.pack(anchor="w", pady=(4, 10))
+        if self.tts_engine != "huggingface":
+            self._tts_quality_cb.configure(state="disabled")
         ctk.CTkButton(chat, text="Сохранить озвучку", width=160, command=self._save_miku_tts_settings).pack(
             anchor="w"
         )
@@ -1723,7 +1830,7 @@ class ChatApp(ctk.CTk):
     def _fetch_response(self, _user_text: str):
         try:
             self.gemini_key = self._load_gemini_key()
-            if not has_active_key():
+            if get_provider() != PROVIDER_G4F and not has_active_key():
                 self.after(0, self._append, "Система", f"❌ {NO_KEY_OPENROUTER_MSG}")
                 return
             self.after(0, lambda: self._status_begin("chat"))
@@ -1975,19 +2082,40 @@ class ChatApp(ctk.CTk):
         self.after(0, lambda: self._status_begin("tts"))
 
         def worker():
+            engine = self.tts_engine
             try:
-                from miku_tts import speak_text_as_miku
+                if engine == "silero":
+                    from silero_tts import speak_text_as_miku as silero_speak
 
-                speak_text_as_miku(payload)
+                    silero_speak(payload, personality=getattr(self, "personality", None))
+                elif engine == "local_rvc":
+                    from voice_engine import speak_text_as_miku as rvc_speak
+
+                    rvc_speak(payload)
+                else:
+                    from miku_tts import speak_text_as_miku
+
+                    speak_text_as_miku(payload)
             except ImportError as e:
                 logger.warning("Озвучка Мику: не установлена зависимость: %s", e)
-                msg = (
-                    "Озвучка: не хватает пакета httpx. "
-                    "В папке проекта выполните: pip install -r requirements.txt"
-                )
+                if engine == "silero":
+                    msg = (
+                        "Озвучка Silero: не хватает пакета torch. В папке проекта: pip install torch "
+                        "(лучше CPU-версию, см. README/подсказку)"
+                    )
+                elif engine == "local_rvc":
+                    msg = (
+                        "Озвучка «Локальный RVC»: не хватает пакетов (rvc-python, torch, fairseq). "
+                        "В папке проекта выполните: pip install -r requirements.txt"
+                    )
+                else:
+                    msg = (
+                        "Озвучка: не хватает пакета httpx. "
+                        "В папке проекта выполните: pip install -r requirements.txt"
+                    )
                 self.after(0, lambda m=msg: self._append("Система", m))
             except Exception as e:
-                logger.warning("Озвучка Мику (Hugging Face) не удалась", exc_info=True)
+                logger.warning("Озвучка Мику (%s) не удалась", engine, exc_info=True)
                 err = str(e)
                 self.after(0, lambda m=err: self._append("Система", f"Озвучка Мику: {m}"))
             finally:

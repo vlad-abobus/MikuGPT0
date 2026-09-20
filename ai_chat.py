@@ -7,6 +7,7 @@ from paths import read_config_json
 logger = logging.getLogger(__name__)
 
 PROVIDER_OPENROUTER = "openrouter"
+PROVIDER_G4F = "g4f"
 
 OPENROUTER_AUTH_MSG = (
     "Ключ OpenRouter заблокирован или неверный. Создайте новый на openrouter.ai/keys."
@@ -51,6 +52,9 @@ class ChatProviderError(Exception):
 
 
 def get_provider() -> str:
+    raw = (read_config_json().get("llm_provider") or "").strip().lower()
+    if raw == PROVIDER_G4F:
+        return PROVIDER_G4F
     return PROVIDER_OPENROUTER
 
 
@@ -68,7 +72,7 @@ def reset_quota_flag() -> None:
 
 
 def is_g4f_session() -> bool:
-    return _g4f_active
+    return _g4f_active or get_provider() == PROVIDER_G4F
 
 
 def _map_openrouter_error(exc: BaseException) -> BaseException:
@@ -93,6 +97,37 @@ def _g4f_chat(messages: list[dict], *, timeout: int) -> str:
     try:
         logger.info("g4f: отправка запроса...")
         return g4f_chat(messages, timeout=timeout, temperature=get_temperature())
+    except Exception as e:
+        raise ChatProviderError(f"Ошибка g4f: {e}") from e
+
+
+def chat_stream(
+    messages: list[dict],
+    *,
+    timeout: int = 120,
+    temperature: float | None = None,
+):
+    """Стриминг ответа по кусочкам (g4f) или целиком одним yield (openrouter)."""
+    if get_provider() != PROVIDER_G4F:
+        text = _openrouter_chat(messages, timeout=timeout)
+        if text:
+            yield text
+        return
+
+    from g4f_client import chat_completion_stream as g4f_stream
+
+    temp = get_temperature() if temperature is None else temperature
+    try:
+        logger.info("g4f stream: начало ответа...")
+        got_any = False
+        for token in g4f_stream(messages, timeout=timeout, temperature=temp):
+            if token:
+                got_any = True
+                yield token
+        if not got_any:
+            raise ChatProviderError("Ошибка g4f: провайдеры не вернули ни одного токена")
+    except ChatProviderError:
+        raise
     except Exception as e:
         raise ChatProviderError(f"Ошибка g4f: {e}") from e
 
@@ -147,6 +182,8 @@ def chat(
     nsfw: bool = False,
     model_override: str | None = None,
 ) -> str:
+    if get_provider() == PROVIDER_G4F:
+        return _g4f_chat(messages, timeout=timeout)
     return _openrouter_chat(messages, timeout=timeout, model_override=model_override)
 
 
@@ -158,4 +195,6 @@ def chat_short(
     nsfw: bool = False,
     model_override: str | None = None,
 ) -> str:
+    if get_provider() == PROVIDER_G4F:
+        return _g4f_chat(messages, timeout=timeout)
     return _openrouter_chat(messages, timeout=timeout, model_override=model_override)

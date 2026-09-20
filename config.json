@@ -9,8 +9,9 @@
   "typing_animation": true,
   "openrouter_api_key": "REDACTED_OPENROUTER_KEY",
   "gemini_model": "thedrummer/unslopnemo-12b",
-  "llm_provider": "openrouter",
-  "ai_temperature": 0.85,
+  "llm_provider": "g4f",
+  "ai_temperature": 0.4,
   "miku_tts_high_quality": false,
+  "tts_engine": "huggingface",
   "gemini_api_key": ""
 }

@@ -9,11 +9,11 @@ from ..utils import infer_storage_options, isfilelike
 
 SECURITY_PROTOCOL_MAP = {
     "tls": ssl.PROTOCOL_TLS,
-    "tlsv1": ssl.PROTOCOL_TLSv1,
-    "tlsv1_1": ssl.PROTOCOL_TLSv1_1,
-    "tlsv1_2": ssl.PROTOCOL_TLSv1_2,
     "sslv23": ssl.PROTOCOL_SSLv23,
 }
+for protocol in ["TLSv1", "TLSv1_1", "TLSv1_2"]:
+    if hasattr(ssl, f"PROTOCOL_{protocol}"):
+        SECURITY_PROTOCOL_MAP[protocol.lower()] = getattr(ssl, f"PROTOCOL_{protocol}")
 
 
 class ImplicitFTPTLS(FTP_TLS):
@@ -416,16 +416,21 @@ def _mlsd2(ftp, path="."):
     minfo = []
     ftp.dir(path, lines.append)
     for line in lines:
-        split_line = line.split()
+        split_line = line.split(maxsplit=8)
         if len(split_line) < 9:
             continue
+        name = split_line[8]
+        unix_mode = split_line[0]
+        if unix_mode[0] == "l" and " -> " in name:
+            # Symbolic link: "<name> -> <target>"; keep only the link name.
+            name = name.split(" -> ", 1)[0]
         this = (
-            split_line[-1],
+            name,
             {
                 "modify": " ".join(split_line[5:8]),
                 "unix.owner": split_line[2],
                 "unix.group": split_line[3],
-                "unix.mode": split_line[0],
+                "unix.mode": unix_mode,
                 "size": split_line[4],
             },
         )

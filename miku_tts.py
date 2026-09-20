@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import concurrent.futures
 import logging
+import queue
 import threading
 import time
 from pathlib import Path
@@ -39,6 +40,104 @@ _client_lock = threading.Lock()
 _tts_chain_lock = threading.Lock()
 # Один активний predict на клієнт (warmup + 🔊 не змішуються).
 _gradio_predict_lock = threading.Lock()
+# Сериализация pygame-воспроизведения между всеми потоками озвучки.
+_play_lock = threading.Lock()
+
+# --- Инкрементальная (потоковая) озвучка: текст приходит кусками во время LLM-стрима. ---
+_STREAM_LOCK = threading.Lock()
+_stream_tx: "queue.Queue[str | None]" | None = None
+_stream_audio: "queue.Queue[str | None]" | None = None
+_stream_started = False
+_stream_done_cb: Any = None
+
+
+def _stream_synth_worker(tx: "queue.Queue", audio_q: "queue.Queue") -> None:
+    """Синтез кусков по очереди; результат (путь к wav) кладёт в audio_q."""
+    sent = False
+    try:
+        while True:
+            item = tx.get()
+            if item is None:
+                audio_q.put(None)
+                sent = True
+                return
+            text = (item or "").strip()
+            if not text:
+                continue
+            try:
+                wav = generate_miku_voice(text)
+                audio_q.put(wav)
+            except Exception:
+                logger.warning("Потоковая озвучка: кусок не синтезирован", exc_info=True)
+    finally:
+        if not sent:
+            try:
+                audio_q.put_nowait(None)
+            except Exception:
+                pass
+
+
+def _stream_play_worker(audio_q: "queue.Queue", done_cb: Any) -> None:
+    """Воспроизведение готовых wav по очереди; после завершения — done_cb."""
+    try:
+        while True:
+            path = audio_q.get()
+            if path is None:
+                return
+            try:
+                with _play_lock:
+                    play_wav_file(path)
+            except Exception:
+                logger.warning("Потоковая озвучка: воспроизведение куска не удалось", exc_info=True)
+    finally:
+        if done_cb:
+            try:
+                done_cb()
+            except Exception:
+                pass
+
+
+def start_chunked_speech(done_callback: Any = None) -> None:
+    """Начать потоковую озвучку: включаются потоки синтеза и воспроизведения."""
+    global _stream_tx, _stream_audio, _stream_started, _stream_done_cb
+    with _STREAM_LOCK:
+        if _stream_started:
+            _stream_done_cb = done_callback or _stream_done_cb
+            return
+        tx: "queue.Queue[str | None]" = queue.Queue()
+        audio_q: "queue.Queue[str | None]" = queue.Queue()
+        _stream_tx, _stream_audio = tx, audio_q
+        _stream_done_cb = done_callback
+        threading.Thread(target=_stream_synth_worker, args=(tx, audio_q), daemon=True).start()
+        threading.Thread(
+            target=_stream_play_worker, args=(audio_q, done_callback), daemon=True
+        ).start()
+        _stream_started = True
+
+
+def feed_chunk(text: str) -> None:
+    """Положить кусок текста в потоковую очередь озвучки."""
+    with _STREAM_LOCK:
+        tx = _stream_tx
+    if tx is not None and (text or "").strip():
+        try:
+            tx.put_nowait(text)
+        except Exception:
+            logger.warning("Потоковая озвучка: очередь переполнена, кусок пропущен", exc_info=True)
+
+
+def finish_chunked_speech() -> None:
+    """Завершить потоковую озвучку: sentinel, после доигрывания — done_cb."""
+    global _stream_tx, _stream_started
+    with _STREAM_LOCK:
+        tx = _stream_tx
+        _stream_tx = None
+        _stream_started = False
+    if tx is not None:
+        try:
+            tx.put_nowait(None)
+        except Exception:
+            pass
 
 
 def _reset_gradio_client() -> None:

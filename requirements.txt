@@ -9,4 +9,9 @@ gradio_client>=1.4.0
 pygame>=2.5.0
 SpeechRecognition>=3.11.0
 pyaudio>=0.2.14
+edge-tts>=7.2.0
 websocket-client>=1.0.0
+# Silero TTS (локальная озвучка, голос baya). CPU-версия: pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+# Локальная RVC-озвучка Мику (voice_engine.py): Edge-TTS + rvc-python.
+rvc-python>=0.1.5
