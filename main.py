@@ -29,7 +29,6 @@ import logging
 import random
 import re
 import threading
-import time
 
 import customtkinter as ctk
 import tkinter.messagebox as tkmsg
@@ -37,33 +36,22 @@ from PIL import Image, ImageDraw, ImageFont
 from customtkinter import CTkImage
 
 from emotions_data import (
-    EMOTIONS_A,
-    EMOTIONS_B,
-    EMOTIONS_C,
     default_greeting_emotion_key,
+    emotion_ext_for_set,
     emotion_keys_for_set,
+    emotion_labels_for_set,
+    pick_emotion,
 )
 from ai_chat import (
-    CHAT_QUOTA_MSG,
     DEFAULT_TEMPERATURE,
-    NO_KEY_OPENROUTER_MSG,
-    OPENROUTER_AUTH_MSG,
-    PROVIDER_G4F,
-    PROVIDER_OPENROUTER,
-    ChatAuthError,
     ChatProviderError,
-    ChatRateLimitError,
     chat,
     chat_short,
-    force_g4f_for_session,
-    get_provider,
     get_temperature,
-    has_active_key,
-    is_g4f_session,
-    reset_quota_flag,
 )
-from paths import read_config_json, resource_path, write_config_json
-from prompts import build_system_prompt
+from paths import read_config_json, resource_path, update_config_json
+from prompts import build_system_prompt, character_essence
+from tts_text import clean_text_for_tts
 from voice_input import VoiceInput
 
 logger = logging.getLogger(__name__)
@@ -80,8 +68,6 @@ _EMOTION_CANVAS_BG = (68, 68, 68)
 IMAGE_DIR = "emotions"
 DEFAULT_FONT = ("Arial", 14)
 MIKU_EMPTY_REPLY = "…♪ Прости, я на миг потеряла нить. Скажи ещё раз?"
-RATE_LIMIT_RETRY_DELAY = 30
-RATE_LIMIT_RETRIES = 1
 
 
 class ChatApp(ctk.CTk):
@@ -91,9 +77,7 @@ class ChatApp(ctk.CTk):
         self.geometry("1280x960")
         self.minsize(900, 600)
 
-        # Load stored Gemini key
-        self.gemini_key = self._load_gemini_key()
-        self.llm_provider = PROVIDER_OPENROUTER
+        # Провайдер только один — локальная LLM; никаких ключей и выбора провайдера нет.
 
         # Переменные конфигурации
         self.flirt_enabled = ctk.BooleanVar(value=False)
@@ -103,10 +87,10 @@ class ChatApp(ctk.CTk):
         self.personality = "Дередере"
         self.emotion_set = ctk.StringVar(value="C")  # По умолчанию набор C
 
-        # Режим персонажа (*действия* + речь), стиль как Character.AI — один переключатель
+        # roleplay: *действия* + речь, стиль как Character.AI — один переключатель
         self.interactive = ctk.BooleanVar(value=False)
         self.miku_tts_high_quality = ctk.BooleanVar(value=True)
-        self.tts_engine = "huggingface"
+        self.tts_engine = "local_rvc"
 
         # Инициализация шрифта-заглушки до загрузки изображений
         try:
@@ -146,13 +130,10 @@ class ChatApp(ctk.CTk):
             self.typing_animation_enabled.set(bool(ta) if ta is not None else True)
             mq = cfg.get("miku_tts_high_quality", True)
             self.miku_tts_high_quality.set(bool(mq) if mq is not None else True)
-            te = (cfg.get("tts_engine") or "huggingface").strip()
-            self.tts_engine = te if te in ("silero", "local_rvc") else "huggingface"
-            self.llm_provider = (
-                PROVIDER_G4F
-                if (cfg.get("llm_provider") or "").strip().lower() == PROVIDER_G4F
-                else PROVIDER_OPENROUTER
-            )
+            te = (cfg.get("tts_engine") or "local_rvc").strip()
+            self.tts_engine = te if te in ("local_rvc", "anime") else "local_rvc"
+            es = (cfg.get("emotion_set") or "C").strip().upper()
+            self.emotion_set.set(es if es in ("A", "B", "C") else "C")
             try:
                 temp = float(cfg.get("ai_temperature", DEFAULT_TEMPERATURE))
             except (TypeError, ValueError):
@@ -160,6 +141,13 @@ class ChatApp(ctk.CTk):
             self.ai_temperature = max(0.0, min(2.0, temp))
         except Exception:
             self.ai_temperature = DEFAULT_TEMPERATURE
+
+        # Память/контекст удаляются с каждой сессией: стираем сохранённую историю в config.json
+        try:
+            if "chat_history" in read_config_json():
+                update_config_json({"chat_history": []})
+        except Exception:
+            logger.debug("Не удалось очистить chat_history из config", exc_info=True)
 
         self._miku_type_gen = 0
         self._tts_seq = 0
@@ -169,10 +157,12 @@ class ChatApp(ctk.CTk):
         # Загружаем картинки эмоций
         self.load_emotion_images()
 
+        # История чата живёт только в рамках текущей сессии.
+        # С каждой новой сессией контекст/память диалога обнуляются.
+        self.chat_history = []
+
         # Строим интерфейс
         self._build_ui()
-        self._apply_g4f_lock()
-        self._apply_provider_ui_state()
         self.update()
         # Сначала превью в главном окне, поверх — диалог имени
         try:
@@ -183,18 +173,20 @@ class ChatApp(ctk.CTk):
         self._prompt_user_name_on_startup()
         # Фоновый прогрев TTS — первая озвучка 🔊 обычно быстрее (модель уже загружена)
         try:
-            if self.tts_engine == "silero":
-                from silero_tts import warmup
-
-                threading.Thread(target=warmup, kwargs={"delay_sec": 2.5}, daemon=True).start()
-            elif self.tts_engine == "local_rvc":
+            if self.tts_engine in ("local_rvc", "anime"):
                 from voice_engine import warmup
 
-                threading.Thread(target=warmup, kwargs={"delay_sec": 2.5}, daemon=True).start()
-            else:
-                from miku_tts import warmup_space
+                kwargs = {"delay_sec": 2.5}
+                if self.tts_engine == "anime":
+                    kwargs["voice"] = "anime"
+                threading.Thread(target=warmup, kwargs=kwargs, daemon=True).start()
+        except Exception:
+            pass
 
-                threading.Thread(target=warmup_space, kwargs={"delay_sec": 2.5}, daemon=True).start()
+# Фоновый прогрев локальной LLM сразу после старта
+        try:
+            from local_llm import warmup as local_llm_warmup
+            threading.Thread(target=local_llm_warmup, kwargs={"delay_sec": 3.0}, daemon=True).start()
         except Exception:
             pass
 
@@ -205,9 +197,6 @@ class ChatApp(ctk.CTk):
 
         # Трекинг последней эмоции для разнообразия
         self.last_emotion_key = default_greeting_emotion_key(self.emotion_set.get())
-
-        # История чата (только user/assistant — системный промпт собирается в _fetch_response)
-        self.chat_history = []
 
     # ---------- Вспомогательное: путь к ресурсам ----------
     def _resource_path(self, relative_path: str) -> str:
@@ -387,14 +376,6 @@ class ChatApp(ctk.CTk):
             return reply, emo
         return self._ensure_miku_reply(""), last_emo
 
-    # ---------- Ключи API ----------
-    def _load_gemini_key(self) -> str:
-        try:
-            return (read_config_json().get("openrouter_api_key", "") or "").strip()
-        except Exception as e:
-            logger.warning("Не удалось загрузить openrouter_api_key из config: %s", e)
-        return ""
-
     def _prompt_user_name_on_startup(self):
         """Спросить имя при каждом запуске (превью с «Начать» видно в главном окне под диалогом)."""
         default = (self.user_name or "").strip()
@@ -466,9 +447,7 @@ class ChatApp(ctk.CTk):
         if hasattr(self, "user_name_var"):
             self.user_name_var.set(name)
         try:
-            cfg = read_config_json()
-            cfg["user_name"] = name
-            write_config_json(cfg)
+            update_config_json({"user_name": name})
         except Exception as e:
             logger.warning("Не удалось сохранить имя в config.json: %s", e)
 
@@ -477,11 +456,11 @@ class ChatApp(ctk.CTk):
         new_name = (self.user_name_var.get() or "").strip()
         new_pro = (self.user_pronouns_var.get() or "").strip()
         try:
-            cfg = read_config_json()
-            cfg["user_name"] = new_name
-            cfg["user_pronouns"] = new_pro
-            cfg["typing_animation"] = bool(self.typing_animation_enabled.get())
-            write_config_json(cfg)
+            update_config_json({
+                "user_name": new_name,
+                "user_pronouns": new_pro,
+                "typing_animation": bool(self.typing_animation_enabled.get()),
+            })
             self.user_name = new_name
             self.user_pronouns = new_pro
             try:
@@ -504,9 +483,7 @@ class ChatApp(ctk.CTk):
             raw = ""
         new_interests = (raw or "").strip()
         try:
-            cfg = read_config_json()
-            cfg["user_interests"] = new_interests
-            write_config_json(cfg)
+            update_config_json({"user_interests": new_interests})
             self.user_interests = new_interests
             try:
                 self._append("Система", "Интересы сохранены. Мику будет учитывать их в ответах.")
@@ -528,9 +505,7 @@ class ChatApp(ctk.CTk):
             raw = ""
         new_memory = (raw or "").strip()
         try:
-            cfg = read_config_json()
-            cfg["user_memory"] = new_memory
-            write_config_json(cfg)
+            update_config_json({"user_memory": new_memory})
             self.user_memory = new_memory
             try:
                 self._append("Система", "Память сохранена. Мику будет учитывать её в разговоре.")
@@ -554,10 +529,10 @@ class ChatApp(ctk.CTk):
         n = max(2, min(20, n))
         self.smart_memory_every_n.set(str(n))
         try:
-            cfg = read_config_json()
-            cfg["smart_memory_enabled"] = enabled
-            cfg["smart_memory_every_n"] = n
-            write_config_json(cfg)
+            update_config_json({
+                "smart_memory_enabled": enabled,
+                "smart_memory_every_n": n,
+            })
             try:
                 state = "включена" if enabled else "выключена"
                 self._append("Система", f"Умная авто-память: {state}, частота: каждые {n} сообщений.")
@@ -601,8 +576,6 @@ class ChatApp(ctk.CTk):
         """Фоновое обновление памяти через модель (короткое резюме)."""
         try:
             if not self.smart_memory_enabled.get():
-                return
-            if not has_active_key():
                 return
             try:
                 n = int(self.smart_memory_every_n.get() or "6")
@@ -654,6 +627,7 @@ class ChatApp(ctk.CTk):
             f"{transcript}\n\n"
             "Обновлённая память (список):"
         )
+        user_prompt = user_prompt[:6000]  # страховка от переполнения контекста модели
 
         def worker():
             try:
@@ -668,9 +642,7 @@ class ChatApp(ctk.CTk):
                 merged = self._smart_memory_merge(old_mem, raw)
                 if not merged or merged.strip() == (old_mem or "").strip():
                     return
-                cfg = read_config_json()
-                cfg["user_memory"] = merged
-                write_config_json(cfg)
+                update_config_json({"user_memory": merged})
                 self.user_memory = merged
                 try:
                     if hasattr(self, "user_memory_box") and self.user_memory_box:
@@ -735,9 +707,7 @@ class ChatApp(ctk.CTk):
         # Append to interests by default (soft preferences)
         updated_interests = (curr_interests + ("\n" if curr_interests else "") + "\n".join(new_lines)).strip()
         try:
-            cfg = read_config_json()
-            cfg["user_interests"] = updated_interests
-            write_config_json(cfg)
+            update_config_json({"user_interests": updated_interests})
             self.user_interests = updated_interests
         except Exception:
             logger.exception("Авто-память: не удалось сохранить интересы")
@@ -762,9 +732,7 @@ class ChatApp(ctk.CTk):
             t = max(0.0, min(2.0, t))
             self.ai_temperature_var.set(t)
             self.ai_temperature = t
-            cfg = read_config_json()
-            cfg["ai_temperature"] = round(t, 2)
-            write_config_json(cfg)
+            update_config_json({"ai_temperature": round(t, 2)})
             self.ai_temp_value_label.configure(text=f"{t:.2f}")
             try:
                 self._append("Система", f"Температура ИИ сохранена: {t:.2f}.")
@@ -773,118 +741,20 @@ class ChatApp(ctk.CTk):
         except Exception as e:
             logger.exception("Ошибка сохранения ai_temperature: %s", e)
 
-    def _apply_provider_ui_state(self):
-        """При GPT4Free подсвечиваем неактуальное поле ключа OpenRouter."""
-        g4f_selected = self.llm_provider == PROVIDER_G4F
-        try:
-            self.gemini_key_entry.configure(state="disabled" if g4f_selected else "normal")
-        except Exception:
-            pass
-
-    def _save_llm_provider(self, _choice: str | None = None):
-        """Сохранить выбранный провайдер ИИ (OpenRouter / GPT4Free) в config.json."""
-        try:
-            chosen = self.llm_provider_var.get()
-            provider = PROVIDER_G4F if chosen == "GPT4Free" else PROVIDER_OPENROUTER
-            cfg = read_config_json()
-            cfg["llm_provider"] = provider
-            write_config_json(cfg)
-            self.llm_provider = provider
-            reset_quota_flag()
-            self._apply_provider_ui_state()
-            self._apply_g4f_lock()
-            try:
-                self._append("Система", f"Провайдер ИИ сохранён: {chosen}.")
-            except Exception:
-                pass
-        except Exception as e:
-            logger.exception("Ошибка сохранения llm_provider: %s", e)
-
-    def _save_gemini_key(self):
-        new_key = (self.gemini_key_var.get() or "").strip()
-        try:
-            cfg = read_config_json()
-            cfg["openrouter_api_key"] = new_key
-            write_config_json(cfg)
-            self.gemini_key = new_key
-            reset_quota_flag()
-            try:
-                self._append("Система", "Ключ OpenRouter сохранён в config.json.")
-            except Exception:
-                pass
-        except Exception as e:
-            logger.exception("Ошибка сохранения ключа OpenRouter: %s", e)
-            try:
-                self._append("Система", "Не удалось записать config.json.")
-            except Exception:
-                pass
-
-    def _paste_gemini_key_from_clipboard(self):
-        try:
-            text = self.clipboard_get()
-        except Exception:
-            try:
-                self._append("Система", "Буфер обмена пуст или недоступен.")
-            except Exception:
-                pass
-            return
-        key = (text or "").strip()
-        if not key:
-            return
-        self.gemini_key_var.set(key)
-        try:
-            self.gemini_key_entry.focus_set()
-        except Exception:
-            pass
-
-    def _ask_g4f_fallback_sync(self) -> bool:
-        """Показать диалог на главном потоке, ждать ответа."""
-        result: list[bool] = [False]
-        event = threading.Event()
-
-        def _dialog():
-            r = tkmsg.askyesno(
-                "Лимит OpenRouter",
-                "Лимит OpenRouter исчерпан.\n"
-                "Следующие ответы могут иметь артефакты или быть менее качественными.\n\n"
-                "Использовать g4f?",
-            )
-            result[0] = r
-            event.set()
-
-        self.after(0, _dialog)
-        event.wait()
-        return result[0]
-
-    def _on_tts_engine_change(self, _engine: str):
-        """Параметр качества относится только к Hugging Face (Silero/RVC его не используют)."""
-        try:
-            self._tts_quality_cb.configure(
-                state="disabled" if self.tts_engine_var.get() != "Hugging Face" else "normal"
-            )
-        except Exception:
-            pass
-
     def _save_miku_tts_settings(self):
-        """Сохранить движок озвучки и режим качества HF (miku_tts_high_quality) в config.json."""
+        """Сохранить движок озвучки и режим качества в config.json."""
         try:
             chosen = self.tts_engine_var.get()
-            if chosen == "Silero TTS":
-                engine = "silero"
-            elif chosen == "Локальный RVC":
-                engine = "local_rvc"
+            if chosen == "Аниме-профиль (Мику)":
+                engine = "anime"
             else:
-                engine = "huggingface"
-            cfg = read_config_json()
-            cfg["miku_tts_high_quality"] = bool(self.miku_tts_high_quality.get())
-            cfg["tts_engine"] = engine
-            write_config_json(cfg)
+                engine = "local_rvc"
+            update_config_json({"tts_engine": engine})
             self.tts_engine = engine
             try:
                 mode = {
-                    "silero": "Silero TTS (локально, baya)",
                     "local_rvc": "Локальный RVC (Edge-TTS + rvc-python, модель Мику)",
-                    "huggingface": "Hugging Face (спейс mikuTTS)",
+                    "anime": "Аниме-профиль (Edge-TTS + rvc-python, модель Мику, pitch +6)",
                 }[engine]
                 self._append("Система", f"Озвучка: сохранено — {mode}.")
             except Exception:
@@ -926,15 +796,8 @@ class ChatApp(ctk.CTk):
 
         self.emotion_images.clear()
 
-        if current_set == "A":
-            emotions_dict = EMOTIONS_A
-            ext = ".png"
-        elif current_set == "B":
-            emotions_dict = EMOTIONS_B
-            ext = ".jpg"
-        else:  # C
-            emotions_dict = EMOTIONS_C
-            ext = ".png"
+        emotions_dict = emotion_labels_for_set(current_set)
+        ext = "." + emotion_ext_for_set(current_set)
 
         for key, desc in emotions_dict.items():
             filename = f"{key}{ext}"
@@ -1026,15 +889,21 @@ class ChatApp(ctk.CTk):
 
         self._flirt_cb = ctk.CTkCheckBox(left_frame, text="Романтика", variable=self.flirt_enabled)
         self._flirt_cb.pack(pady=(0, 5))
-        self._nsfw_cb = ctk.CTkCheckBox(left_frame, text="NSFW контент", variable=self.nsfw_enabled)
+        self._nsfw_cb = ctk.CTkCheckBox(
+            left_frame,
+            text="NSFW контент",
+            variable=self.nsfw_enabled,
+            command=self._sync_roleplay_with_nsfw,
+        )
         self._nsfw_cb.pack(pady=(0, 15))
 
         ctk.CTkLabel(left_frame, text="Режим чата:").pack(pady=(5, 0))
-        ctk.CTkCheckBox(
+        self._roleplay_cb = ctk.CTkCheckBox(
             left_frame,
-            text="Персонаж (как Character.AI): *действия* + речь, ролевой стиль",
+            text="roleplay: *действия* + речь, ролевой стиль",
             variable=self.interactive,
-        ).pack(pady=(0, 10))
+        )
+        self._roleplay_cb.pack(pady=(0, 10))
 
         right_frame = ctk.CTkFrame(self.chat_tab, corner_radius=10)
         right_frame.pack(side="right", fill="both", expand=True, pady=10)
@@ -1117,7 +986,7 @@ class ChatApp(ctk.CTk):
         about_text = (
             "МикуGPT — с лета 2025\n\n"
             " Версия 1.5\n\n"
-            "ИИ: OpenRouter (thedrummer/unslopnemo-12b).\n"
+            "ИИ: OpenRouter (thedrummer/unslopnemo-12b) / GPT4Free / Локальная GGUF\n"
             "Мику отвечает на казахском/русском/украинском.\n"
             "Авторы: Lucky_13, Влад , (сообщество LK_13)\n\n"
             "Управление:\n"
@@ -1142,15 +1011,6 @@ class ChatApp(ctk.CTk):
             text_color=("gray62", "gray62") if hint else None,
             anchor="w",
         ).pack(anchor="w", pady=(0, 4))
-
-    def _settings_key_row(self, parent, textvariable, placeholder: str, paste_cmd, save_cmd) -> ctk.CTkEntry:
-        row = ctk.CTkFrame(parent, fg_color="transparent")
-        row.pack(fill="x", pady=(0, 12))
-        entry = ctk.CTkEntry(row, textvariable=textvariable, placeholder_text=placeholder, show="*")
-        entry.pack(side="left", fill="x", expand=True, padx=(0, 8))
-        ctk.CTkButton(row, text="Вставить", width=88, command=paste_cmd).pack(side="right", padx=(0, 4))
-        ctk.CTkButton(row, text="Сохранить", width=88, command=save_cmd).pack(side="right")
-        return entry
 
     def _save_memory_tab(self) -> None:
         self._save_user_interests()
@@ -1207,37 +1067,6 @@ class ChatApp(ctk.CTk):
         ctk.CTkButton(ai, text="Сохранить температуру", width=160, command=self._save_ai_temperature).pack(
             anchor="w", pady=(0, 16)
         )
-
-        prov_row = ctk.CTkFrame(ai, fg_color="transparent")
-        prov_row.pack(fill="x", pady=(0, 8))
-        ctk.CTkLabel(prov_row, text="Провайдер ИИ", width=120, anchor="w").pack(side="left")
-        self.llm_provider_var = ctk.StringVar(
-            value="GPT4Free" if self.llm_provider == PROVIDER_G4F else "OpenRouter"
-        )
-        self._llm_provider_menu = ctk.CTkOptionMenu(
-            prov_row,
-            values=["OpenRouter", "GPT4Free"],
-            variable=self.llm_provider_var,
-            command=self._save_llm_provider,
-            width=160,
-        )
-        self._llm_provider_menu.pack(side="left")
-        self._settings_label(
-            ai,
-            "GPT4Free — бесплатно, без ключа. OpenRouter — по ключу openrouter.ai/keys",
-            hint=True,
-        )
-
-        self._settings_label(ai, "OpenRouter (openrouter.ai/keys)")
-        self.gemini_key_var = ctk.StringVar(value=getattr(self, "gemini_key", "") or "")
-        self.gemini_key_entry = self._settings_key_row(
-            ai,
-            self.gemini_key_var,
-            "gsk_...",
-            self._paste_gemini_key_from_clipboard,
-            self._save_gemini_key,
-        )
-        self._apply_provider_ui_state()
 
         # —— Память ——
         mem = self._settings_pad(tab_mem)
@@ -1306,53 +1135,46 @@ class ChatApp(ctk.CTk):
         engine_row = ctk.CTkFrame(chat, fg_color="transparent")
         engine_row.pack(fill="x", pady=(0, 6))
         ctk.CTkLabel(engine_row, text="Движок озвучки", width=120, anchor="w").pack(side="left")
-        if self.tts_engine == "silero":
-            _tts_ui_value = "Silero TTS"
-        elif self.tts_engine == "local_rvc":
-            _tts_ui_value = "Локальный RVC"
+        if self.tts_engine == "anime":
+            _tts_ui_value = "Аниме-профиль (Мику)"
         else:
-            _tts_ui_value = "Hugging Face"
+            _tts_ui_value = "Локальный RVC (Мику)"
         self.tts_engine_var = ctk.StringVar(value=_tts_ui_value)
         self._tts_engine_menu = ctk.CTkOptionMenu(
             engine_row,
-            values=["Silero TTS", "Hugging Face", "Локальный RVC"],
+            values=["Локальный RVC (Мику)", "Аниме-профиль (Мику)"],
             variable=self.tts_engine_var,
-            command=self._on_tts_engine_change,
             width=160,
         )
         self._tts_engine_menu.pack(side="left")
         self._settings_label(
             chat,
-            "Silero: локально baya. Локальный RVC: Edge-TTS + модель Мику из voice/ (нужен rvc-python). "
-            "Hugging Face: спейс John6666/mikuTTS",
+            "Оба варианта — модель Мику (infamous_miku_v2) из voice/. "
+            "Аниме-профиль звучит ярче (pitch +6, index 0.70).",
             hint=True,
         )
-        self._tts_quality_cb = ctk.CTkCheckBox(
-            chat,
-            text="Hugging Face: высокое качество (медленнее)",
-            variable=self.miku_tts_high_quality,
-        )
-        self._tts_quality_cb.pack(anchor="w", pady=(4, 10))
-        if self.tts_engine != "huggingface":
-            self._tts_quality_cb.configure(state="disabled")
         ctk.CTkButton(chat, text="Сохранить озвучку", width=160, command=self._save_miku_tts_settings).pack(
             anchor="w"
         )
 
-    def _apply_g4f_lock(self):
-        """При G4F-сессии блокируем NSFW и флирт (всегда выключены)."""
-        if is_g4f_session():
-            self.flirt_enabled.set(False)
-            self.nsfw_enabled.set(False)
-            if hasattr(self, "_flirt_cb"):
-                self._flirt_cb.configure(state="disabled")
-            if hasattr(self, "_nsfw_cb"):
-                self._nsfw_cb.configure(state="disabled")
+    def _sync_roleplay_with_nsfw(self, *_):
+        """С включенным NSFW roleplay включается автоматически и его нельзя выключить."""
+        if self.nsfw_enabled.get():
+            self.interactive.set(True)
+            if hasattr(self, "_roleplay_cb"):
+                self._roleplay_cb.configure(state="disabled")
+        else:
+            if hasattr(self, "_roleplay_cb"):
+                self._roleplay_cb.configure(state="normal")
 
     def _change_emotion_set(self, new_set: str):
         self.emotion_set.set(new_set)
         self.load_emotion_images()
         self._set_emotion(default_greeting_emotion_key(new_set))
+        try:
+            update_config_json({"emotion_set": new_set})
+        except Exception as e:
+            logger.warning("Не удалось сохранить emotion_set в config.json: %s", e)
 
     # ---------- Personality ----------
     def _update_personality(self, choice: str):
@@ -1495,7 +1317,7 @@ class ChatApp(ctk.CTk):
         self._chat_status_label.configure(text=f"⚠ {error}", text_color="#FF6B6B")
         self.after(4000, lambda: self._chat_status_label.configure(text=""))
 
-    # ---------- Отображение реплики пользователя в режиме персонажа ----------
+    # ---------- Отображение реплики пользователя в roleplay ----------
     def _format_roleplay_user_display(self, text: str) -> str:
         """(действие) или смешанный ввод → аккуратное отображение; строки с * не трогаем."""
         lines = []
@@ -1807,13 +1629,13 @@ class ChatApp(ctk.CTk):
         # Подбираем ответ согласно характеру (без насилия/ругательств)
         if self.personality == "Яндере":
             reply = "О, только для меня?.. Я буду беречь тебя навсегда... ♪"
-            emo_key = "love" if self.emotion_set.get() == "C" else ("happy" if self.emotion_set.get() == "A" else "smileR_M")
+            emo_key = pick_emotion(self.emotion_set.get(), ["love", "happy", "smileR_M"])
         elif self.personality == "Агресивный":
             reply = "Эй, не шути со мной, а то получишь улыбку по-особенному ♪"
-            emo_key = "annoyed" if self.emotion_set.get() == "C" else ("happy" if self.emotion_set.get() == "A" else "smileR_M")
+            emo_key = pick_emotion(self.emotion_set.get(), ["annoyed", "happy", "smileR_M"])
         else:
             reply = "Как приятно! Я тоже тебя люблю! ♪"
-            emo_key = "happy" if self.emotion_set.get() == "A" else ("happy_satisfaction" if self.emotion_set.get() == "C" else "smileR_M")
+            emo_key = pick_emotion(self.emotion_set.get(), ["happy_satisfaction", "happy", "smileR_M"])
 
         # Вставляємо відповідь у UI (в основному потоці)
         try:
@@ -1829,86 +1651,56 @@ class ChatApp(ctk.CTk):
     # ---------- Fetch response (threaded) ----------
     def _fetch_response(self, _user_text: str):
         try:
-            self.gemini_key = self._load_gemini_key()
-            if get_provider() != PROVIDER_G4F and not has_active_key():
-                self.after(0, self._append, "Система", f"❌ {NO_KEY_OPENROUTER_MSG}")
-                return
             self.after(0, lambda: self._status_begin("chat"))
             try:
                 try:
                     sys_prompt = self._generate_system_prompt(self.personality)
                     api_messages = [{"role": "system", "content": sys_prompt}]
-                    for m in self.chat_history:
+                    # Локальная LLM: контекст модели конечен. Держим историю в рамках окна:
+                    # оцениваем токены (~3 симв./токен, с запасом), идём от свежих сообщений
+                    # и режем старые, пока не упрёмся в лимит.
+                    try:
+                        from local_llm import context_limit
+                        ctx = context_limit()
+                    except Exception:
+                        ctx = 8192
+                    reserve = 900  # под последнее сообщение, ответ модели и служебные строки
+                    used = (len(sys_prompt) // 3) + 40
+                    for m in reversed(self.chat_history[-14:]):
                         role = m.get("role")
                         content = self._chat_text(m.get("content"))
-                        if role in ("user", "assistant") and content:
-                            api_messages.append({"role": role, "content": content})
+                        if role not in ("user", "assistant") or not content:
+                            continue
+                        content = content[:1400]
+                        used += (len(content) // 3) + 4
+                        if used > ctx - reserve:
+                            break
+                        api_messages.insert(1, {"role": role, "content": content})
+                    essence = character_essence(self.personality, self.nsfw_enabled.get())
+                    if essence:
+                        api_messages.append({
+                            "role": "system",
+                            "content": (
+                                f"Твоя изюминка именно сейчас (прояви её в ПЕРВОЙ фразе и держи "
+                                f"до конца реплики — интонацией, действием или словом): {essence}. "
+                                "Не объясняй характер словами, показывай его поведением."
+                            ),
+                        })
                     reply, emo = self._fetch_miku_reply(api_messages)
-                except ChatAuthError as exc:
-                    logger.info("ИИ: ошибка ключа — %s", exc)
-                    self.after(0, self._append, "Система", str(exc))
+                except ChatProviderError as exc:
+                    logger.warning("ИИ: ошибка локальной LLM — %s", exc)
+                    self.after(0, self._append, "Система", f"❌ {exc}")
                     current_set = self.emotion_set.get()
-                    fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
+                    fallback_key = pick_emotion(current_set, ["angry_look", "angryM", "annoyed"])
                     self.after(0, self._set_emotion, fallback_key)
                     return
-                except ChatRateLimitError as exc:
-                    if str(exc) == CHAT_QUOTA_MSG:
-                        logger.info("OpenRouter: дневной лимит, переключаю на g4f")
-                        force_g4f_for_session()
-                        self.after(0, self._apply_g4f_lock)
-                        try:
-                            reply, emo = self._fetch_miku_reply(api_messages)
-                        except Exception as fallback_err:
-                            logger.warning("g4f тоже не сработал: %s", fallback_err)
-                            self.after(0, self._append, "Система", f"❌ {fallback_err}")
-                            current_set = self.emotion_set.get()
-                            fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
-                            self.after(0, self._set_emotion, fallback_key)
-                            return
-                    else:
-                        logger.info("ИИ: лимит запросов — ждём минуту и пробуем снова")
-                        self.after(0, self._set_emotion, "blush" if self.emotion_set.get() == "A" else "blushM" if self.emotion_set.get() == "B" else "tired")
-                        self.after(0, lambda: self._append("Система", "♪ OpenRouter задумался..."))
-                        for attempt in range(RATE_LIMIT_RETRIES):
-                            time.sleep(RATE_LIMIT_RETRY_DELAY)
-                            try:
-                                reply, emo = self._fetch_miku_reply(api_messages)
-                                break
-                            except (ChatRateLimitError, ChatProviderError) as e:
-                                logger.info("ИИ: снова лимит/ошибка, попытка %s/%s: %s", attempt + 2, RATE_LIMIT_RETRIES + 1, e)
-                                continue
-                        else:
-                            self.after(0, self._append, "Система", "♪ Мику так и не смогла ответить... Попробуй позже.")
-                            current_set = self.emotion_set.get()
-                            fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
-                            self.after(0, self._set_emotion, fallback_key)
-                            return
-                except ChatProviderError as exc:
-                    logger.warning("ИИ: ошибка провайдера — %s", exc)
-                    force_g4f_for_session()
-                    self.after(0, self._apply_g4f_lock)
-                    try:
-                        reply, emo = self._fetch_miku_reply(api_messages)
-                    except Exception as fallback_err:
-                        logger.warning("g4f тоже не сработал: %s", fallback_err)
-                        self.after(0, self._append, "Система", f"❌ {fallback_err}")
-                        current_set = self.emotion_set.get()
-                        fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
-                        self.after(0, self._set_emotion, fallback_key)
-                        return
                 except Exception as exc:
                     logger.warning("ИИ: непойманная ошибка", exc_info=True)
-                    force_g4f_for_session()
-                    self.after(0, self._apply_g4f_lock)
-                    try:
-                        reply, emo = self._fetch_miku_reply(api_messages)
-                    except Exception as fallback_err:
-                        logger.warning("g4f тоже не сработал: %s", fallback_err)
-                        self.after(0, self._append, "Система", f"❌ {fallback_err}")
-                        current_set = self.emotion_set.get()
-                        fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
-                        self.after(0, self._set_emotion, fallback_key)
-                        return
+                    self.after(0, self._append, "Система", f"❌ {exc}")
+                    current_set = self.emotion_set.get()
+                    fallback_key = pick_emotion(current_set, ["angry_look", "angryM", "annoyed"])
+                    self.after(0, self._set_emotion, fallback_key)
+                    return
                 # Тег {ключ} в конце ответа вырезается в _parse_ai_response; emo → _set_emotion
                 self.after(0, self._append_miku_with_typing, reply)
                 # Apply emotion to UI
@@ -1924,7 +1716,7 @@ class ChatApp(ctk.CTk):
             logger.exception("_fetch_response: непойманное исключение: %s", e)
             self.after(0, self._append, "Система", error_msg)
             current_set = self.emotion_set.get()
-            fallback_key = "angry_look" if current_set == "A" else "angryM" if current_set == "B" else "annoyed"
+            fallback_key = pick_emotion(current_set, ["angry_look", "angryM", "annoyed"])
             self.after(0, self._set_emotion, fallback_key)
             self.after(0, lambda: self._status_end("chat"))
 
@@ -1943,6 +1735,7 @@ class ChatApp(ctk.CTk):
             user_pronouns=(getattr(self, "user_pronouns", "") or "").strip() or None,
             user_name=(getattr(self, "user_name", "") or "").strip() or None,
             last_emotion=self.last_emotion_key,
+            compact=True,
         )
 
     # ---------- Parse AI response ----------
@@ -1966,13 +1759,7 @@ class ChatApp(ctk.CTk):
         key = self._normalize_emotion_key(key)
         if not key:
             return False
-        current_set = self.emotion_set.get()
-        if current_set == "A":
-            return key in EMOTIONS_A
-        elif current_set == "B":
-            return key in EMOTIONS_B
-        else:  # C
-            return key in EMOTIONS_C
+        return key in emotion_keys_for_set(self.emotion_set.get())
 
     # ---------- Установка эмоции на UI ----------
     def _set_emotion(self, emotion_key: str):
@@ -1999,9 +1786,9 @@ class ChatApp(ctk.CTk):
         return name or "Вы"
 
     def _text_for_tts(self, raw: str) -> str:
-        """Убрать тег {ключ} / JSON эмоции из ответа перед озвучкой."""
+        """Ответ перед озвучкой: убрать JSON-эмоцию, RP-действия, каомодзи/значки, паузы на запятых."""
         clean, _ = self._strip_emotion_tag(raw or "")
-        return clean
+        return clean_text_for_tts(clean)
 
     def _insert_tts_chip(self, text_for_speech: str) -> None:
         """Компактная «кнопка» 🔊 в конце строки сообщения (клик — озвучка через HF)."""
@@ -2084,35 +1871,19 @@ class ChatApp(ctk.CTk):
         def worker():
             engine = self.tts_engine
             try:
-                if engine == "silero":
-                    from silero_tts import speak_text_as_miku as silero_speak
-
-                    silero_speak(payload, personality=getattr(self, "personality", None))
-                elif engine == "local_rvc":
+                if engine in ("local_rvc", "anime"):
+                    from voice_engine import set_active_voice
                     from voice_engine import speak_text_as_miku as rvc_speak
 
+                    if engine == "anime":
+                        set_active_voice("anime")
                     rvc_speak(payload)
-                else:
-                    from miku_tts import speak_text_as_miku
-
-                    speak_text_as_miku(payload)
             except ImportError as e:
                 logger.warning("Озвучка Мику: не установлена зависимость: %s", e)
-                if engine == "silero":
-                    msg = (
-                        "Озвучка Silero: не хватает пакета torch. В папке проекта: pip install torch "
-                        "(лучше CPU-версию, см. README/подсказку)"
-                    )
-                elif engine == "local_rvc":
-                    msg = (
-                        "Озвучка «Локальный RVC»: не хватает пакетов (rvc-python, torch, fairseq). "
-                        "В папке проекта выполните: pip install -r requirements.txt"
-                    )
-                else:
-                    msg = (
-                        "Озвучка: не хватает пакета httpx. "
-                        "В папке проекта выполните: pip install -r requirements.txt"
-                    )
+                msg = (
+                    "Озвучка «Локальный RVC»: не хватает пакетов (rvc-python, torch, fairseq). "
+                    "В папке проекта выполните: pip install -r requirements.txt"
+                )
                 self.after(0, lambda m=msg: self._append("Система", m))
             except Exception as e:
                 logger.warning("Озвучка Мику (%s) не удалась", engine, exc_info=True)
@@ -2140,9 +1911,15 @@ class ChatApp(ctk.CTk):
                 foreground="#FF9FF3",
                 font=(DEFAULT_FONT[0], DEFAULT_FONT[1], "bold"),
             )
+            self.chat_display.tag_config(
+                "action",
+                foreground="#7C8090",
+                font=(DEFAULT_FONT[0], DEFAULT_FONT[1], "italic"),
+            )
             self.chat_display.config(state="disabled")
             self._miku_type_pending = message
             self._miku_type_index = 0
+            self._miku_type_action = False
             self.after(18, lambda: self._miku_type_step(gen))
 
         self.after(0, start)
@@ -2169,13 +1946,29 @@ class ChatApp(ctk.CTk):
             chunk = rest[:2] if len(rest) >= 2 else rest[:1]
         self._miku_type_index = i + len(chunk)
         self.chat_display.config(state="normal")
-        self.chat_display.insert("end", chunk)
+        for ch in chunk:
+            if ch == "*":
+                self._miku_type_action = not self._miku_type_action
+                self.chat_display.insert("end", ch, "action")
+            else:
+                tags = ("action",) if self._miku_type_action else ()
+                self.chat_display.insert("end", ch, tags)
         self.chat_display.config(state="disabled")
         self.chat_display.see("end")
         delay = 6 if chunk in ("\n", "\r\n") else (12 if len(chunk) > 1 else 20)
         self.after(delay, lambda: self._miku_type_step(gen))
 
     # ---------- Вспомогательная вставка текста в чат ----------
+    def _insert_styled_body(self, text: str):
+        """Вставка тела сообщения с полупрозрачной подсветкой действий *...*."""
+        for part in re.split(r"(\*[^*]+\*)", text):
+            if not part:
+                continue
+            if part.startswith("*") and part.endswith("*") and len(part) > 2:
+                self.chat_display.insert("end", part, "action")
+            else:
+                self.chat_display.insert("end", part)
+
     def _append(self, sender: str, message: str):
         body = self._chat_text(message)
         if not body:
@@ -2185,7 +1978,10 @@ class ChatApp(ctk.CTk):
         self.chat_display.tag_config("sender",
                                      foreground="#FF9FF3" if sender == "Мику" else "#70A1FF",
                                      font=(DEFAULT_FONT[0], DEFAULT_FONT[1], "bold"))
-        self.chat_display.insert("end", body)
+        self.chat_display.tag_config("action",
+                                     foreground="#7C8090",
+                                     font=(DEFAULT_FONT[0], DEFAULT_FONT[1], "italic"))
+        self._insert_styled_body(body)
         self.chat_display.insert("end", " ")
         self._insert_tts_chip(self._text_for_tts(message))
         self.chat_display.insert("end", "\n\n")

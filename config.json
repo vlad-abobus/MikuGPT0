@@ -7,11 +7,9 @@
   "smart_memory_every_n": 6,
   "user_pronouns": "он/его",
   "typing_animation": true,
-  "openrouter_api_key": "REDACTED_OPENROUTER_KEY",
-  "gemini_model": "thedrummer/unslopnemo-12b",
-  "llm_provider": "g4f",
-  "ai_temperature": 0.4,
-  "miku_tts_high_quality": false,
-  "tts_engine": "huggingface",
-  "gemini_api_key": ""
+  "local_llm_gpu_layers": -1,
+  "emotion_set": "C",
+  "ai_temperature": 1.6,
+  "miku_tts_high_quality": true,
+  "tts_engine": "anime"
 }

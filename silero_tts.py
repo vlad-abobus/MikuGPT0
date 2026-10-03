@@ -183,7 +183,9 @@ def _load_model():
 
 
 def _build_ssml(text: str, preset: dict) -> str:
-    safe = html.escape(text.strip(), quote=False)
+    from tts_text import clean_text_for_tts
+
+    safe = html.escape(clean_text_for_tts(text).strip(), quote=False)
     return (
         "<speak>"
         f"<prosody pitch='{preset['pitch']}' rate='{preset['rate']}'>"

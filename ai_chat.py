@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""Единая точка вызова LLM: локальная модель (llama-cpp-python, GGUF D:\model\llm_model.gguf).
+
+Провайдер один — локальная LLM. Без ключей, без сети, без fallback-провайдеров.
+"""
 from __future__ import annotations
 
 import logging
@@ -6,28 +11,15 @@ from paths import read_config_json
 
 logger = logging.getLogger(__name__)
 
-PROVIDER_OPENROUTER = "openrouter"
-PROVIDER_G4F = "g4f"
-
-OPENROUTER_AUTH_MSG = (
-    "Ключ OpenRouter заблокирован или неверный. Создайте новый на openrouter.ai/keys."
-)
-NO_KEY_OPENROUTER_MSG = (
-    "Укажите ключ OpenRouter в config.json (поле «openrouter_api_key»)."
-)
-
-CHAT_RATE_LIMIT_MSG = (
-    "OpenRouter временно ограничил запросы. Подождите минуту."
-)
-CHAT_QUOTA_MSG = (
-    "Лимит OpenRouter исчерпан. Переключаю на g4f..."
-)
+PROVIDER_LOCAL = "local"
 
 DEFAULT_TEMPERATURE = 0.75
 TEMPERATURE_MIN = 0.0
 TEMPERATURE_MAX = 2.0
 
-_g4f_active = False
+
+class ChatProviderError(Exception):
+    """Ошибка локальной LLM."""
 
 
 def get_temperature() -> float:
@@ -39,66 +31,22 @@ def get_temperature() -> float:
     return max(TEMPERATURE_MIN, min(TEMPERATURE_MAX, t))
 
 
-class ChatAuthError(Exception):
-    """Неверный или заблокированный API-ключ."""
-
-
-class ChatRateLimitError(Exception):
-    """Лимит запросов (429) на всех доступных моделях."""
-
-
-class ChatProviderError(Exception):
-    """Прочая ошибка провайдера."""
-
-
 def get_provider() -> str:
-    raw = (read_config_json().get("llm_provider") or "").strip().lower()
-    if raw == PROVIDER_G4F:
-        return PROVIDER_G4F
-    return PROVIDER_OPENROUTER
-
-
-def has_openrouter_key() -> bool:
-    return bool((read_config_json().get("openrouter_api_key") or "").strip())
+    return PROVIDER_LOCAL
 
 
 def has_active_key() -> bool:
-    return has_openrouter_key()
+    return True
 
 
-def reset_quota_flag() -> None:
-    global _g4f_active
-    _g4f_active = False
-
-
-def is_g4f_session() -> bool:
-    return _g4f_active or get_provider() == PROVIDER_G4F
-
-
-def _map_openrouter_error(exc: BaseException) -> BaseException:
-    from gemini_client import GeminiRateLimitError
-
-    if isinstance(exc, GeminiRateLimitError):
-        return ChatRateLimitError(CHAT_RATE_LIMIT_MSG)
-    if isinstance(exc, ValueError):
-        msg = str(exc)
-        if "ключ" in msg.lower():
-            return ChatAuthError(OPENROUTER_AUTH_MSG)
-        if "не задан" in msg.lower():
-            return ChatAuthError(NO_KEY_OPENROUTER_MSG)
-    if isinstance(exc, RuntimeError):
-        return ChatProviderError(str(exc))
-    return ChatProviderError(str(exc))
-
-
-def _g4f_chat(messages: list[dict], *, timeout: int) -> str:
-    from g4f_client import chat_completion as g4f_chat
+def _local_chat(messages: list[dict], *, timeout: int) -> str:
+    from local_llm import chat_completion as local_chat
 
     try:
-        logger.info("g4f: отправка запроса...")
-        return g4f_chat(messages, timeout=timeout, temperature=get_temperature())
+        logger.info("Локальная LLM: отправка запроса...")
+        return local_chat(messages, timeout=timeout, temperature=get_temperature())
     except Exception as e:
-        raise ChatProviderError(f"Ошибка g4f: {e}") from e
+        raise ChatProviderError(f"Ошибка локальной LLM: {e}") from e
 
 
 def chat_stream(
@@ -107,71 +55,22 @@ def chat_stream(
     timeout: int = 120,
     temperature: float | None = None,
 ):
-    """Стриминг ответа по кусочкам (g4f) или целиком одним yield (openrouter)."""
-    if get_provider() != PROVIDER_G4F:
-        text = _openrouter_chat(messages, timeout=timeout)
-        if text:
-            yield text
-        return
-
-    from g4f_client import chat_completion_stream as g4f_stream
+    """Стриминг ответа локальной модели по кусочкам."""
+    from local_llm import chat_completion_stream as local_stream
 
     temp = get_temperature() if temperature is None else temperature
     try:
-        logger.info("g4f stream: начало ответа...")
         got_any = False
-        for token in g4f_stream(messages, timeout=timeout, temperature=temp):
+        for token in local_stream(messages, temperature=temp):
             if token:
                 got_any = True
                 yield token
         if not got_any:
-            raise ChatProviderError("Ошибка g4f: провайдеры не вернули ни одного токена")
+            raise ChatProviderError("Ошибка локальной LLM: модель не вернула ни одного токена")
     except ChatProviderError:
         raise
     except Exception as e:
-        raise ChatProviderError(f"Ошибка g4f: {e}") from e
-
-
-def force_g4f_for_session() -> None:
-    global _g4f_active
-    _g4f_active = True
-
-
-def _openrouter_chat(
-    messages: list[dict],
-    *,
-    timeout: int,
-    model_override: str | None = None,
-) -> str:
-    global _g4f_active
-
-    if _g4f_active:
-        return _g4f_chat(messages, timeout=timeout)
-
-    from gemini_client import chat_completion as or_chat
-    from gemini_client import (
-        GeminiQuotaError,
-        OPENROUTER_BASE_URL,
-    )
-
-    if not has_openrouter_key():
-        raise ChatAuthError(NO_KEY_OPENROUTER_MSG)
-
-    model = model_override or None
-
-    try:
-        return or_chat(
-            messages,
-            timeout=timeout,
-            temperature=get_temperature(),
-            model_override=model,
-            api_base=OPENROUTER_BASE_URL,
-        )
-    except GeminiQuotaError:
-        logger.info("OpenRouter quota исчерпан")
-        raise ChatRateLimitError(CHAT_QUOTA_MSG)
-    except Exception as e:
-        raise _map_openrouter_error(e) from e
+        raise ChatProviderError(f"Ошибка локальной LLM: {e}") from e
 
 
 def chat(
@@ -182,9 +81,7 @@ def chat(
     nsfw: bool = False,
     model_override: str | None = None,
 ) -> str:
-    if get_provider() == PROVIDER_G4F:
-        return _g4f_chat(messages, timeout=timeout)
-    return _openrouter_chat(messages, timeout=timeout, model_override=model_override)
+    return _local_chat(messages, timeout=timeout)
 
 
 def chat_short(
@@ -195,6 +92,4 @@ def chat_short(
     nsfw: bool = False,
     model_override: str | None = None,
 ) -> str:
-    if get_provider() == PROVIDER_G4F:
-        return _g4f_chat(messages, timeout=timeout)
-    return _openrouter_chat(messages, timeout=timeout, model_override=model_override)
+    return _local_chat(messages, timeout=timeout)

@@ -6,7 +6,7 @@
 
   [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
   [![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-8B5CF6?style=for-the-badge&logo=tkinter&logoColor=white)](https://github.com/TomSchimansky/CustomTkinter)
-  [![AI](https://img.shields.io/badge/AI-OpenRouter-FF6B9D?style=for-the-badge&logo=openai&logoColor=white)](https://openrouter.ai)
+  [![AI](https://img.shields.io/badge/AI-Local%20LLM-FF6B9D?style=for-the-badge&logo=python&logoColor=white)](https://llama.cpp)
   [![License](https://img.shields.io/badge/License-MIT-FFD93D?style=for-the-badge)](LICENSE)
   [![Download](https://img.shields.io/badge/Скачать-FF6B9D?style=for-the-badge&logo=github&logoColor=white)](https://github.com/vlad-abobus/MikuGPT0/releases)
 
@@ -31,7 +31,7 @@
 | 🔊 | **Озвучка (TTS)** | Читает ответы вслух своим голосом (Hugging Face + RVC) |
 | 🧠 | **Память** | Запоминает твои интересы, факты и историю диалога |
 | 💕 | **Романтика / NSFW** | Переключение режимов общения одной галочкой |
-| 🎪 | **Режим персонажа** | Отыгрыш действий и речи (*действие* + фраза), как в Character.AI |
+| 🎪 | **roleplay** | Отыгрыш действий и речи (*действие* + фраза), как в Character.AI |
 | 🎛️ | **6 характеров** | Дередере, Цундере, Дандере, Яндере, Агрессивный, Уку-Мамадере |
 | 🔥 | **Smart Memory** | Автоматически конспектирует диалог каждые N сообщений |
 | 🖼️ | **Живые эмоции** | Изображение Мику меняется в реальном времени под настроение |
@@ -98,10 +98,11 @@ python main.py
 ```text
 MikuGPT0/
 ├── main.py             # 🖥️ GUI (CustomTkinter) и основная логика
-├── ai_chat.py          # 🤖 Взаимодействие с API (OpenRouter / g4f)
-├── gemini_client.py    # 🔮 Gemini fallback клиент
+├── ai_chat.py          # 🤖 Взаимодействие с LLM (локальная GGUF: D:\model\llm_model.gguf)
+├── local_llm.py        # 🖥️ Локальная LLM (llama-cpp-python + CUDA, D:\model\llm_model.gguf)
 ├── prompts.py          # 📝 Системные промпты и характеры
-├── emotions_data.py    # 🎭 Словари и маппинг эмоций (A/B/C)
+├── emotions.json        # 🎭 Пресеты эмоций (наборы A/B/C: ключи, подписи, описания для промпта)
+├── emotions_data.py    # 🎭 Загрузка эмоций из emotions.json (наборы A/B/C)
 ├── miku_tts.py         # 🔊 Модуль озвучки (RVC / Hugging Face)
 ├── voice_input.py      # 🎤 Модуль распознавания речи
 ├── paths.py            # 📂 Утилиты для работы с путями

@@ -182,8 +182,10 @@ def _f0_method_and_index_rate() -> tuple[str, float]:
 
 
 def _prepare_tts_text(text: str) -> str:
-    """Текст для синтеза как есть (русский/другой язык), только обрезка по длине."""
-    t = (text or "").strip()
+    """Текст для синтеза: очистка от эмоций/RP-вставок/каомодзи + обрезка по длине."""
+    from tts_text import clean_text_for_tts
+
+    t = clean_text_for_tts(text)
     if len(t) > _MAX_INPUT_CHARS:
         t = t[:_MAX_INPUT_CHARS]
     return t
