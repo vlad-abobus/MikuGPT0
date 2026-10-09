@@ -179,11 +179,11 @@ def _voice_rvc_params(voice: str) -> dict:
     if voice == _VOICE_ANIME:
         return {
             "f0method": "rmvpe",
-            "f0up_key": 6,
-            "index_rate": 0.70,
+            "f0up_key": 5,
+            "index_rate": 0.65,
             "filter_radius": 3,
-            "rms_mix_rate": 1,
-            "protect": 0.33,
+            "rms_mix_rate": 0.9,
+            "protect": 0.25,
         }
     return {
         "f0method": "rmvpe" if high else "pm",
@@ -341,7 +341,9 @@ def _edge_tts_to_wav(text: str, voice: str) -> str:
     fd, path = tempfile.mkstemp(prefix="miku_rvc_in_", suffix=".wav")
     os.close(fd)
     try:
-        communicate = edge_tts.Communicate(text=text, voice=voice, rate="+10%")
+        # Более естественно и анимешно: чуть помедленнее + мягкий тембр
+        # Более естественно и анимешно: чуть помедленнее
+        communicate = edge_tts.Communicate(text=text, voice=voice, rate="+0%")
         asyncio.run(communicate.save(path))
     except Exception:
         try:

@@ -1641,7 +1641,13 @@ class ChatApp(ctk.CTk):
         try:
             self.after(0, self._append_miku_with_typing, reply)
             self.after(0, self._set_emotion, emo_key)
-            # Додаємо в історію як відповідь assitant, щоб зберегти контекст
+            try:
+                clean_tts = self._text_for_tts(reply)
+                if clean_tts:
+                    self.after(500, lambda: self._request_miku_tts(clean_tts))
+            except Exception:
+                pass
+            # Добавим в историю только правильный ассистент, чтобы не ломать контекст
             self.chat_history.append({"role": "assistant", "content": reply})
         except Exception:
             logger.exception("Ошибка при вставке ответа яндере/arousal в UI")
@@ -1705,6 +1711,12 @@ class ChatApp(ctk.CTk):
                 self.after(0, self._append_miku_with_typing, reply)
                 # Apply emotion to UI
                 self.after(0, self._set_emotion, emo)
+                try:
+                    clean_tts = self._text_for_tts(reply)
+                    if clean_tts:
+                        self.after(500, lambda: self._request_miku_tts(clean_tts))
+                except Exception:
+                    pass
                 self.chat_history.append({"role": "assistant", "content": reply})
                 if len(self.chat_history) > 40:
                     self.chat_history = self.chat_history[-40:]
