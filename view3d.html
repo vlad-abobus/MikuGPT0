@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panda 3D Viewer</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #webgl {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.45);
+      color: #e7e7e7;
+      font-size: 12px;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 0.25s ease;
+    }
+
+    #info.hidden {
+      opacity: 0;
+    }
+
+    #thinking {
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(20, 20, 26, 0.72);
+      color: #cfeee8;
+      font-size: 13px;
+      letter-spacing: 0.03em;
+      border: 1px solid rgba(127, 232, 216, 0.35);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+      user-select: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    #thinking.visible {
+      opacity: 1;
+    }
+
+    #thinking .dots::after {
+      content: "";
+      animation: dots 1.2s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0% {
+        content: "";
+      }
+
+      25% {
+        content: ".";
+      }
+
+      50% {
+        content: "..";
+      }
+
+      75% {
+        content: "...";
+      }
+    }
+
+    #loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #f5f5f5;
+      gap: 14px;
+      background: radial-gradient(ellipse at center,
+          rgba(20, 20, 24, 0.92) 0%,
+          rgba(6, 6, 8, 0.98) 100%);
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 10;
+    }
+
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.18);
+      border-top-color: #7fe8d8;
+      animation: spin 0.9s linear infinite;
+      box-shadow: 0 0 0 4px rgba(127, 232, 216, 0.08);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-shadow: 0 6px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: rgba(245, 245, 245, 0.64);
+      max-width: 320px;
+      text-align: center;
+      line-height: 1.6;
+      padding: 0 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="webgl"></canvas>
+  <div id="info"></div>
+  <div id="thinking"><span>Думает</span><span class="dots"></span></div>
+  <div id="loader">
+    <div class="spinner"></div>
+    <div class="title">Загрузка 3D-модели панды...</div>
+    <div class="hint">
+      Нужны <code>models/panda_idle.glb</code>, <code>models/panda_talk.glb</code>,
+      <code>models/panda_yell.glb</code> (экспорт из FBX с анимацией и скелетом).
+    </div>
+  </div>
+
+  <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
+        }
+      }
+    </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+    const canvas = document.getElementById("webgl");
+    const infoEl = document.getElementById("info");
+    const loaderEl = document.getElementById("loader");
+    const thinkingEl = document.getElementById("thinking");
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: false,
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.useLegacyLights = false;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050505);
+
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    const envTexture = pmremGenerator.fromScene(
+      new RoomEnvironment(renderer)
+    ).texture;
+    scene.environment = envTexture;
+    scene.backgroundBlurriness = 0.08;
+
+    const camera = new THREE.PerspectiveCamera(
+      40,
+      window.innerWidth / window.innerHeight,
+      0.08,
+      120
+    );
+    camera.position.set(0.0, 0.9, 2.4);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.target.set(0, 0.6, 0);
+    controls.minDistance = 1.2;
+    controls.maxDistance = 3.2;
+    controls.autoRotate = false;
+    controls.enablePan = false;
+
+    const hemiLight = new THREE.HemisphereLight(0xf2f7ff, 0x0b0b0f, 2.2);
+    scene.add(hemiLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
+    dirLight.position.set(2.4, 3.2, 2.6);
+    dirLight.castShadow = true;
+    dirLight.shadow.bias = -0.00008;
+    dirLight.shadow.mapSize.set(2048, 2048);
+    scene.add(dirLight);
+
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(10, 10),
+      new THREE.ShadowMaterial({ opacity: 0.18 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    const clock = new THREE.Clock();
+
+    let mixer = null;
+    let actions = {};
+    let currentAction = null;
+    let modelRoot = null;
+    let speaking = false;
+    let thinking = false;
+    let speakingTimer = null;
+
+    const actionNames = new Set();
+
+    // Сколько секунд отрезать от конца клипа Talk (обрезка «хвоста» анимации).
+    const TALK_TRIM_SECONDS = 2.0;
+
+    function showInfo(text) {
+      if (!text) {
+        infoEl.classList.add("hidden");
+        return;
+      }
+      infoEl.textContent = text;
+      infoEl.classList.remove("hidden");
+    }
+
+    function setLoaderVisible(visible) {
+      if (visible) {
+        loaderEl.classList.remove("hidden");
+      } else {
+        loaderEl.classList.add("hidden");
+      }
+    }
+
+    function setThinkingVisible(visible) {
+      if (!thinkingEl) return;
+      thinkingEl.classList.toggle("visible", !!visible);
+    }
+
+    function getActionNameCandidates(names) {
+      const map = {
+        idle: ["Idle", "idle", "Idle_001", "Idle_Loop", "Base_Idle"],
+        talk: ["Talk", "talk", "Talking", "Talk_001", "Speak", "Speech"],
+        yell: [
+          "Yell",
+          "yell",
+          "Yelling",
+          "Yell_001",
+          "Shout",
+          "Scream",
+          "Angry_Talk",
+        ],
+      };
+      const out = { idle: null, talk: null, yell: null };
+      for (const key of Object.keys(map)) {
+        for (const cand of map[key]) {
+          if (names.includes(cand)) {
+            out[key] = cand;
+            break;
+          }
+        }
+      }
+      return out;
+    }
+
+    function fadeToAction(name, fadeTime = 0.25) {
+      if (!name) return null;
+      const next = actions[name];
+      if (!next) return currentAction;
+      if (currentAction === next) return next;
+      if (currentAction) {
+        currentAction.fadeOut(fadeTime);
+      }
+      next.reset().fadeIn(fadeTime).play();
+      currentAction = next;
+      return next;
+    }
+
+    function clearSpeakTimer() {
+      if (speakingTimer) {
+        clearTimeout(speakingTimer);
+        speakingTimer = null;
+      }
+    }
+
+    // Одиночное проигрывание клипа (LoopOnce) — чтобы ловить момент окончания.
+    function playOnce(role, fadeTime = 0.15) {
+      const action = actions[role];
+      if (!action) return false;
+      if (currentAction && currentAction !== action) {
+        currentAction.fadeOut(fadeTime);
+      }
+      action.reset();
+      action.setLoop(THREE.LoopOnce, 1);
+      action.clampWhenFinished = true;
+      action.enabled = true;
+      action.setEffectiveTimeScale(1);
+      action.setEffectiveWeight(1);
+      action.fadeIn(fadeTime);
+      action.play();
+      currentAction = action;
+      return true;
+    }
+
+    // Пока идёт озвучка: Talk, затем по окончании — Yell, затем снова Talk и т.д.
+    function onSpeakClipFinished(event) {
+      if (!speaking) return;
+      if (event.action === actions.talk) {
+        playOnce("yell", 0.15);
+      } else if (event.action === actions.yell) {
+        playOnce("talk", 0.15);
+      }
+    }
+
+    function setState(state) {
+      if (state === "speaking") {
+        thinking = false;
+        setThinkingVisible(false);
+        clearSpeakTimer();
+        const wasSpeaking = speaking;
+        speaking = true;
+        if (!wasSpeaking) {
+          if (!playOnce("talk", 0.18)) {
+            if (!playOnce("yell", 0.18)) {
+              fadeToAction("idle", 0.2);
+            }
+          }
+        }
+        showInfo("");
+        return;
+      }
+
+      speaking = false;
+      thinking = state === "thinking";
+      setThinkingVisible(thinking);
+      clearSpeakTimer();
+      fadeToAction("idle", state === "thinking" ? 0.2 : 0.3);
+      showInfo("");
+    }
+
+    function startSpeaking(durationMs = 0) {
+      setState("speaking");
+      if (durationMs && durationMs > 0) {
+        clearSpeakTimer();
+        speakingTimer = setTimeout(() => {
+          speakingTimer = null;
+          if (speaking) {
+            setState("idle");
+          }
+        }, Math.max(600, durationMs));
+      }
+    }
+
+    function loadGLB(loader, url) {
+      return new Promise((resolve, reject) => {
+        loader.load(url, resolve, undefined, reject);
+      });
+    }
+
+    async function loadModels() {
+      const loader = new GLTFLoader();
+      const files = {
+        idle: "models/panda_idle.glb",
+        talk: "models/panda_talk.glb",
+        yell: "models/panda_yell.glb",
+      };
+
+      const loaded = {};
+      let lastError = null;
+      for (const role of Object.keys(files)) {
+        try {
+          loaded[role] = await loadGLB(loader, files[role]);
+        } catch (err) {
+          loaded[role] = null;
+          lastError = err;
+        }
+      }
+
+      const base = loaded.idle || loaded.talk || loaded.yell;
+      if (!base) {
+        console.warn(
+          "Не удалось загрузить 3D-панду. Положите GLB в models/panda_idle.glb и т.д.",
+          lastError
+        );
+        setLoaderVisible(false);
+        showInfo("Модель панды не найдена (models/panda_*.glb)");
+        return;
+      }
+
+      modelRoot = base.scene;
+      modelRoot.traverse((obj) => {
+        if (obj.isMesh) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+          obj.frustumCulled = false;
+        }
+      });
+
+      modelRoot.scale.set(0.9, 0.9, 0.9);
+      modelRoot.position.set(0, 0, 0);
+      scene.add(modelRoot);
+
+      mixer = new THREE.AnimationMixer(modelRoot);
+      mixer.addEventListener("finished", onSpeakClipFinished);
+      actions = {};
+
+      for (const role of ["idle", "talk", "yell"]) {
+        const g = loaded[role];
+        if (!g || !g.animations || g.animations.length === 0) continue;
+        const clip = g.animations[0];
+        const action = mixer.clipAction(clip);
+        action.setLoop(THREE.LoopRepeat);
+        action.clampWhenFinished = false;
+        actions[role] = action;
+        actionNames.add(role);
+      }
+
+      if (loaded.talk && actions["talk"]) {
+        const talkClip = actions["talk"].getClip();
+        talkClip.duration = Math.max(0.1, talkClip.duration - TALK_TRIM_SECONDS);
+      }
+
+      if (!actions["idle"]) {
+        const firstKey = Object.keys(actions)[0];
+        if (firstKey) actions["idle"] = actions[firstKey];
+      }
+      if (!actions["talk"]) actions["talk"] = actions["idle"] || null;
+      if (!actions["yell"]) actions["yell"] = actions["talk"] || actions["idle"] || null;
+
+      setLoaderVisible(false);
+      setState("idle");
+      showInfo("");
+    }
+
+    window.addEventListener("resize", () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    });
+
+    function animate() {
+      const dt = clock.getDelta();
+      if (mixer) mixer.update(dt);
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+    loadModels();
+
+    window.setPandaState = (state) => {
+      try {
+        setState(state);
+      } catch (e) {
+        console.warn(e);
+      }
+    };
+
+    window.pandaSpeak = (durationMs) => {
+      try {
+        const d = durationMs ? parseInt(durationMs) : 1800;
+        startSpeaking(isNaN(d) ? 1800 : d);
+      } catch (e) {
+        startSpeaking(1800);
+      }
+    };
+
+    window.pandaStop = () => {
+      try {
+        setState("idle");
+      } catch (e) {
+        console.warn(e);
+      }
+    };
+
+    function currentRole() {
+      for (const k of ["idle", "talk", "yell"]) {
+        if (actions[k] && actions[k] === currentAction) return k;
+      }
+      return null;
+    }
+
+    window.pandaDebug = () => {
+      try {
+        return JSON.stringify({
+          loaded: !!modelRoot,
+          actions: Object.keys(actions),
+          currentRole: currentRole(),
+          speaking: speaking,
+          thinking: thinking,
+          thinkingBadge: thinkingEl ? thinkingEl.classList.contains("visible") : null,
+          talkDuration: actions.talk ? Number(actions.talk.getClip().duration.toFixed(2)) : null,
+        });
+      } catch (e) {
+        return "err:" + e;
+      }
+    };
+
+    if (window.pywebview && window.pywebview.api) {
+      window.addEventListener("pywebviewready", () => {
+        console.log("pywebview ready");
+      });
+    }
+  </script>
+</body>
+
+</html>

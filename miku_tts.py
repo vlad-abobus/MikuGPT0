@@ -43,6 +43,59 @@ _gradio_predict_lock = threading.Lock()
 # Сериализация pygame-воспроизведения между всеми потоками озвучки.
 _play_lock = threading.Lock()
 
+# --- События воспроизведения для синхронизации анимации (3D-панда) ---
+# Слушатель получает ("start", duration_ms) когда реально начинается звук и
+# ("end", 0) когда звук закончился (после небольшой паузы без новых фраз).
+_playback_listener: Any = None
+_speech_active = False
+_speech_end_timer: "threading.Timer | None" = None
+_speech_state_lock = threading.Lock()
+_SPEECH_GAP_SEC = 0.4
+
+
+def set_playback_listener(listener: Any) -> None:
+    """Зарегистрировать колбэк ``listener(event: str, duration_ms: int)``."""
+    global _playback_listener
+    _playback_listener = listener
+
+
+def _notify_playback(event: str, duration_ms: int = 0) -> None:
+    listener = _playback_listener
+    if listener is None:
+        return
+    try:
+        listener(event, int(duration_ms))
+    except Exception:
+        logger.debug("Ошибка слушателя воспроизведения", exc_info=True)
+
+
+def _fire_speech_end() -> None:
+    global _speech_active
+    with _speech_state_lock:
+        if not _speech_active:
+            return
+        _speech_active = False
+    _notify_playback("end", 0)
+
+
+def _arm_speech(duration_ms: int) -> None:
+    """Отметить старт звука и перезапустить таймер окончания озвучки."""
+    global _speech_active, _speech_end_timer
+    just_started = False
+    with _speech_state_lock:
+        if not _speech_active:
+            _speech_active = True
+            just_started = True
+        if _speech_end_timer is not None:
+            _speech_end_timer.cancel()
+        delay = max(0, int(duration_ms)) / 1000.0 + _SPEECH_GAP_SEC
+        timer = threading.Timer(delay, _fire_speech_end)
+        timer.daemon = True
+        _speech_end_timer = timer
+        timer.start()
+    if just_started:
+        _notify_playback("start", duration_ms)
+
 # --- Инкрементальная (потоковая) озвучка: текст приходит кусками во время LLM-стрима. ---
 _STREAM_LOCK = threading.Lock()
 _stream_tx: "queue.Queue[str | None]" | None = None
@@ -331,11 +384,23 @@ def generate_miku_voice(text: str) -> str:
 
 
 def play_wav_file(path: str) -> None:
-    """Воспроизведение .wav / .mp3 через pygame (в том же потоке, где вызвана)."""
+    """Воспроизведение .wav / .mp3 через pygame (в том же потоке, где вызвана).
+
+    Сообщает слушателю (см. :func:`set_playback_listener`) о реальном старте и
+    окончании звука — на этом строится синхронизация анимации панды.
+    """
     import pygame
 
     try:
         pygame.mixer.init()
+        duration_ms = 0
+        try:
+            duration_ms = int(pygame.mixer.Sound(path).get_length() * 1000)
+        except Exception:
+            duration_ms = 0
+        if duration_ms <= 0:
+            duration_ms = 1000
+        _arm_speech(duration_ms)
         pygame.mixer.music.stop()
         pygame.mixer.music.load(path)
         pygame.mixer.music.play()

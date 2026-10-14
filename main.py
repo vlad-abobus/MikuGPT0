@@ -32,6 +32,10 @@ import threading
 
 import customtkinter as ctk
 import tkinter.messagebox as tkmsg
+try:
+    from panda_window import PandaWindowController
+except Exception:
+    PandaWindowController = None
 from PIL import Image, ImageDraw, ImageFont
 from customtkinter import CTkImage
 
@@ -76,6 +80,7 @@ class ChatApp(ctk.CTk):
         self.title("Ассистент Мику ♪")
         self.geometry("1280x960")
         self.minsize(900, 600)
+        self.protocol("WM_DELETE_WINDOW", self._on_app_close)
 
         # Провайдер только один — локальная LLM; никаких ключей и выбора провайдера нет.
 
@@ -153,6 +158,9 @@ class ChatApp(ctk.CTk):
         self._tts_seq = 0
         self._status_tags: set[str] = set()
         self._status_after_id = None
+        self._panda_window = None
+        self._panda_state = "idle"
+        self._tts_in_progress = False
 
         # Загружаем картинки эмоций
         self.load_emotion_images()
@@ -197,6 +205,51 @@ class ChatApp(ctk.CTk):
 
         # Трекинг последней эмоции для разнообразия
         self.last_emotion_key = default_greeting_emotion_key(self.emotion_set.get())
+
+        # Анимация панды привязана к реальному воспроизведению озвучки.
+        self._install_tts_playback_listener()
+
+        # Отдельное окно 3D-панды (pywebview), появляется после стабилизации геометрии.
+        try:
+            self.after(800, self._start_panda_window)
+        except Exception:
+            logger.debug("Не удалось запланировать окно панды", exc_info=True)
+
+    # ---------- 3D-панда (отдельное окно pywebview) ----------
+    def _start_panda_window(self):
+        if PandaWindowController is None:
+            return
+        try:
+            self.update_idletasks()
+            ax, ay = self.winfo_rootx(), self.winfo_rooty()
+            aw = self.winfo_width() or 1280
+            sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
+            win_w, win_h = 300, 380
+            x = ax + aw + 8
+            if x + win_w > sw - 10:
+                x = max(10, ax - win_w - 8)
+            y = max(10, ay + 40)
+            if y + win_h > sh - 40:
+                y = max(10, sh - win_h - 40)
+            self._panda_window = PandaWindowController()
+            self._panda_window.start(resource_path("view3d.html"), x, y, win_w, win_h)
+        except Exception:
+            logger.debug("Не удалось запустить окно панды", exc_info=True)
+
+    def _on_app_close(self):
+        try:
+            if getattr(self, "_panda_window", None) is not None:
+                self._panda_window.stop()
+        except Exception:
+            logger.debug("Не удалось остановить окно панды", exc_info=True)
+        try:
+            self.quit()
+        except Exception:
+            pass
+        try:
+            self.destroy()
+        except Exception:
+            pass
 
     # ---------- Вспомогательное: путь к ресурсам ----------
     def _resource_path(self, relative_path: str) -> str:
@@ -1658,6 +1711,7 @@ class ChatApp(ctk.CTk):
     def _fetch_response(self, _user_text: str):
         try:
             self.after(0, lambda: self._status_begin("chat"))
+            self.after(0, lambda: self._set_panda_state("thinking"))
             try:
                 try:
                     sys_prompt = self._generate_system_prompt(self.personality)
@@ -1722,15 +1776,17 @@ class ChatApp(ctk.CTk):
                     self.chat_history = self.chat_history[-40:]
             finally:
                 self.after(0, lambda: self._status_end("chat"))
+                self.after(0, lambda: self._set_panda_state("idle"))
 
         except Exception as e:
-            error_msg = f"Ошибка: {str(e)}"
-            logger.exception("_fetch_response: непойманное исключение: %s", e)
-            self.after(0, self._append, "Система", error_msg)
+            error_msg = f"�?�?��+���: {str(e)}"
+            logger.exception("_fetch_response: �?����?���?���?�?�?�� ��?��>�?�ؐ�?���: %s", e)
+            self.after(0, self._append, "����?�'��?��", error_msg)
             current_set = self.emotion_set.get()
             fallback_key = pick_emotion(current_set, ["angry_look", "angryM", "annoyed"])
             self.after(0, self._set_emotion, fallback_key)
             self.after(0, lambda: self._status_end("chat"))
+            self.after(0, lambda: self._set_panda_state("idle"))
 
     # ---------- System prompt (сборка в модуле prompts.py) ----------
     def _generate_system_prompt(self, personality: str) -> str:
@@ -1879,6 +1935,7 @@ class ChatApp(ctk.CTk):
             return
 
         self.after(0, lambda: self._status_begin("tts"))
+        self._tts_in_progress = True
 
         def worker():
             engine = self.tts_engine
@@ -1903,6 +1960,7 @@ class ChatApp(ctk.CTk):
                 self.after(0, lambda m=err: self._append("Система", f"Озвучка Мику: {m}"))
             finally:
                 self.after(0, lambda: self._status_end("tts"))
+                self._tts_in_progress = False
 
         threading.Thread(target=worker, daemon=True).start()
 
@@ -2001,8 +2059,62 @@ class ChatApp(ctk.CTk):
         self.chat_display.see("end")
 
     # (Сценарии удалены — автоматическая генерация и вставка сценариев отключены)
+    def _install_tts_playback_listener(self):
+        """Слушает реальный старт/конец озвучки и переключает анимацию панды."""
+        try:
+            import miku_tts
+        except Exception:
+            return
 
-if __name__ == "__main__":
+        def _on_playback(event, _duration_ms=0):
+            try:
+                if event == "start":
+                    self.after(0, lambda: self._set_panda_state("speaking"))
+                elif event == "end":
+                    self.after(0, lambda: self._set_panda_state("idle"))
+            except Exception:
+                pass
+
+        try:
+            miku_tts.set_playback_listener(_on_playback)
+        except Exception:
+            logger.debug("Не удалось установить слушателя озвучки", exc_info=True)
+
+    def _set_panda_state(self, state: str):
+        pw = getattr(self, '_panda_window', None)
+        if pw is None:
+            return
+        try:
+            self._panda_state = state
+            pw.send(f"state:{state}")
+        except Exception as e:
+            logger.debug('panda state failed: %s', e)
+
+    def _panda_speak(self, duration_ms: int = 1800):
+        pw = getattr(self, '_panda_window', None)
+        if pw is None:
+            return
+        try:
+            pw.send(f"speak:{max(600, int(duration_ms))}")
+        except Exception as e:
+            logger.debug('panda speak failed: %s', e)
+
+    def _panda_stop(self):
+        pw = getattr(self, '_panda_window', None)
+        if pw is None:
+            return
+        try:
+            pw.send("stop")
+        except Exception as e:
+            logger.debug('panda stop failed: %s', e)
+
+
+if __name__ == '__main__':
+    if '--panda-viewer' in sys.argv:
+        from panda_viewer import main as panda_viewer_main
+
+        sys.exit(panda_viewer_main([a for a in sys.argv[1:] if a != '--panda-viewer']))
+
     from app_logging import setup_logging
 
     setup_logging()
