@@ -6,7 +6,7 @@
 
   [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
   [![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-8B5CF6?style=for-the-badge&logo=tkinter&logoColor=white)](https://github.com/TomSchimansky/CustomTkinter)
-  [![AI](https://img.shields.io/badge/AI-Local%20LLM-FF6B9D?style=for-the-badge&logo=python&logoColor=white)](https://llama.cpp)
+  [![AI](https://img.shields.io/badge/AI-Gemini%202.5%20Flash--Lite-FF6B9D?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/apikey)
   [![License](https://img.shields.io/badge/License-MIT-FFD93D?style=for-the-badge)](LICENSE)
   [![Download](https://img.shields.io/badge/Скачать-FF6B9D?style=for-the-badge&logo=github&logoColor=white)](https://github.com/vlad-abobus/MikuGPT0/releases)
 
@@ -73,7 +73,10 @@ source venv/bin/activate
 # 3. Установи зависимости
 pip install -r requirements.txt
 
-# 4. Запусти приложение
+# 4. Вставь ключ Gemini в api_gem.txt (строка api_key=...)
+#    Ключ берётся тут: https://aistudio.google.com/apikey
+
+# 5. Запусти приложение
 python main.py
 
 ```
@@ -98,8 +101,9 @@ python main.py
 ```text
 MikuGPT0/
 ├── main.py             # 🖥️ GUI (CustomTkinter) и основная логика
-├── ai_chat.py          # 🤖 Взаимодействие с LLM (локальная GGUF: D:\model\llm_model.gguf)
-├── local_llm.py        # 🖥️ Локальная LLM (llama-cpp-python + CUDA, D:\model\llm_model.gguf)
+├── ai_chat.py          # 🤖 Единая точка вызова LLM (Google Gemini)
+├── gemini_client.py    # 🌐 Google Gemini API (gemini-2.5-flash-lite, REST)
+├── api_gem.txt         # 🔑 API-ключ Gemini и настройки запроса (заполняется вручную)
 ├── prompts.py          # 📝 Системные промпты и характеры
 ├── emotions.json        # 🎭 Пресеты эмоций (наборы A/B/C: ключи, подписи, описания для промпта)
 ├── emotions_data.py    # 🎭 Загрузка эмоций из emotions.json (наборы A/B/C)

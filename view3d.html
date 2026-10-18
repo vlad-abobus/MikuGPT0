@@ -43,55 +43,6 @@
       opacity: 0;
     }
 
-    #thinking {
-      position: absolute;
-      left: 50%;
-      bottom: 16px;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: rgba(20, 20, 26, 0.72);
-      color: #cfeee8;
-      font-size: 13px;
-      letter-spacing: 0.03em;
-      border: 1px solid rgba(127, 232, 216, 0.35);
-      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.45);
-      pointer-events: none;
-      user-select: none;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    #thinking.visible {
-      opacity: 1;
-    }
-
-    #thinking .dots::after {
-      content: "";
-      animation: dots 1.2s steps(4, end) infinite;
-    }
-
-    @keyframes dots {
-      0% {
-        content: "";
-      }
-
-      25% {
-        content: ".";
-      }
-
-      50% {
-        content: "..";
-      }
-
-      75% {
-        content: "...";
-      }
-    }
-
     #loader {
       position: absolute;
       inset: 0;
@@ -152,13 +103,13 @@
 <body>
   <canvas id="webgl"></canvas>
   <div id="info"></div>
-  <div id="thinking"><span>Думает</span><span class="dots"></span></div>
   <div id="loader">
     <div class="spinner"></div>
     <div class="title">Загрузка 3D-модели панды...</div>
-    <div class="hint">
-      Нужны <code>models/panda_idle.glb</code>, <code>models/panda_talk.glb</code>,
-      <code>models/panda_yell.glb</code> (экспорт из FBX с анимацией и скелетом).
+      <div class="hint">
+      �?�?�?��?�'��'�� GLB-�?�?�?��>�? �? <code>models/panda.glb</code> (��>��
+      <code>mdels/panda.glb</code>). �?�?��?���Ő��: <b>Idle</b>, <b>Talk</b>,
+      <b>Yell</b> (��>�� <b>Yelling</b>). ���� �? <code>mdels/</code> ���� ��'�� FBX — ���?�?�?�?�?�?��>�� �? GLB.
     </div>
   </div>
 
@@ -179,13 +130,12 @@
     const canvas = document.getElementById("webgl");
     const infoEl = document.getElementById("info");
     const loaderEl = document.getElementById("loader");
-    const thinkingEl = document.getElementById("thinking");
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
       alpha: false,
-    });
+    }); 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -243,7 +193,7 @@
 
     const clock = new THREE.Clock();
 
-    let mixer = null;
+    const mixer = new THREE.AnimationMixer(scene);
     let actions = {};
     let currentAction = null;
     let modelRoot = null;
@@ -252,9 +202,6 @@
     let speakingTimer = null;
 
     const actionNames = new Set();
-
-    // Сколько секунд отрезать от конца клипа Talk (обрезка «хвоста» анимации).
-    const TALK_TRIM_SECONDS = 2.0;
 
     function showInfo(text) {
       if (!text) {
@@ -271,11 +218,6 @@
       } else {
         loaderEl.classList.add("hidden");
       }
-    }
-
-    function setThinkingVisible(visible) {
-      if (!thinkingEl) return;
-      thinkingEl.classList.toggle("visible", !!visible);
     }
 
     function getActionNameCandidates(names) {
@@ -317,118 +259,95 @@
       return next;
     }
 
-    function clearSpeakTimer() {
-      if (speakingTimer) {
-        clearTimeout(speakingTimer);
-        speakingTimer = null;
-      }
-    }
-
-    // Одиночное проигрывание клипа (LoopOnce) — чтобы ловить момент окончания.
-    function playOnce(role, fadeTime = 0.15) {
-      const action = actions[role];
-      if (!action) return false;
-      if (currentAction && currentAction !== action) {
-        currentAction.fadeOut(fadeTime);
-      }
-      action.reset();
-      action.setLoop(THREE.LoopOnce, 1);
-      action.clampWhenFinished = true;
-      action.enabled = true;
-      action.setEffectiveTimeScale(1);
-      action.setEffectiveWeight(1);
-      action.fadeIn(fadeTime);
-      action.play();
-      currentAction = action;
-      return true;
-    }
-
-    // Пока идёт озвучка: Talk, затем по окончании — Yell, затем снова Talk и т.д.
-    function onSpeakClipFinished(event) {
-      if (!speaking) return;
-      if (event.action === actions.talk) {
-        playOnce("yell", 0.15);
-      } else if (event.action === actions.yell) {
-        playOnce("talk", 0.15);
-      }
-    }
-
     function setState(state) {
-      if (state === "speaking") {
-        thinking = false;
-        setThinkingVisible(false);
-        clearSpeakTimer();
-        const wasSpeaking = speaking;
-        speaking = true;
-        if (!wasSpeaking) {
-          if (!playOnce("talk", 0.18)) {
-            if (!playOnce("yell", 0.18)) {
-              fadeToAction("idle", 0.2);
-            }
+      switch (state) {
+        case "thinking":
+          thinking = true;
+          speaking = false;
+          if (speakingTimer) {
+            clearTimeout(speakingTimer);
+            speakingTimer = null;
           }
-        }
-        showInfo("");
-        return;
+          fadeToAction("idle", 0.2);
+          showInfo("Думает...");
+          break;
+        case "speaking":
+          thinking = false;
+          speaking = true;
+          if (speakingTimer) {
+            clearTimeout(speakingTimer);
+            speakingTimer = null;
+          }
+          const speakAnim = Math.random() < 0.5 ? "talk" : "yell";
+          fadeToAction(speakAnim, 0.18);
+          showInfo("Говорит");
+          break;
+        case "speaking_end":
+        case "idle":
+        default:
+          thinking = false;
+          speaking = false;
+          if (speakingTimer) {
+            clearTimeout(speakingTimer);
+            speakingTimer = null;
+          }
+          fadeToAction("idle", 0.25);
+          showInfo("");
+          break;
       }
-
-      speaking = false;
-      thinking = state === "thinking";
-      setThinkingVisible(thinking);
-      clearSpeakTimer();
-      fadeToAction("idle", state === "thinking" ? 0.2 : 0.3);
-      showInfo("");
     }
 
-    function startSpeaking(durationMs = 0) {
+    function startSpeaking(durationMs = 1800) {
       setState("speaking");
-      if (durationMs && durationMs > 0) {
-        clearSpeakTimer();
-        speakingTimer = setTimeout(() => {
-          speakingTimer = null;
-          if (speaking) {
-            setState("idle");
-          }
-        }, Math.max(600, durationMs));
-      }
+      if (speakingTimer) clearTimeout(speakingTimer);
+      speakingTimer = setTimeout(() => {
+        speakingTimer = null;
+        if (speaking) {
+          setState("idle");
+        }
+      }, Math.max(600, durationMs));
     }
 
-    function loadGLB(loader, url) {
-      return new Promise((resolve, reject) => {
-        loader.load(url, resolve, undefined, reject);
-      });
-    }
-
-    async function loadModels() {
+    async function loadModel() {
       const loader = new GLTFLoader();
-      const files = {
-        idle: "models/panda_idle.glb",
-        talk: "models/panda_talk.glb",
-        yell: "models/panda_yell.glb",
-      };
+      const candidates = [
+        "models/panda.glb",
+        "mdels/panda.glb",
+        "models/panda.gltf",
+        "mdels/panda.gltf",
+      "mdels/panda.glb",
+      "mdels/Panda.glb",
+      "models/panda.glb",
+      "mdels/Panda.gltf",
+      "mdels/panda.gltf",
+      "models/panda.gltf",
+    ];
 
-      const loaded = {};
+      let gltf = null;
       let lastError = null;
-      for (const role of Object.keys(files)) {
+
+      for (const url of candidates) {
         try {
-          loaded[role] = await loadGLB(loader, files[role]);
+          gltf = await new Promise((resolve, reject) => {
+            loader.load(url, resolve, undefined, reject);
+          });
+          break;
         } catch (err) {
-          loaded[role] = null;
           lastError = err;
         }
       }
 
-      const base = loaded.idle || loaded.talk || loaded.yell;
-      if (!base) {
+      if (!gltf) {
         console.warn(
-          "Не удалось загрузить 3D-панду. Положите GLB в models/panda_idle.glb и т.д.",
+          "Не удалось загрузить 3D-панду. Положите GLB в models/panda.glb",
           lastError
         );
         setLoaderVisible(false);
-        showInfo("Модель панды не найдена (models/panda_*.glb)");
+        showInfo("Модель панды не найдена (models/panda.glb)");
         return;
       }
 
-      modelRoot = base.scene;
+      modelRoot = gltf.scene;
       modelRoot.traverse((obj) => {
         if (obj.isMesh) {
           obj.castShadow = true;
@@ -441,32 +360,32 @@
       modelRoot.position.set(0, 0, 0);
       scene.add(modelRoot);
 
-      mixer = new THREE.AnimationMixer(modelRoot);
-      mixer.addEventListener("finished", onSpeakClipFinished);
+      const clips = gltf.animations || [];
+      mixer.stopAllAction();
       actions = {};
 
-      for (const role of ["idle", "talk", "yell"]) {
-        const g = loaded[role];
-        if (!g || !g.animations || g.animations.length === 0) continue;
-        const clip = g.animations[0];
+      const clipNames = clips.map((c) => c.name);
+      const candMap = getActionNameCandidates(clipNames);
+
+      for (const clip of clips) {
         const action = mixer.clipAction(clip);
         action.setLoop(THREE.LoopRepeat);
         action.clampWhenFinished = false;
-        actions[role] = action;
-        actionNames.add(role);
+        actions[clip.name] = action;
+        actionNames.add(clip.name);
       }
 
-      if (loaded.talk && actions["talk"]) {
-        const talkClip = actions["talk"].getClip();
-        talkClip.duration = Math.max(0.1, talkClip.duration - TALK_TRIM_SECONDS);
-      }
+      const idleName = candMap.idle || clipNames.find((n) => /idle/i.test(n));
+      const talkName = candMap.talk || clipNames.find((n) => /talk/i.test(n));
+      const yellName = candMap.yell || clipNames.find((n) => /yell|shout|scream/i.test(n));
 
-      if (!actions["idle"]) {
-        const firstKey = Object.keys(actions)[0];
-        if (firstKey) actions["idle"] = actions[firstKey];
+      if (idleName && actions[idleName]) actions["idle"] = actions[idleName];
+      if (talkName && actions[talkName]) actions["talk"] = actions[talkName];
+      if (yellName && actions[yellName]) actions["yell"] = actions[yellName];
+
+      if (!actions["idle"] && Object.keys(actions).length > 0) {
+        actions["idle"] = actions[Object.keys(actions)[0]];
       }
-      if (!actions["talk"]) actions["talk"] = actions["idle"] || null;
-      if (!actions["yell"]) actions["yell"] = actions["talk"] || actions["idle"] || null;
 
       setLoaderVisible(false);
       setState("idle");
@@ -483,14 +402,14 @@
 
     function animate() {
       const dt = clock.getDelta();
-      if (mixer) mixer.update(dt);
+      mixer.update(dt);
       controls.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
 
     animate();
-    loadModels();
+    loadModel();
 
     window.setPandaState = (state) => {
       try {
@@ -514,29 +433,6 @@
         setState("idle");
       } catch (e) {
         console.warn(e);
-      }
-    };
-
-    function currentRole() {
-      for (const k of ["idle", "talk", "yell"]) {
-        if (actions[k] && actions[k] === currentAction) return k;
-      }
-      return null;
-    }
-
-    window.pandaDebug = () => {
-      try {
-        return JSON.stringify({
-          loaded: !!modelRoot,
-          actions: Object.keys(actions),
-          currentRole: currentRole(),
-          speaking: speaking,
-          thinking: thinking,
-          thinkingBadge: thinkingEl ? thinkingEl.classList.contains("visible") : null,
-          talkDuration: actions.talk ? Number(actions.talk.getClip().duration.toFixed(2)) : null,
-        });
-      } catch (e) {
-        return "err:" + e;
       }
     };
 

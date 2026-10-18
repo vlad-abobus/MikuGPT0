@@ -15,11 +15,8 @@ websocket-client>=1.0.0
 torch>=2.2
 # Локальная RVC-озвучка Мику (voice_engine.py): Edge-TTS + rvc-python.
 rvc-python>=0.1.5
-# Локальная LLM (local_llm.py): GGUF-модель на своём ПК.
-# CUDA-сборка для RTX 50xx (ускорение ~10x): pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu132
-#   + нужен cuBLAS 13 runtime (C:\...\numpy, не трогай, иначе сломан rvc-python)
-# CPU-сборка: pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
-llama-cpp-python>=0.3.35
+# ИИ: Google Gemini API (gemini_client.py, ai_chat.py) — model gemini-2.5-flash-lite.
+# Работает на requests (уже в списке выше). Ключ и настройки: api_gem.txt.
 
 # Отдельное окно 3D-панды (panda_viewer.py). Нужен WebView2 Runtime (Windows).
 pywebview>=5.0

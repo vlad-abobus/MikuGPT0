@@ -2,6 +2,7 @@
 .venv/
 venv/
 env/
+ENV/
 
 # Python cache / compiled files
 __pycache__/
@@ -16,6 +17,7 @@ __pycache__/
 build/
 dist/
 *.spec
+_internal/
 
 # Logs and temp files
 logs/
@@ -29,6 +31,7 @@ logs/
 config.json
 list_key.json
 key_list.txt
+api_gem.txt
 *.env
 .env
 
@@ -53,9 +56,14 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Local model/audio cache
+# Local model/audio cache (весові голоси/моделі не тримаємо в репо)
 silero_cache/
 *.pt
+*.pth
+*.index
+
+# Сторонній клон бібліотеки, не частина проєкту
+tts-with-rvc/
 
 # Keep project assets tracked when they are part of the app
 # (do not ignore screenshots/icons/emotion files here)

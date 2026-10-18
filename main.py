@@ -82,7 +82,7 @@ class ChatApp(ctk.CTk):
         self.minsize(900, 600)
         self.protocol("WM_DELETE_WINDOW", self._on_app_close)
 
-        # Провайдер только один — локальная LLM; никаких ключей и выбора провайдера нет.
+        # Провайдер только один — Google Gemini (gemini-2.5-flash-lite), ключ из api_gem.txt.
 
         # Переменные конфигурации
         self.flirt_enabled = ctk.BooleanVar(value=False)
@@ -106,7 +106,7 @@ class ChatApp(ctk.CTk):
         # Словарь CTkImage-объектов
         self.emotion_images = {}
 
-        # config.json: имя, местоимения, заметки в промпт, ключи API
+        # config.json: имя, местоимения, заметки в промпт; ключ Gemini — в api_gem.txt
         self.user_name = ""
         self.user_pronouns = ""
         self.config_notes = ""
@@ -191,10 +191,25 @@ class ChatApp(ctk.CTk):
         except Exception:
             pass
 
-# Фоновый прогрев локальной LLM сразу после старта
+# Фоновая проверка Gemini API сразу после старта
         try:
-            from local_llm import warmup as local_llm_warmup
-            threading.Thread(target=local_llm_warmup, kwargs={"delay_sec": 3.0}, daemon=True).start()
+            from gemini_client import warmup as gemini_warmup
+            threading.Thread(target=gemini_warmup, kwargs={"delay_sec": 3.0}, daemon=True).start()
+        except Exception:
+            pass
+
+        # Если ключ Gemini не вставлен — говорим об этом прямо в чате
+        try:
+            from gemini_client import api_gem_path, has_key as gemini_has_key
+
+            if not gemini_has_key():
+                _gemini_file = os.path.basename(api_gem_path())
+                self.after(700, lambda: self._append(
+                    "Система",
+                    f"⚠️ В файле {_gemini_file} не заполнен api_key. "
+                    "Возьми ключ на https://aistudio.google.com/apikey и вставь строку "
+                    f"api_key=... в {_gemini_file} — без него Мику не сможет отвечать.",
+                ))
         except Exception:
             pass
 
@@ -1039,7 +1054,7 @@ class ChatApp(ctk.CTk):
         about_text = (
             "МикуGPT — с лета 2025\n\n"
             " Версия 1.5\n\n"
-            "ИИ: OpenRouter (thedrummer/unslopnemo-12b) / GPT4Free / Локальная GGUF\n"
+            "ИИ: Google Gemini 2.5 Flash-Lite (ключ в api_gem.txt)\n"
             "Мику отвечает на казахском/русском/украинском.\n"
             "Авторы: Lucky_13, Влад , (сообщество LK_13)\n\n"
             "Управление:\n"
@@ -1716,11 +1731,11 @@ class ChatApp(ctk.CTk):
                 try:
                     sys_prompt = self._generate_system_prompt(self.personality)
                     api_messages = [{"role": "system", "content": sys_prompt}]
-                    # Локальная LLM: контекст модели конечен. Держим историю в рамках окна:
+                    # Gemini: держим историю в рамках окна контекста модели (api_gem.txt → context_window):
                     # оцениваем токены (~3 симв./токен, с запасом), идём от свежих сообщений
                     # и режем старые, пока не упрёмся в лимит.
                     try:
-                        from local_llm import context_limit
+                        from gemini_client import context_limit
                         ctx = context_limit()
                     except Exception:
                         ctx = 8192
@@ -1748,7 +1763,7 @@ class ChatApp(ctk.CTk):
                         })
                     reply, emo = self._fetch_miku_reply(api_messages)
                 except ChatProviderError as exc:
-                    logger.warning("ИИ: ошибка локальной LLM — %s", exc)
+                    logger.warning("ИИ: ошибка Gemini API — %s", exc)
                     self.after(0, self._append, "Система", f"❌ {exc}")
                     current_set = self.emotion_set.get()
                     fallback_key = pick_emotion(current_set, ["angry_look", "angryM", "annoyed"])

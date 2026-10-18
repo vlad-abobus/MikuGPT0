@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Единая точка вызова LLM: локальная модель (llama-cpp-python, GGUF D:\model\llm_model.gguf).
+"""Единая точка вызова LLM: Google Gemini API (gemini-2.5-flash-lite).
 
-Провайдер один — локальная LLM. Без ключей, без сети, без fallback-провайдеров.
+Провайдер один — Gemini. Ключ и все настройки запроса берутся из api_gem.txt.
 """
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from paths import read_config_json
 
 logger = logging.getLogger(__name__)
 
-PROVIDER_LOCAL = "local"
+PROVIDER_GEMINI = "gemini"
 
 DEFAULT_TEMPERATURE = 0.75
 TEMPERATURE_MIN = 0.0
@@ -19,7 +19,7 @@ TEMPERATURE_MAX = 2.0
 
 
 class ChatProviderError(Exception):
-    """Ошибка локальной LLM."""
+    """Ошибка Gemini API."""
 
 
 def get_temperature() -> float:
@@ -32,21 +32,23 @@ def get_temperature() -> float:
 
 
 def get_provider() -> str:
-    return PROVIDER_LOCAL
+    return PROVIDER_GEMINI
 
 
 def has_active_key() -> bool:
-    return True
+    from gemini_client import has_key
+
+    return has_key()
 
 
-def _local_chat(messages: list[dict], *, timeout: int) -> str:
-    from local_llm import chat_completion as local_chat
+def _gemini_chat(messages: list[dict], *, timeout: int) -> str:
+    from gemini_client import chat_completion as gemini_chat
 
     try:
-        logger.info("Локальная LLM: отправка запроса...")
-        return local_chat(messages, timeout=timeout, temperature=get_temperature())
+        logger.info("Gemini: отправка запроса...")
+        return gemini_chat(messages, timeout=timeout, temperature=get_temperature())
     except Exception as e:
-        raise ChatProviderError(f"Ошибка локальной LLM: {e}") from e
+        raise ChatProviderError(f"Ошибка Gemini API: {e}") from e
 
 
 def chat_stream(
@@ -55,22 +57,22 @@ def chat_stream(
     timeout: int = 120,
     temperature: float | None = None,
 ):
-    """Стриминг ответа локальной модели по кусочкам."""
-    from local_llm import chat_completion_stream as local_stream
+    """Стриминг ответа Gemini по кусочкам."""
+    from gemini_client import chat_completion_stream as gemini_stream
 
     temp = get_temperature() if temperature is None else temperature
     try:
         got_any = False
-        for token in local_stream(messages, temperature=temp):
+        for token in gemini_stream(messages, temperature=temp):
             if token:
                 got_any = True
                 yield token
         if not got_any:
-            raise ChatProviderError("Ошибка локальной LLM: модель не вернула ни одного токена")
+            raise ChatProviderError("Ошибка Gemini API: модель не вернула ни одного токена")
     except ChatProviderError:
         raise
     except Exception as e:
-        raise ChatProviderError(f"Ошибка локальной LLM: {e}") from e
+        raise ChatProviderError(f"Ошибка Gemini API: {e}") from e
 
 
 def chat(
@@ -81,7 +83,7 @@ def chat(
     nsfw: bool = False,
     model_override: str | None = None,
 ) -> str:
-    return _local_chat(messages, timeout=timeout)
+    return _gemini_chat(messages, timeout=timeout)
 
 
 def chat_short(
@@ -92,4 +94,4 @@ def chat_short(
     nsfw: bool = False,
     model_override: str | None = None,
 ) -> str:
-    return _local_chat(messages, timeout=timeout)
+    return _gemini_chat(messages, timeout=timeout)
