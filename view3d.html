@@ -43,6 +43,48 @@
       opacity: 0;
     }
 
+    #reset-view {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 7px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(20, 25, 32, 0.78);
+      color: #f2f6fa;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: background 0.2s ease, border-color 0.2s ease;
+      z-index: 2;
+    }
+
+    #reset-view:hover {
+      background: rgba(48, 105, 150, 0.9);
+      border-color: rgba(127, 190, 240, 0.7);
+    }
+
+    #reset-view:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    #interaction-hint {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 8px;
+      border-radius: 7px;
+      background: rgba(0, 0, 0, 0.42);
+      color: rgba(245, 245, 245, 0.7);
+      font-size: 11px;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
     #loader {
       position: absolute;
       inset: 0;
@@ -103,6 +145,8 @@
 <body>
   <canvas id="webgl"></canvas>
   <div id="info"></div>
+  <button id="reset-view" type="button" disabled>↺ Исходный вид</button>
+  <div id="interaction-hint">Потяни мышью — вращение на 360°</div>
   <div id="loader">
     <div class="spinner"></div>
     <div class="title">Загрузка 3D-модели панды...</div>
@@ -130,6 +174,7 @@
     const canvas = document.getElementById("webgl");
     const infoEl = document.getElementById("info");
     const loaderEl = document.getElementById("loader");
+    const resetViewButton = document.getElementById("reset-view");
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -168,8 +213,11 @@
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.target.set(0, 0.6, 0);
-    controls.minDistance = 1.2;
-    controls.maxDistance = 3.2;
+    controls.minDistance = 0.5;
+    controls.maxDistance = 12;
+    controls.minPolarAngle = 0.12;
+    controls.maxPolarAngle = Math.PI - 0.12;
+    controls.rotateSpeed = 0.75;
     controls.autoRotate = false;
     controls.enablePan = false;
 
@@ -202,6 +250,34 @@
     let speakingTimer = null;
 
     const actionNames = new Set();
+
+    function fitCameraToModel(root) {
+      root.updateMatrixWorld(true);
+      const bounds = new THREE.Box3();
+      root.traverse((object) => {
+        if (!object.isMesh || !object.geometry) return;
+        if (!object.geometry.boundingBox) object.geometry.computeBoundingBox();
+        if (object.geometry.boundingBox) {
+          bounds.union(object.geometry.boundingBox.clone().applyMatrix4(object.matrixWorld));
+        }
+      });
+      const size = bounds.getSize(new THREE.Vector3());
+      const center = bounds.getCenter(new THREE.Vector3());
+      const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+      const horizontalFov = 2 * Math.atan(Math.tan(verticalFov * 0.5) * camera.aspect);
+      const heightDistance = size.y / (2 * Math.tan(verticalFov * 0.5));
+      const widthDistance = size.x / (2 * Math.tan(horizontalFov * 0.5));
+      const distance = Math.max(heightDistance, widthDistance) * 1.12;
+      const target = center.clone();
+      target.y += size.y * 0.06;
+
+      controls.target.copy(target);
+      camera.position.copy(target).add(new THREE.Vector3(0, size.y * 0.04, distance));
+      controls.minDistance = Math.max(0.25, distance * 0.55);
+      controls.maxDistance = distance * 2.5;
+      controls.update();
+      controls.saveState();
+    }
 
     function showInfo(text) {
       if (!text) {
@@ -370,7 +446,8 @@
           lastError
         );
         setLoaderVisible(false);
-        showInfo("Модель панды не найдена (models/panda_idle.glb)");
+        const reason = lastError && lastError.message ? `: ${lastError.message}` : "";
+        showInfo(`Не удалось загрузить модель (models/panda_idle.glb)${reason}`);
         return;
       }
 
@@ -386,6 +463,8 @@
       modelRoot.scale.set(0.9, 0.9, 0.9);
       modelRoot.position.set(0, 0, 0);
       scene.add(modelRoot);
+      fitCameraToModel(modelRoot);
+      resetViewButton.disabled = false;
 
       mixer.stopAllAction();
       actions = {};
@@ -458,6 +537,10 @@
 
     animate();
     loadModel();
+
+    resetViewButton.addEventListener("click", () => {
+      controls.reset();
+    });
 
     window.setPandaState = (state) => {
       try {

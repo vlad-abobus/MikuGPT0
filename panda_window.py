@@ -51,6 +51,7 @@ class PandaWindowController:
         self._proc = None
         self._sock = None
         self._lock = threading.Lock()
+        self._visible = False
 
     def start(self, html_path: str, x: int, y: int, width: int = 300, height: int = 380) -> None:
         if self._proc is not None:
@@ -106,9 +107,16 @@ class PandaWindowController:
                     pass
                 return
             self._sock = sock
+            visibility_cmd = "show" if self._visible else "hide"
+        try:
+            sock.sendall((visibility_cmd + "\n").encode("utf-8"))
+        except OSError as e:
+            logger.debug("Не удалось установить видимость окна панды: %s", e)
 
     def send(self, cmd: str) -> None:
         with self._lock:
+            if cmd in ("show", "hide"):
+                self._visible = cmd == "show"
             sock = self._sock
         if sock is None:
             return

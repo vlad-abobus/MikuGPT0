@@ -56,7 +56,7 @@ class VoiceInput:
     def init_error(self) -> str | None:
         return self._init_error
 
-    def start(self, on_result, on_error=None, on_processing=None) -> None:
+    def start(self, on_result, on_error=None, on_processing=None, language: str = "ru-RU") -> None:
         if not self._available:
             if on_error:
                 on_error(self._init_error or "Микрофон недоступен")
@@ -73,7 +73,7 @@ class VoiceInput:
             if on_processing:
                 on_processing()
             try:
-                text = recognizer.recognize_google(audio, language="ru-RU")
+                text = recognizer.recognize_google(audio, language=language)
                 if on_result:
                     on_result(text)
             except self._sr.UnknownValueError:

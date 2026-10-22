@@ -36,6 +36,20 @@ def _dispatch(cmd: str, holder: dict) -> None:
         _eval_js(holder, f"window.pandaSpeak && window.pandaSpeak({ms});")
     elif cmd == "stop":
         _eval_js(holder, "window.pandaStop && window.pandaStop();")
+    elif cmd == "show":
+        win = holder.get("win")
+        if win is not None:
+            try:
+                win.show()
+            except Exception as e:
+                logger.debug("panda viewer: show failed: %s", e)
+    elif cmd == "hide":
+        win = holder.get("win")
+        if win is not None:
+            try:
+                win.hide()
+            except Exception as e:
+                logger.debug("panda viewer: hide failed: %s", e)
     elif cmd == "quit":
         holder["stop"] = True
         win = holder.get("win")
@@ -106,17 +120,18 @@ def run_viewer(html: str, port: int, width: int, height: int, x: int, y: int) ->
 
     try:
         window = webview.create_window(
-            "Panda",
+            "Мику — 3D-модель",
             url=html,
             width=int(width),
             height=int(height),
             x=int(x),
             y=int(y),
-            frameless=True,
-            easy_drag=True,
+            frameless=False,
+            easy_drag=False,
             on_top=True,
             resizable=False,
             background_color="#050505",
+            hidden=True,
         )
     except Exception as e:
         logger.error("panda viewer: create_window failed: %s", e)
