@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Единая точка вызова LLM: Google Gemini API (gemini-2.5-flash-lite).
+"""Единая точка вызова LLM: Google Gemini API (gemini-3.5-flash-lite).
 
 Провайдер один — Gemini. Ключ и все настройки запроса берутся из api_gem.txt.
 """

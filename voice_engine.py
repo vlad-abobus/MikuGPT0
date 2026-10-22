@@ -256,6 +256,36 @@ def _copy_bundled_base_models() -> None:
             logger.warning("RVC: не удалось скопировать %s → %s", src, target)
 
 
+def _patch_rvc_download() -> None:
+    """Подменить HF-загрузку rvc_python: rmvpe.onnx (~345 МБ) нужен только для DirectML,
+    а устройство всегда cuda/cpu. Локально hubert/rmvpe уже лежат в base_model."""
+    try:
+        import rvc_python.infer as ri
+    except Exception:
+        return
+
+    def _download_local_only(lib_dir: str) -> None:
+        base = os.path.join(lib_dir, "base_model")
+        try:
+            os.makedirs(base, exist_ok=True)
+        except Exception:
+            return
+        for src, name in ((HUBERT_PT, "hubert_base.pt"), (RMVPE_PT, "rmvpe.pt")):
+            dst = os.path.join(base, name)
+            if os.path.isfile(dst) or not os.path.isfile(src):
+                continue
+            try:
+                shutil.copyfile(src, dst)
+                logger.info("RVC: %s скопирован в %s", name, dst)
+            except Exception:
+                logger.warning("RVC: не удалось скопировать %s → %s", src, dst)
+
+    try:
+        ri.download_rvc_models = _download_local_only
+    except Exception:
+        logger.debug("Не удалось подменить download_rvc_models", exc_info=True)
+
+
 def _patch_torch_load() -> None:
     """torch 2.6+ по умолчанию weights_only=True, а чекпоинты HuBERT содержат безопасные globals fairseq.
     Переопределяем дефолт на weights_only=False, если вызывающий код не задал флаг явно."""
@@ -288,6 +318,7 @@ def _ensure_rvc(voice: str | None = None) -> Any:
         try:
             _patch_torch_load()
             _copy_bundled_base_models()
+            _patch_rvc_download()
             from rvc_python.infer import RVCInference
 
             device = _detect_device()
@@ -303,12 +334,18 @@ def _ensure_rvc(voice: str | None = None) -> Any:
             _rvc_voice = voice
             logger.info("RVC: модель готова (%s, голос %s)", device, voice)
         except ImportError as e:
+            import traceback
+
+            logger.error("RVC ImportError traceback:\n%s", traceback.format_exc())
             _rvc_error = (
-                "Локальный RVC: не установлены зависимости (rvc-python, torch, fairseq). "
-                "Выполните: pip install -r requirements.txt"
+                "��������� RVC: �� ����������� ����������� (rvc-python, torch, fairseq). "
+                "���������: pip install -r requirements.txt"
             )
             raise RuntimeError(_rvc_error) from e
         except Exception as e:
+            import traceback
+
+            logger.error("RVC init exception traceback:\n%s", traceback.format_exc())
             _rvc_error = f"Локальный RVC: ошибка загрузки модели: {e}"
             raise RuntimeError(_rvc_error) from e
     return _rvc

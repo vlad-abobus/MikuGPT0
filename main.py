@@ -82,7 +82,7 @@ class ChatApp(ctk.CTk):
         self.minsize(900, 600)
         self.protocol("WM_DELETE_WINDOW", self._on_app_close)
 
-        # Провайдер только один — Google Gemini (gemini-2.5-flash-lite), ключ из api_gem.txt.
+        # Провайдер только один — Google Gemini (gemini-3.5-flash-lite), ключ из api_gem.txt.
 
         # Переменные конфигурации
         self.flirt_enabled = ctk.BooleanVar(value=False)

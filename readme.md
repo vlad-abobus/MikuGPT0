@@ -102,7 +102,7 @@ python main.py
 MikuGPT0/
 ├── main.py             # 🖥️ GUI (CustomTkinter) и основная логика
 ├── ai_chat.py          # 🤖 Единая точка вызова LLM (Google Gemini)
-├── gemini_client.py    # 🌐 Google Gemini API (gemini-2.5-flash-lite, REST)
+├── gemini_client.py    # 🌐 Google Gemini API (gemini-3.5-flash-lite, REST)
 ├── api_gem.txt         # 🔑 API-ключ Gemini и настройки запроса (заполняется вручную)
 ├── prompts.py          # 📝 Системные промпты и характеры
 ├── emotions.json        # 🎭 Пресеты эмоций (наборы A/B/C: ключи, подписи, описания для промпта)

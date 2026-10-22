@@ -310,44 +310,71 @@
 
     async function loadModel() {
       const loader = new GLTFLoader();
-      const candidates = [
+      const singleCandidates = [
         "models/panda.glb",
-        "mdels/panda.glb",
         "models/panda.gltf",
+        "mdels/panda.glb",
+        "mdels/Panda.glb",
         "mdels/panda.gltf",
-      "mdels/panda.glb",
-      "mdels/Panda.glb",
-      "models/panda.glb",
-      "mdels/Panda.gltf",
-      "mdels/panda.gltf",
-      "models/panda.gltf",
-    ];
+        "mdels/Panda.gltf",
+      ];
+      const splitCandidates = [
+        ["models/panda_idle.glb", "models/panda_talk.glb", "models/panda_yell.glb"],
+        ["mdels/panda_idle.glb", "mdels/panda_talk.glb", "mdels/panda_yell.glb"],
+      ];
 
-      let gltf = null;
+      const load = (url) =>
+        new Promise((resolve, reject) => loader.load(url, resolve, undefined, reject));
+
+      let clips = null;
+      let sceneRoot = null;
       let lastError = null;
+      let splitClips = null; // [idleClip, talkClip, yellClip] из трёх отдельных GLB
 
-      for (const url of candidates) {
+      for (const url of singleCandidates) {
         try {
-          gltf = await new Promise((resolve, reject) => {
-            loader.load(url, resolve, undefined, reject);
-          });
+          const gltf = await load(url);
+          sceneRoot = gltf.scene;
+          clips = gltf.animations || [];
           break;
         } catch (err) {
           lastError = err;
         }
       }
 
-      if (!gltf) {
+      if (!sceneRoot) {
+        for (const [idleUrl, talkUrl, yellUrl] of splitCandidates) {
+          try {
+            const [idleG, talkG, yellG] = await Promise.all([
+              load(idleUrl),
+              load(talkUrl),
+              load(yellUrl),
+            ]);
+            sceneRoot = idleG.scene;
+            splitClips = [
+              (idleG.animations || [])[0] || null,
+              (talkG.animations || [])[0] || null,
+              (yellG.animations || [])[0] || null,
+            ];
+            clips = splitClips.filter(Boolean);
+            break;
+          } catch (err) {
+            lastError = err;
+          }
+        }
+      }
+
+      if (!sceneRoot) {
         console.warn(
-          "Не удалось загрузить 3D-панду. Положите GLB в models/panda.glb",
+          "Не удалось загрузить 3D-панду. Нужны GLB в models/panda_*.glb",
           lastError
         );
         setLoaderVisible(false);
-        showInfo("Модель панды не найдена (models/panda.glb)");
+        showInfo("Модель панды не найдена (models/panda_idle.glb)");
         return;
       }
 
-      modelRoot = gltf.scene;
+      modelRoot = sceneRoot;
       modelRoot.traverse((obj) => {
         if (obj.isMesh) {
           obj.castShadow = true;
@@ -360,28 +387,49 @@
       modelRoot.position.set(0, 0, 0);
       scene.add(modelRoot);
 
-      const clips = gltf.animations || [];
       mixer.stopAllAction();
       actions = {};
 
-      const clipNames = clips.map((c) => c.name);
-      const candMap = getActionNameCandidates(clipNames);
-
-      for (const clip of clips) {
+      const makeAction = (clip) => {
         const action = mixer.clipAction(clip);
         action.setLoop(THREE.LoopRepeat);
         action.clampWhenFinished = false;
-        actions[clip.name] = action;
-        actionNames.add(clip.name);
+        return action;
+      };
+
+      if (splitClips) {
+        // Все клипы в GLB называются одинаково ("mixamo.com") —
+        // маппим строго по позиции файла, а не по имени.
+        const [idleClip, talkClip, yellClip] = splitClips;
+        if (idleClip) actions["idle"] = makeAction(idleClip);
+        if (talkClip) actions["talk"] = makeAction(talkClip);
+        if (yellClip) actions["yell"] = makeAction(yellClip);
+        actionNames.add("idle");
+        actionNames.add("talk");
+        actionNames.add("yell");
+      } else {
+        const clipNames = clips.map((c, i) => c.name || `clip_${i}`);
+        const candMap = getActionNameCandidates(clipNames);
+
+        for (let i = 0; i < clips.length; i++) {
+          const clip = clips[i];
+          const name = clipNames[i];
+          actions[name] = makeAction(clip);
+          actionNames.add(name);
+        }
+
+        let idleName = candMap.idle || clipNames.find((n) => /idle/i.test(n));
+        let talkName = candMap.talk || clipNames.find((n) => /talk/i.test(n));
+        let yellName = candMap.yell || clipNames.find((n) => /yell|shout|scream/i.test(n));
+
+        if (!idleName) idleName = clipNames[0];
+        if (!talkName) talkName = clipNames[1] || clipNames[0];
+        if (!yellName) yellName = clipNames[2] || clipNames[1] || clipNames[0];
+
+        if (idleName && actions[idleName]) actions["idle"] = actions[idleName];
+        if (talkName && actions[talkName]) actions["talk"] = actions[talkName];
+        if (yellName && actions[yellName]) actions["yell"] = actions[yellName];
       }
-
-      const idleName = candMap.idle || clipNames.find((n) => /idle/i.test(n));
-      const talkName = candMap.talk || clipNames.find((n) => /talk/i.test(n));
-      const yellName = candMap.yell || clipNames.find((n) => /yell|shout|scream/i.test(n));
-
-      if (idleName && actions[idleName]) actions["idle"] = actions[idleName];
-      if (talkName && actions[talkName]) actions["talk"] = actions[talkName];
-      if (yellName && actions[yellName]) actions["yell"] = actions[yellName];
 
       if (!actions["idle"] && Object.keys(actions).length > 0) {
         actions["idle"] = actions[Object.keys(actions)[0]];

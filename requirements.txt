@@ -15,7 +15,7 @@ websocket-client>=1.0.0
 torch>=2.2
 # Локальная RVC-озвучка Мику (voice_engine.py): Edge-TTS + rvc-python.
 rvc-python>=0.1.5
-# ИИ: Google Gemini API (gemini_client.py, ai_chat.py) — model gemini-2.5-flash-lite.
+# ИИ: Google Gemini API (gemini_client.py, ai_chat.py) — model gemini-3.5-flash-lite.
 # Работает на requests (уже в списке выше). Ключ и настройки: api_gem.txt.
 
 # Отдельное окно 3D-панды (panda_viewer.py). Нужен WebView2 Runtime (Windows).

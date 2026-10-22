@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Google Gemini API (Google AI Studio) — модель gemini-2.5-flash-lite.
+"""Google Gemini API (Google AI Studio) — модель gemini-3.5-flash-lite.
 
 Все данные запроса читаются из файла api_gem.txt (лежит рядом с main.py / рядом с exe):
     api_key=...      — обязательный ключ Google AI Studio
-    model=...        — имя модели (по умолчанию gemini-2.5-flash-lite)
+    model=...        — имя модели (по умолчанию gemini-3.5-flash-lite)
     max_output_tokens, timeout, context_window — опционально.
 
 Без ключа ничего не работает: см. api_gem.txt, там подробно описано, что заполнять.
@@ -24,7 +24,7 @@ from paths import resource_path
 logger = logging.getLogger(__name__)
 
 API_FILE_NAME = "api_gem.txt"
-DEFAULT_MODEL = "gemini-2.5-flash-lite"
+DEFAULT_MODEL = "gemini-3.5-flash-lite"
 DEFAULT_MAX_OUTPUT_TOKENS = 1024
 DEFAULT_TIMEOUT = 60
 DEFAULT_CONTEXT_WINDOW = 1_000_000
