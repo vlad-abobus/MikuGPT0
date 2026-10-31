@@ -1,155 +1,228 @@
-
 <div align="center">
-  <img src="LLK.png" alt="MikuGPT Logo" width="300"/>
 
-  # 🎀 MikuGPT — Твоя Мику на ПК 🎀
+<a href="https://github.com/vlad-abobus/MikuGPT0">
+  <img src="logotitlemikuai.png" alt="MikuGPT — Хацунэ Мику на твоём компьютере" width="280">
+</a>
 
-  [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-  [![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-8B5CF6?style=for-the-badge&logo=tkinter&logoColor=white)](https://github.com/TomSchimansky/CustomTkinter)
-  [![AI](https://img.shields.io/badge/AI-Gemini%202.5%20Flash--Lite-FF6B9D?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/apikey)
-  [![License](https://img.shields.io/badge/License-MIT-FFD93D?style=for-the-badge)](LICENSE)
-  [![Download](https://img.shields.io/badge/Скачать-FF6B9D?style=for-the-badge&logo=github&logoColor=white)](https://github.com/vlad-abobus/MikuGPT0/releases)
+### Не ассистент. Собеседница.
+
+Десктопный ИИ-компаньон с Хацунэ Мику: характер, эмоции и голос в одном приложении.
+
+<p>
+  <a href="https://github.com/vlad-abobus/MikuGPT0/releases/download/lol/main.exe">
+    <img src="https://img.shields.io/badge/СКАЧАТЬ-main.exe-157069?style=for-the-badge&labelColor=141715&logo=windows&logoColor=white" alt="Скачать main.exe">
+  </a>
+  <a href="https://t.me/dev_miku">
+    <img src="https://img.shields.io/badge/Telegram-@dev__miku-B14066?style=for-the-badge&labelColor=141715&logo=telegram&logoColor=white" alt="Telegram @dev_miku">
+  </a>
+  <a href="https://github.com/vlad-abobus/MikuGPT0">
+    <img src="https://img.shields.io/badge/GitHub-Проект-303632?style=for-the-badge&labelColor=141715&logo=github&logoColor=white" alt="GitHub MikuGPT0">
+  </a>
+</p>
+
+<sub><a href="https://vlad-abobus.github.io/MikuGPT0/">Сайт проекта</a> · Windows 10 / 11 · x64 · версия 1.5 · open source</sub>
 
 </div>
 
----
-
-## 🌸 О проекте
-
-**MikuGPT** — это десктопный ИИ-чат с Хацунэ Мику. Она живёт у тебя на компьютере, реагирует с **эмоциями**, озвучивает ответы и запоминает твои предпочтения.
-
-> 💬 *«Привет! Я Мику!»*
-
----
-
-## 🌟 Возможности
-
-| Иконка | Фича | Описание |
-|:------:|:----:|:---------|
-| 🎭 | **Эмоции** | Мику показывает 40+ эмоций — от смущения до агрессии. Поддерживает 3 набора (A / B / C) |
-| 🎤 | **Голосовой ввод** | Говори в микрофон — Мику распознает и поймёт твою речь |
-| 🔊 | **Озвучка (TTS)** | Читает ответы вслух своим голосом (Hugging Face + RVC) |
-| 🧠 | **Память** | Запоминает твои интересы, факты и историю диалога |
-| 💕 | **Романтика / NSFW** | Переключение режимов общения одной галочкой |
-| 🎪 | **roleplay** | Отыгрыш действий и речи (*действие* + фраза), как в Character.AI |
-| 🎛️ | **6 характеров** | Дередере, Цундере, Дандере, Яндере, Агрессивный, Уку-Мамадере |
-| 🔥 | **Smart Memory** | Автоматически конспектирует диалог каждые N сообщений |
-| 🖼️ | **Живые эмоции** | Изображение Мику меняется в реальном времени под настроение |
-| 🌙 | **Тёмная тема** | Стильный и удобный GUI в тёмных тонах |
+<p align="center">
+  <a href="screen.PNG">
+    <img src="screen.PNG" alt="Интерфейс MikuGPT: чат с Мику, эмоции и настройки характера" width="100%">
+  </a>
+  <br>
+  <sub>Интерфейс MikuGPT · версия 1.5</sub>
+</p>
 
 ---
 
-## 🖥️ Скриншоты
+## О проекте
 
-| Главный экран | Настройки |
-|:-------------:|:---------:|
-| *Чат с Мику, эмоции, голосовой ввод* | *Профиль, память, API, характер* |
-| ![Главный экран](screen.PNG) | ![Настройки](screen2.PNG) |
+**MikuGPT** — это Мику, которая живёт на твоём компьютере. Она помнит, что ты любишь, меняет выражение лица прямо во время разговора и говорит своим голосом — без браузера и лишних вкладок.
+
+Проект бесплатный и открытый: история, память и настройки остаются локально, а для работы нужен только собственный ключ Google Gemini.
+
+<div align="center">
+  <img src="LLK.png" width="96" alt="Мику машет рукой">
+  <br>
+  <em>«Не спеши. Я никуда не денусь — просто напиши „привет“.»</em>
+</div>
+
+## Возможности
+
+| | Возможность | Что это даёт |
+|:--:|:--|:--|
+| 🎭 | **Живые эмоции** | 40+ реакций и три набора — A, B и C. Портрет меняется прямо по ходу ответа, а не после перезапуска. |
+| 🎙️ | **Голос и слух** | TTS + RVC дают Мику узнаваемый голос, а голосовой ввод превращает речь в сообщение. |
+| 🧠 | **Smart Memory** | Имя, интересы и важные мелочи остаются в контексте. Диалог автоматически конспектируется каждые несколько сообщений. |
+| 💬 | **Шесть характеров** | Дередере, Цундере, Дандере, Яндере, Агрессивная и Уку-Мамадере — один голос, но разный тон. |
+| 🎪 | **Ролеплей** | Описывай действия звёздочками — получай ответ в формате *действие* + реплика, как в Character.AI. |
+| 💕 | **Романтика и NSFW** | Режимы общения переключаются в настройках одной галочкой. |
+| 🔒 | **Приватность** | История, память и настройки хранятся на компьютере. API-ключ тоже остаётся локальным. |
+| 🌙 | **Тёмный интерфейс** | Спокойный GUI на CustomTkinter: чат, эмоции, голос и настройки в одном окне. |
+
+## Шесть способов быть рядом
+
+- **Дередере** — солнечный ураган. Всегда в восторге от общения, заряжает энергией и не даёт унывать.
+- **Цундере** — ворчит и вредничает, но внимание, спрятанное за колкостями, замечаешь сразу.
+- **Дандере** — тихая и застенчивая. Говорит мало, зато каждое слово — искреннее.
+- **Яндере** — любит до самозабвения. Никогда не отпустит и обязательно напомнит об этом.
+- **Агрессивная** — дерзкая, громкая и острая на язык. Провоцирует, спорит, но скучать не даёт.
+- **Уку-Мамадере** — окутает заботой, напомнит про шапку и чай. Уютная гавань в одном окне.
+
+## Эмоции
+
+<p align="center">
+  <img src="emotions/C/nice.png" width="140" alt="Мику улыбается и показывает большой палец">
+  <img src="emotions/C/blushing.png" width="140" alt="Мику смущается и опускает взгляд">
+  <img src="emotions/C/party.png" width="140" alt="Мику радуется с музыкальными нотками">
+  <img src="emotions/C/sleeping.png" width="140" alt="Мику спит">
+</p>
+
+<p align="center">
+  <sub>Уверенность · Смущение · Радость · Сонливость</sub>
+</p>
+
+В приложении 64 реакции в трёх наборах. Набор C — самый большой: 40 портретов, которые меняются вместе с настроением Мику.
+
+## Интерфейс
+
+Вся служебная часть спрятана в настройках и справке. На экране остаётся главное: Мику, диалог и тонкая настройка характера.
+
+<p align="center">
+  <a href="screen2.PNG">
+    <img src="screen2.PNG" alt="Экран «О программе» в MikuGPT с версией и поддерживаемыми языками" width="100%">
+  </a>
+  <br>
+  <sub>Экран «О программе» · версия 1.5</sub>
+</p>
+
+## Технологии
+
+| Компонент | Реализация |
+|:--|:--|
+| Интерфейс | Python 3.10+ и CustomTkinter |
+| Модель | Google Gemini 3.5 Flash-Lite |
+| Голос | TTS + RVC (Hugging Face) |
+| Ввод | Текст и распознавание речи |
+| Платформа | Windows 10 / 11, x64 |
+| Языки | Русский, украинский, казахский |
 
 ---
 
-## 🚀 Установка и запуск
+## Установка
 
-### 📦 Готовая сборка (EXE)
-1. Скачай последний релиз со страницы [Releases](https://github.com/vlad-abobus/MikuGPT0/releases).
-2. Распакуй архив и запусти `main.exe`.
+> [!IMPORTANT]
+> Для работы нужен свой API-ключ [Google AI Studio](https://aistudio.google.com/apikey). Он бесплатный, но у бесплатного тарифа есть лимиты запросов.
 
-### 🐍 Из исходного кода
+### Готовая сборка
+
+1. Скачай [`main.exe`](https://github.com/vlad-abobus/MikuGPT0/releases/download/lol/main.exe) из последнего релиза. Другие версии — в [релизах](https://github.com/vlad-abobus/MikuGPT0/releases).
+2. Создай или открой `api_gem.txt` рядом с приложением и вставь ключ:
+
+   ```ini
+   api_key=твой_ключ
+   model=gemini-3.5-flash-lite
+   ```
+
+3. Запусти `main.exe`, выбери характер и поздоровайся.
+
+### Из исходного кода
 
 ```bash
-# 1. Клонируй репозиторий
-git clone [https://github.com/vlad-abobus/MikuGPT0.git](https://github.com/vlad-abobus/MikuGPT0.git)
+git clone https://github.com/vlad-abobus/MikuGPT0.git
 cd MikuGPT0
 
-# 2. Создай и активируй виртуальное окружение
 python -m venv venv
-
-# Для Windows (PowerShell):
 .\venv\Scripts\Activate.ps1
 
-# Для Linux / macOS:
-source venv/bin/activate
-
-# 3. Установи зависимости
 pip install -r requirements.txt
 
-# 4. Вставь ключ Gemini в api_gem.txt (строка api_key=...)
-#    Ключ берётся тут: https://aistudio.google.com/apikey
-
-# 5. Запусти приложение
+# Добавь ключ в api_gem.txt, затем:
 python main.py
-
 ```
 
----
+Для Linux / macOS активация окружения выглядит так: `source venv/bin/activate`.
 
-## 🎮 Управление
+## Управление
 
-| Элемент / Клавиша | Функция |
-| --- | --- |
+| Элемент / клавиша | Действие |
+|:--|:--|
 | `Enter` | Отправить сообщение |
-| `Shift + Enter` | Перенос строки |
-| 🎤 | Активация голосового ввода |
-| 🎭 | Выбор набора эмоций (A / B / C) |
-| 💕 | Переключение режима романтики |
-| 🔞 | Переключение NSFW-режима |
+| `Shift + Enter` | Перенести строку |
+| 🎤 | Включить голосовой ввод |
+| 🎭 | Выбрать набор эмоций (A / B / C) |
+| 💕 | Включить режим романтики |
+| 🔞 | Включить NSFW-режим |
 
----
+## Структура проекта
 
-## 🧩 Структура проекта
+<details>
+<summary><b>Посмотреть основные файлы</b></summary>
 
 ```text
 MikuGPT0/
-├── main.py             # 🖥️ GUI (CustomTkinter) и основная логика
-├── ai_chat.py          # 🤖 Единая точка вызова LLM (Google Gemini)
-├── gemini_client.py    # 🌐 Google Gemini API (gemini-3.5-flash-lite, REST)
-├── api_gem.txt         # 🔑 API-ключ Gemini и настройки запроса (заполняется вручную)
-├── prompts.py          # 📝 Системные промпты и характеры
-├── emotions.json        # 🎭 Пресеты эмоций (наборы A/B/C: ключи, подписи, описания для промпта)
-├── emotions_data.py    # 🎭 Загрузка эмоций из emotions.json (наборы A/B/C)
-├── miku_tts.py         # 🔊 Модуль озвучки (RVC / Hugging Face)
-├── voice_input.py      # 🎤 Модуль распознавания речи
-├── paths.py            # 📂 Утилиты для работы с путями
-├── app_logging.py      # 📋 Логирование ошибок и событий
-├── config.json         # ⚙️ Пользовательская конфигурация
-├── requirements.txt    # 📦 Зависимости Python
-├── LLK.png             # 🖼️ Логотип приложения
-├── icon.ico            # 🏷️ Иконка окна / EXE
-├── build_exe.bat       # 🔨 Скрипт сборки PyInstaller
-├── emotions/           # 🎭 Папки с графикой эмоций
-│   ├── A/              #    19 эмоций (PNG)
-│   ├── B/              #    9 эмоций (JPG)
-│   └── C/              #    40+ эмоций (PNG)
-└── dist/               # 📦 Папка готовой сборки
-
+├── main.py              # GUI (CustomTkinter) и основная логика
+├── ai_chat.py           # Единая точка вызова LLM
+├── gemini_client.py     # Google Gemini API
+├── prompts.py           # Системные промпты и характеры
+├── emotions.json        # Эмоции: наборы A / B / C
+├── emotions_data.py     # Загрузка и подготовка эмоций
+├── miku_tts.py          # Озвучка: TTS / Hugging Face
+├── voice_engine.py      # Голосовая модель RVC
+├── voice_input.py       # Распознавание речи
+├── paths.py             # Работа с путями
+├── app_logging.py       # Логирование
+├── config.json          # Пользовательские настройки
+├── requirements.txt     # Зависимости Python
+├── api_gem.txt          # Локальный ключ Gemini (в .gitignore)
+├── build_exe.bat        # Сборка PyInstaller
+├── icon.ico             # Иконка приложения
+├── LLK.png              # Мику для README
+├── logotitlemikuai.png  # Логотип проекта
+├── screen.PNG           # Скриншот интерфейса
+├── screen2.PNG          # Экран «О программе»
+├── index.html           # Лендинг проекта
+├── styles.css           # Стили лендинга
+├── site.js              # Интерактив лендинга
+├── emotions/
+│   ├── A/               # 15 эмоций (PNG)
+│   ├── B/               # 9 эмоций (JPG)
+│   └── C/               # 40 эмоций (PNG)
+├── voice/               # Голосовые модели
+└── models/              # Локальные модели
 ```
 
----
-
-## 💖 Поддержать проект
-
-Поддержите разработку — финансовая помощь идёт на оплату серверов и API ИИ-моделей:
-
-* **Monobank:** [send.monobank.ua/jar/HTxkQ2n5w](https://send.monobank.ua/jar/HTxkQ2n5w?utm_source=gemini)
+</details>
 
 ---
 
-## 👨‍💻 Авторы
+## Поддержать проект
+
+Проект был и остаётся бесплатным. Если хочется сказать спасибо — помощь идёт на развитие и оплату API:
+
+<p>
+  <a href="https://send.monobank.ua/jar/HTxkQ2n5w">
+    <img src="https://img.shields.io/badge/Поддержать-Monobank-B14066?style=for-the-badge&labelColor=141715" alt="Поддержать проект на Monobank">
+  </a>
+</p>
+
+Новости и обновления — в Telegram: [@dev_miku](https://t.me/dev_miku).
+
+## Авторы
 
 | Роль | Участник |
-| --- | --- |
-| 🎨 **Идея, дизайн, эмоции** | **Lucky_13** |
+|:--|:--|
+| 🎨 **Идея, арт, эмоции** | **Lucky_13** |
 | 🛠️ **Код, архитектура, промпты** | **VladislavMorgan** |
 | 👥 **Тестирование и фидбек** | **Community LK_13** |
 
----
+## Лицензия
 
-## 📜 Лицензия
-
-Проект распространяется под лицензией **MIT**. Подробности см. в файле [LICENSE](https://www.google.com/search?q=LICENSE&utm_source=gemini).
+Проект распространяется под лицензией **MIT**. С текстом лицензии можно ознакомиться [здесь](https://opensource.org/license/mit).
 
 ---
 
-**★ Сделано с любовью специально для LK_13 ★**
-
-MikuGPT © Community LK_13
+<div align="center">
+  <img src="logotitlemikuai.png" width="120" alt="MikuGPT">
+  <br>
+  <sub>Сделано с любовью для LK_13 · Hatsune Miku © Crypton Future Media</sub>
+</div>
