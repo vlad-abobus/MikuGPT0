@@ -1085,7 +1085,7 @@ class ChatApp(ctk.CTk):
             
             clean_tts = self._text_for_tts(reply)
             if clean_tts:
-                self.after(500, lambda: self._request_miku_tts(clean_tts))
+                self.after(200, lambda: self._request_miku_tts(clean_tts))
         finally:
             self.after(0, lambda: self._status_end("chat"))
             self.after(0, lambda: self._set_panda_state("idle"))
@@ -1102,7 +1102,7 @@ class ChatApp(ctk.CTk):
             self._miku_type_label.configure(text="")
             self._miku_type_pending = message
             self._miku_type_index = 0
-            self.after(18, lambda: self._miku_type_step(gen))
+            self.after(8, lambda: self._miku_type_step(gen))
         self.after(0, start)
 
     def _miku_type_step(self, gen: int):
@@ -1111,11 +1111,11 @@ class ChatApp(ctk.CTk):
         i = getattr(self, "_miku_type_index", 0)
         if i >= len(pending): return
         rest = pending[i:]
-        chunk = rest[:2] if len(rest) >= 2 else rest[:1]
+        chunk = rest[:3] if len(rest) >= 3 else rest[:1]
         self._miku_type_index = i + len(chunk)
         self._miku_type_label.configure(text=pending[:self._miku_type_index])
         self._scroll_chat_end()
-        delay = 12 if len(chunk) > 1 else 20
+        delay = 8 if len(chunk) > 1 else 14
         self.after(delay, lambda: self._miku_type_step(gen))
 
     def _append(self, sender: str, message: str):
