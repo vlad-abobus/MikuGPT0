@@ -51,6 +51,7 @@ from ai_chat import (
     ChatProviderError,
     chat,
     chat_short,
+    chat_stream,
     get_temperature,
 )
 from paths import read_config_json, resource_path, update_config_json
@@ -113,8 +114,7 @@ class ChatApp(ctk.CTk):
         self.emotion_set = ctk.StringVar(value="C")  
 
         self.interactive = ctk.BooleanVar(value=False)
-        self.miku_tts_high_quality = ctk.BooleanVar(value=True)
-        self.tts_engine = "local_rvc"
+        self.sync_tts_enabled = ctk.BooleanVar(value=True)
 
         try:
             self.placeholder_font = ImageFont.truetype("arial.ttf", 20)
@@ -152,10 +152,8 @@ class ChatApp(ctk.CTk):
             self.smart_memory_every_n.set(str(smn_int))
             ta = cfg.get("typing_animation", True)
             self.typing_animation_enabled.set(bool(ta) if ta is not None else True)
-            mq = cfg.get("miku_tts_high_quality", True)
-            self.miku_tts_high_quality.set(bool(mq) if mq is not None else True)
-            te = (cfg.get("tts_engine") or "local_rvc").strip()
-            self.tts_engine = te if te in ("local_rvc", "anime") else "local_rvc"
+            st = cfg.get("sync_tts_enabled", True)
+            self.sync_tts_enabled.set(bool(st) if st is not None else True)
             es = (cfg.get("emotion_set") or "C").strip().upper()
             self.emotion_set.set(es if es in ("A", "B", "C") else "C")
             try:
@@ -180,6 +178,18 @@ class ChatApp(ctk.CTk):
         self._panda_state = "idle"
         self._tts_in_progress = False
 
+        # Синхронная озвучка: поколение ответа, карточка, которая заполняется
+        # фразами ровно в момент старта их аудио, и активный SpeechStream.
+        self._reply_gen = 0
+        self._reply_gen_lock = threading.Lock()
+        self._sync_gen = 0
+        self._sync_card = None
+        self._sync_label = None
+        self._sync_text = ""
+        self._sync_last_seq = 0
+        self._pending_reply_text: dict[int, str] = {}
+        self._active_speech = None
+
         self.load_emotion_images()
         self.chat_history = []
 
@@ -188,12 +198,10 @@ class ChatApp(ctk.CTk):
         self._prompt_user_name_on_startup()
         
         try:
-            if self.tts_engine in ("local_rvc", "anime"):
-                from voice_engine import warmup
-                kwargs = {"delay_sec": 2.5}
-                if self.tts_engine == "anime":
-                    kwargs["voice"] = "anime"
-                threading.Thread(target=warmup, kwargs=kwargs, daemon=True).start()
+            from fish_tts import configuration_error, is_configured as fish_configured
+            if not fish_configured():
+                _fish_error = configuration_error()
+                self.after(900, lambda m=_fish_error: self._append("Система", f"⚠️ {m}"))
         except Exception:
             pass
 
@@ -204,14 +212,13 @@ class ChatApp(ctk.CTk):
             pass
 
         try:
-            from gemini_client import api_gem_path, has_key as gemini_has_key
+            from gemini_client import has_key as gemini_has_key
             if not gemini_has_key():
-                _gemini_file = os.path.basename(api_gem_path())
                 self.after(700, lambda: self._append(
                     "Система",
-                    f"⚠️ В файле {_gemini_file} не заполнен api_key. "
-                    "Возьми ключ на https://aistudio.google.com/apikey и вставь строку "
-                    f"api_key=... в {_gemini_file} — без него Мику не сможет отвечать.",
+                    "⚠️ Не задан GEMINI_API_KEY в .env. Возьми ключ на "
+                    "https://aistudio.google.com/apikey и добавь строку "
+                    "GEMINI_API_KEY=... рядом с приложением — без него Мику не сможет отвечать.",
                 ))
         except Exception:
             pass
@@ -252,6 +259,10 @@ class ChatApp(ctk.CTk):
             logger.debug("Не удалось запустить окно панды", exc_info=True)
 
     def _on_app_close(self):
+        try:
+            self._cancel_active_speech()
+        except Exception:
+            pass
         try:
             if getattr(self, "_panda_window", None) is not None:
                 self._panda_window.stop()
@@ -433,13 +444,7 @@ class ChatApp(ctk.CTk):
             soft_msg = {"role": "system", "content": self._SOFTENERS[attempt - 1]}
             retry_messages = api_messages + [soft_msg]
             raw = chat(retry_messages, nsfw=nsfw_on)
-        reply, emo, _ = self._parse_ai_response(raw)
-        emo = self._ensure_different_emotion(emo)
-        last_emo = emo or self.last_emotion_key
-        if self._chat_text(reply) and not self._is_refusal(reply):
-            self.last_emotion_key = emo or self.last_emotion_key
-            return reply, emo
-        return self._ensure_miku_reply(""), last_emo
+        return self._finalize_ai_reply(raw)
 
     def _prompt_user_name_on_startup(self):
         default = (self.user_name or "").strip()
@@ -665,7 +670,7 @@ class ChatApp(ctk.CTk):
         self._flirt_cb = ctk.CTkCheckBox(controls, text="Романтика", variable=self.flirt_enabled, **cb_kwargs)
         self._flirt_cb.grid(row=2, column=0, sticky="w", pady=6)
         
-        self._nsfw_cb = ctk.CTkCheckBox(controls, text="NSFW / 18+", variable=self.nsfw_enabled, command=self._sync_roleplay_with_nsfw, **cb_kwargs)
+        self._nsfw_cb = ctk.CTkCheckBox(controls, text="NSFW / 18+", variable=self.nsfw_enabled, **cb_kwargs)
         self._nsfw_cb.grid(row=3, column=0, sticky="w", pady=6)
         
         self._roleplay_cb = ctk.CTkCheckBox(controls, text="Отыгрыш (действия)", variable=self.interactive, **cb_kwargs)
@@ -725,6 +730,11 @@ class ChatApp(ctk.CTk):
         self.send_btn.grid(row=0, column=2)
 
     def _create_message_card(self, sender: str, message: str):
+        _card, body_label = self._create_message_card_ex(sender, message)
+        return body_label
+
+    def _create_message_card_ex(self, sender: str, message: str, *, show_speaker: bool = True):
+        """Создать карточку сообщения и вернуть ``(card, body_label)``."""
         is_miku = sender == "Мику"
         is_sys = sender == "Система"
         
@@ -754,17 +764,22 @@ class ChatApp(ctk.CTk):
         body_label.grid(row=1, column=1, sticky="ew", padx=(0, 12), pady=(2, 16))
         self._message_labels.append(body_label)
 
-        if is_miku:
-            speech = self._text_for_tts(message)
-            speaker = ctk.CTkButton(
-                card, text="🔊", width=36, height=36, corner_radius=10,
-                fg_color="transparent", hover_color="#3A4A5A", text_color=TEXT_MUTED,
-                command=lambda payload=speech: self._request_miku_tts(payload),
-            )
-            speaker.grid(row=0, column=2, rowspan=2, sticky="ne", padx=(0, 8), pady=8)
+        if is_miku and show_speaker:
+            self._add_speaker_button(card, self._text_for_tts(message))
             
         self._scroll_chat_end()
-        return body_label
+        return card, body_label
+
+    def _add_speaker_button(self, card, speech: str) -> None:
+        """Добавить кнопку 🔊, читающую переданный текст."""
+        if not (speech or "").strip():
+            return
+        speaker = ctk.CTkButton(
+            card, text="🔊", width=36, height=36, corner_radius=10,
+            fg_color="transparent", hover_color="#3A4A5A", text_color=TEXT_MUTED,
+            command=lambda payload=speech: self._request_tts(payload),
+        )
+        speaker.grid(row=0, column=2, rowspan=2, sticky="ne", padx=(0, 8), pady=8)
 
     def _build_settings_tab(self):
         inner = ctk.CTkTabview(
@@ -850,14 +865,19 @@ class ChatApp(ctk.CTk):
         ctk.CTkCheckBox(chat, text="Анимация печати", variable=self.typing_animation_enabled, **self._cb_kwargs()).pack(anchor="w", pady=(0, 10))
         
         self._settings_label(chat, "Озвучка Мику")
-        engine_row = ctk.CTkFrame(chat, fg_color="transparent")
-        engine_row.pack(fill="x", pady=(0, 16))
-        self.tts_engine_var = ctk.StringVar(value="Аниме-профиль (Мику)" if self.tts_engine == "anime" else "Локальный RVC (Мику)")
-        ctk.CTkOptionMenu(
-            engine_row, values=["Локальный RVC (Мику)", "Аниме-профиль (Мику)"], variable=self.tts_engine_var,
-            width=200, **self._menu_kwargs()
-        ).pack(side="left")
-        self._save_btn(chat, "Сохранить озвучку", self._save_miku_tts_settings)
+        ctk.CTkLabel(
+            chat, text="Fish Audio · голос Мику", anchor="w",
+            font=DEFAULT_FONT, text_color=TEXT_MAIN,
+        ).pack(fill="x", pady=(0, 4))
+        self._settings_label(
+            chat, "Ключ и ID голоса задаются в .env: FISH_API_KEY, FISH_REFERENCE_ID",
+            hint=True,
+        )
+        ctk.CTkCheckBox(
+            chat, text="Синхронная озвучка (текст появляется вместе с голосом)",
+            variable=self.sync_tts_enabled, **self._cb_kwargs()
+        ).pack(anchor="w", pady=(0, 10))
+        self._save_btn(chat, "Сохранить озвучку", self._save_tts_settings)
 
     def _build_about_tab(self):
         self.about_tab.grid_columnconfigure(0, weight=1)
@@ -1010,13 +1030,12 @@ class ChatApp(ctk.CTk):
         self.response_language = language_code
         self._append("Система", f"Язык ответов изменён: {language_name}.")
 
-    def _save_miku_tts_settings(self):
+    def _save_tts_settings(self):
         try:
-            chosen = self.tts_engine_var.get()
-            engine = "anime" if chosen == "Аниме-профиль (Мику)" else "local_rvc"
-            update_config_json({"tts_engine": engine})
-            self.tts_engine = engine
-            self._append("Система", f"Озвучка: сохранено.")
+            update_config_json({
+                "sync_tts_enabled": bool(self.sync_tts_enabled.get()),
+            })
+            self._append("Система", "Озвучка: сохранено.")
         except Exception:
             pass
 
@@ -1037,15 +1056,6 @@ class ChatApp(ctk.CTk):
         self.personality = choice
         self._append("Система", f"Характер изменен на: {choice} ♪")
 
-    def _sync_roleplay_with_nsfw(self, *_):
-        if self.nsfw_enabled.get():
-            self.interactive.set(True)
-            if hasattr(self, "_roleplay_cb"):
-                self._roleplay_cb.configure(state="disabled")
-        else:
-            if hasattr(self, "_roleplay_cb"):
-                self._roleplay_cb.configure(state="normal")
-
     def _on_enter(self, event):
         self.send_message()
         return "break"
@@ -1054,12 +1064,132 @@ class ChatApp(ctk.CTk):
         user_txt = self._chat_text(self.entry.get())
         if not user_txt:
             return
+        self._cancel_active_speech()
         self._append(self.user_name or "Вы", user_txt)
         self.entry.delete(0, "end")
         self.chat_history.append({"role": "user", "content": user_txt})
         threading.Thread(target=self._fetch_response, args=(user_txt,), daemon=True).start()
 
+    def _next_reply_gen(self) -> int:
+        with self._reply_gen_lock:
+            self._reply_gen += 1
+            return self._reply_gen
+
+    def _start_synced_speech(self, gen: int):
+        """Подготовить синхронную озвучку ответа. ``None`` — если она недоступна."""
+        if not self.sync_tts_enabled.get():
+            return None
+        try:
+            from fish_tts import generate_miku_voice
+            from speech_stream import SpeechStream
+
+            speech = SpeechStream(
+                generate_miku_voice,
+                on_phrase=lambda seq, text: self.after(
+                    0, lambda: self._on_spoken_phrase(gen, seq, text)
+                ),
+                on_done=lambda: self.after(0, lambda: self._on_speech_done(gen)),
+                on_error=lambda exc: self.after(
+                    0, lambda m=str(exc): self._on_speech_error(gen, m)
+                ),
+            )
+            speech.start()
+        except Exception as exc:
+            logger.warning("Синхронная озвучка недоступна: %s", exc)
+            return None
+
+        self._active_speech = speech
+        self._tts_in_progress = True
+        self.after(0, lambda: self._status_begin("tts"))
+        return speech
+
+    def _on_spoken_phrase(self, gen: int, seq: int, text: str) -> None:
+        """Фраза начинает звучать — показываем её в карточке ответа."""
+        if gen != self._reply_gen:
+            return
+        if self._sync_gen != gen:
+            self._sync_gen = gen
+            self._sync_card = None
+            self._sync_label = None
+            self._sync_text = ""
+            self._sync_last_seq = 0
+        if seq <= self._sync_last_seq:
+            return
+        self._sync_last_seq = seq
+
+        chunk = text or ""
+        if not chunk.strip():
+            return
+        if self._sync_label is None:
+            self._sync_card, self._sync_label = self._create_message_card_ex(
+                "Мику", "", show_speaker=False
+            )
+        self._sync_text += chunk
+        try:
+            self._sync_label.configure(text=self._sync_text.strip())
+        except Exception:
+            pass
+        self._scroll_chat_end()
+
+    def _on_speech_done(self, gen: int) -> None:
+        """Озвучка ответа доиграла: фиксируем полный текст и кнопку 🔊."""
+        if gen != self._reply_gen:
+            return
+        full = self._pending_reply_text.pop(gen, "")
+        self._tts_in_progress = False
+        self._active_speech = None
+        self._status_end("tts")
+
+        text = (full or self._sync_text).strip()
+        if self._sync_label is None:
+            if text:
+                self._append("Мику", text)
+            self._set_panda_state("idle")
+            return
+
+        try:
+            self._sync_label.configure(text=text)
+            self._add_speaker_button(self._sync_card, self._text_for_tts(text))
+        except Exception:
+            logger.debug("Не удалось завершить карточку синхронной озвучки", exc_info=True)
+        self._sync_card = None
+        self._sync_label = None
+        self._sync_text = ""
+        self._set_panda_state("idle")
+
+    def _on_speech_error(self, gen: int, message: str) -> None:
+        if gen != self._reply_gen:
+            return
+        logger.warning("Ошибка синхронной озвучки: %s", message)
+        self._append("Система", f"Ошибка озвучки: {message}")
+
+    def _cancel_active_speech(self) -> None:
+        """Остановить текущую синхронную озвучку (перед новым сообщением)."""
+        speech = self._active_speech
+        self._active_speech = None
+        if speech is not None:
+            try:
+                speech.cancel()
+            except Exception:
+                logger.debug("Не удалось отменить озвучку", exc_info=True)
+        self._pending_reply_text.clear()
+        # Старая карточка остаётся как есть, но новый ответ не должен в неё дописываться.
+        self._sync_gen = 0
+        self._sync_card = None
+        self._sync_label = None
+        self._sync_text = ""
+        self._sync_last_seq = 0
+        if self._tts_in_progress:
+            self._tts_in_progress = False
+            self._status_end("tts")
+
+    def _update_idle_state(self) -> None:
+        if not self._tts_in_progress:
+            self._set_panda_state("idle")
+
     def _fetch_response(self, _user_text: str):
+        speech = None
+        gen = self._next_reply_gen()
         try:
             self.after(0, lambda: self._status_begin("chat"))
             self.after(0, lambda: self._set_panda_state("thinking"))
@@ -1073,22 +1203,89 @@ class ChatApp(ctk.CTk):
                 api_messages = [{"role": "system", "content": sys_prompt}]
                 for m in self.chat_history[-14:]:
                     api_messages.append(m)
-                
-                reply, emo = self._fetch_miku_reply(api_messages)
+
+                if self.sync_tts_enabled.get():
+                    speech = self._start_synced_speech(gen)
+
+                if speech is not None and not self.nsfw_enabled.get():
+                    # Gemini отдаёт текст токенами, а SpeechStream озвучивает
+                    # готовые фразы и показывает их ровно в момент старта аудио.
+                    reply, emo = self._fetch_miku_reply_stream(api_messages, speech.feed)
+                else:
+                    reply, emo = self._fetch_miku_reply(api_messages)
+                    if speech is not None:
+                        speech.feed(reply)
             except Exception as exc:
+                if speech is not None:
+                    speech.cancel()
+                    self._active_speech = None
+                    self._tts_in_progress = False
+                    self.after(0, lambda: self._status_end("tts"))
                 self.after(0, self._append, "Система", f"❌ Ошибка ИИ: {exc}")
                 return
-            
-            self.after(0, self._append_miku_with_typing, reply)
-            self.after(0, self._set_emotion, emo)
+
+            self._pending_reply_text[gen] = reply
             self.chat_history.append({"role": "assistant", "content": reply})
-            
-            clean_tts = self._text_for_tts(reply)
-            if clean_tts:
-                self.after(200, lambda: self._request_miku_tts(clean_tts))
+            self.after(0, self._set_emotion, emo)
+
+            if speech is not None:
+                speech.finish()
+            else:
+                self.after(0, self._append_miku_with_typing, reply)
+                clean_tts = self._text_for_tts(reply)
+                if clean_tts:
+                    self.after(200, lambda payload=clean_tts: self._request_tts(payload))
         finally:
             self.after(0, lambda: self._status_end("chat"))
-            self.after(0, lambda: self._set_panda_state("idle"))
+            self.after(0, self._update_idle_state)
+
+    def _fetch_miku_reply_stream(self, api_messages: list[dict], on_delta=None) -> tuple[str, str]:
+        """Потоковый ответ Gemini с передачей токенов в синхронную озвучку."""
+        parts: list[str] = []
+        pending: list[str] = []
+        released = False
+        for token in chat_stream(api_messages):
+            if not token:
+                continue
+            parts.append(token)
+            if on_delta is None:
+                continue
+            if released:
+                on_delta(token)
+                continue
+
+            # Первые ~20 символов придерживаем: так отказ модели не успевает
+            # попасть в озвучку до того, как его распознает _is_refusal().
+            pending.append(token)
+            prefix = "".join(pending)
+            if len(prefix) >= 24 and not self._is_refusal(prefix):
+                released = True
+                on_delta(prefix)
+            elif len(prefix) >= 300:
+                released = True
+                on_delta(prefix)
+
+        if on_delta is not None and not released:
+            prefix = "".join(pending)
+            if prefix and not self._is_refusal(prefix):
+                released = True
+                on_delta(prefix)
+
+        reply, emo = self._finalize_ai_reply("".join(parts))
+        if on_delta is not None and not released and reply:
+            # Отказ или пустой стрим заменяется готовой репликой — её тоже
+            # нужно показать вместе с озвучкой, а не молча добавить в конце.
+            on_delta(reply)
+        return reply, emo
+
+    def _finalize_ai_reply(self, raw: str) -> tuple[str, str]:
+        reply, emo, _ = self._parse_ai_response(raw)
+        emo = self._ensure_different_emotion(emo)
+        last_emo = emo or self.last_emotion_key
+        if self._chat_text(reply) and not self._is_refusal(reply):
+            self.last_emotion_key = emo or self.last_emotion_key
+            return reply, emo
+        return self._ensure_miku_reply(""), last_emo
 
     def _append_miku_with_typing(self, message: str):
         message = self._ensure_miku_reply(message)
@@ -1171,28 +1368,29 @@ class ChatApp(ctk.CTk):
             try: self._chat_status_label.configure(text="")
             except Exception: pass
 
-    def _request_miku_tts(self, text: str) -> None:
+    def _request_tts(self, text: str) -> None:
         if not text.strip(): return
+        self._tts_in_progress = True
         self.after(0, lambda: self._status_begin("tts"))
         def worker():
             try:
-                if self.tts_engine in ("local_rvc", "anime"):
-                    from voice_engine import set_active_voice, speak_text_as_miku
-                    if self.tts_engine == "anime": set_active_voice("anime")
-                    speak_text_as_miku(text)
+                from fish_tts import speak_text_as_miku
+                speak_text_as_miku(text)
             except Exception as e:
                 self.after(0, lambda m=str(e): self._append("Система", f"Ошибка озвучки: {m}"))
             finally:
+                self._tts_in_progress = False
                 self.after(0, lambda: self._status_end("tts"))
+                self.after(0, self._update_idle_state)
         threading.Thread(target=worker, daemon=True).start()
 
     def _install_tts_playback_listener(self):
         try:
-            import miku_tts
+            import audio_player
             def _on_playback(event, _duration_ms=0):
                 if event == "start": self.after(0, lambda: self._set_panda_state("speaking"))
                 elif event == "end": self.after(0, lambda: self._set_panda_state("idle"))
-            miku_tts.set_playback_listener(_on_playback)
+            audio_player.set_playback_listener(_on_playback)
         except Exception: pass
 
     def _set_panda_state(self, state: str):

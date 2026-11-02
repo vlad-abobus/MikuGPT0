@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """Google Gemini API (Google AI Studio) — модель gemini-3.5-flash-lite.
 
-Все данные запроса читаются из файла api_gem.txt (лежит рядом с main.py / рядом с exe):
-    api_key=...      — обязательный ключ Google AI Studio
-    model=...        — имя модели (по умолчанию gemini-3.5-flash-lite)
-    max_output_tokens, timeout, context_window — опционально.
+Ключ и параметры берутся из .env (переменные окружения имеют приоритет):
+    GEMINI_API_KEY=...          — обязательный ключ Google AI Studio
+    GEMINI_MODEL=...            — имя модели (по умолчанию gemini-3.5-flash-lite)
+    GEMINI_MAX_OUTPUT_TOKENS=... — опционально
+    GEMINI_TIMEOUT=...           — опционально
+    GEMINI_CONTEXT_WINDOW=...    — опционально
 
-Без ключа ничего не работает: см. api_gem.txt, там подробно описано, что заполнять.
+Для совместимости со старыми сборками поддерживается и api_gem.txt, но .env
+считается основным источником настроек.
 """
 from __future__ import annotations
 
@@ -25,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 API_FILE_NAME = "api_gem.txt"
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
-DEFAULT_MAX_OUTPUT_TOKENS = 1024
+DEFAULT_MAX_OUTPUT_TOKENS = 2048
 DEFAULT_TIMEOUT = 60
 DEFAULT_CONTEXT_WINDOW = 1_000_000
 MIN_CONTEXT_WINDOW = 2048
@@ -110,8 +113,13 @@ def _settings() -> dict[str, str]:
         return dict(_cache)
 
 
+def _env(name: str, default: str = "") -> str:
+    """Значение из .env/окружения; пустая строка считается отсутствием."""
+    return (os.environ.get(name) or "").strip() or default
+
+
 def api_key() -> str:
-    return _settings().get("api_key", "").strip()
+    return _env("GEMINI_API_KEY") or _settings().get("api_key", "").strip()
 
 
 def has_key() -> bool:
@@ -119,11 +127,11 @@ def has_key() -> bool:
 
 
 def model() -> str:
-    return (_settings().get("model") or DEFAULT_MODEL).strip() or DEFAULT_MODEL
+    return _env("GEMINI_MODEL") or (_settings().get("model") or DEFAULT_MODEL).strip() or DEFAULT_MODEL
 
 
 def _max_output_tokens() -> int:
-    raw = _settings().get("max_output_tokens")
+    raw = _env("GEMINI_MAX_OUTPUT_TOKENS") or _settings().get("max_output_tokens")
     try:
         n = int(raw)
     except (TypeError, ValueError):
@@ -132,7 +140,7 @@ def _max_output_tokens() -> int:
 
 
 def request_timeout() -> int:
-    raw = _settings().get("timeout")
+    raw = _env("GEMINI_TIMEOUT") or _settings().get("timeout")
     try:
         n = int(raw)
     except (TypeError, ValueError):
@@ -142,7 +150,7 @@ def request_timeout() -> int:
 
 def context_limit() -> int:
     """Окно контекста модели (токены) — по нему main.py обрезает историю."""
-    raw = _settings().get("context_window")
+    raw = _env("GEMINI_CONTEXT_WINDOW") or _settings().get("context_window")
     try:
         n = int(raw)
     except (TypeError, ValueError):
@@ -153,7 +161,8 @@ def context_limit() -> int:
 def _require_key() -> str:
     if not has_key():
         raise RuntimeError(
-            f"API-ключ Gemini не задан. Открой файл {api_gem_path()} и заполни строку api_key=..."
+            "API-ключ Gemini не задан. Укажи GEMINI_API_KEY в .env "
+            f"(рядом с приложением: {api_gem_path()}) или заполни api_gem.txt."
         )
     return api_key()
 
@@ -254,6 +263,10 @@ def chat_completion(
     except requests.RequestException as e:
         raise RuntimeError(f"Gemini API: нет сети — {e}") from e
 
+    # Gemini всегда отвечает UTF-8, но не указывает charset в Content-Type.
+    # Без явной настройки requests использует ISO-8859-1 и ломает кириллицу.
+    resp.encoding = "utf-8"
+
     if resp.status_code != 200:
         raise RuntimeError(f"Gemini API HTTP {resp.status_code}: {_error_text(resp)}")
 
@@ -299,13 +312,21 @@ def chat_completion_stream(
     except requests.RequestException as e:
         raise RuntimeError(f"Gemini API: нет сети — {e}") from e
 
+    # SSE приходит как text/event-stream без charset, поэтому requests по
+    # умолчанию декодирует его как ISO-8859-1. Читаем байты и декодируем UTF-8
+    # сами — иначе кириллица превращается в «ÐŸÑ€Ð¸Ð²ÐµÑ‚».
+    resp.encoding = "utf-8"
+
     if resp.status_code != 200:
         raise RuntimeError(f"Gemini API HTTP {resp.status_code}: {_error_text(resp)}")
 
     logger.info("Gemini %s stream: начало ответа...", model())
     try:
-        for line in resp.iter_lines(decode_unicode=True):
-            if not line or not line.startswith("data:"):
+        for raw_line in resp.iter_lines():
+            if not raw_line:
+                continue
+            line = raw_line.decode("utf-8", errors="replace")
+            if not line.startswith("data:"):
                 continue
             payload = line[5:].strip()
             if not payload or payload == "[DONE]":
@@ -329,7 +350,7 @@ def warmup(delay_sec: float = 2.5) -> None:
 
     time.sleep(delay_sec)
     if not has_key():
-        logger.warning("Gemini API: ключ не задан — заполни %s", api_gem_path())
+        logger.warning("Gemini API: ключ не задан — укажи GEMINI_API_KEY в .env")
         return
     try:
         resp = requests.get(

@@ -75,7 +75,7 @@ def setup_logging() -> None:
             os.path.join(_app_base_dir(), _LOG_DIR_NAME),
         )
 
-    for name in ("urllib3", "requests", "httpx", "httpcore", "gradio_client"):
+    for name in ("urllib3", "requests", "httpx", "httpcore"):
         logging.getLogger(name).setLevel(max(logging.WARNING, level))
 
     log = logging.getLogger(__name__)

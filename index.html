@@ -212,7 +212,7 @@
                             <span class="feature-tag">Голос</span>
                         </div>
                         <h3>Говорит с тобой</h3>
-                        <p>Ответы можно слушать: TTS и RVC дают Мику узнаваемый голос вместо безликого синтеза. Озвучка включается в один клик.</p>
+                        <p>Ответы можно слушать: Fish Audio даёт Мику узнаваемый голос вместо безликого синтеза. Озвучка включается в один клик.</p>
                     </article>
                     <article class="feature reveal">
                         <div class="feature-top">
@@ -236,7 +236,7 @@
                             <span class="feature-tag">Приватность</span>
                         </div>
                         <h3>Данные остаются у тебя</h3>
-                        <p>История, память и настройки хранятся локально. API-ключ тоже лежит в файле проекта — без сторонних аккаунтов и телеметрии.</p>
+                        <p>История, память и настройки хранятся локально. API-ключи лежат в локальном <code>.env</code> — без телеметрии и лишних аккаунтов.</p>
                     </article>
                 </div>
             </div>
@@ -413,6 +413,10 @@
                             <dd>Gemini 3.5 Flash-Lite</dd>
                         </div>
                         <div class="spec-row">
+                            <dt>Голос</dt>
+                            <dd>Fish Audio · s2.1-pro-free</dd>
+                        </div>
+                        <div class="spec-row">
                             <dt>Платформа</dt>
                             <dd>Windows 10 / 11</dd>
                         </div>
@@ -444,7 +448,7 @@
                         </p>
                         <h2 id="download-title">Забери <em>Мику</em> домой.</h2>
                         <p class="download-lead">
-                            Сборка для Windows, ключ Gemini и пара минут. Всё остальное она возьмёт на себя.
+                            Сборка для Windows, ключи Gemini и Fish Audio, пара минут. Всё остальное она возьмёт на себя.
                         </p>
                         <div class="download-actions">
                             <a class="btn btn-ink" href="https://github.com/vlad-abobus/MikuGPT0/releases/download/lol/main.exe" target="_blank" rel="noopener noreferrer">
@@ -476,8 +480,8 @@
                             <li class="step">
                                 <span class="step-num">02</span>
                                 <div>
-                                    <h3>Добавь ключ Gemini</h3>
-                                    <p>Вставь ключ в api_gem.txt. Получить его можно бесплатно в <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.</p>
+                                    <h3>Добавь ключи в <code>.env</code></h3>
+                                    <p>Создай <code>.env</code> рядом с приложением: <code>GEMINI_API_KEY</code> из <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> и <code>FISH_API_KEY</code> из <a href="https://fish.audio/app/developers" target="_blank" rel="noopener noreferrer">Fish Audio</a>.</p>
                                 </div>
                             </li>
                             <li class="step">
@@ -517,7 +521,7 @@
                 <div class="faq-list reveal" style="--delay: 0.08s">
                     <details class="faq-item" open>
                         <summary>Это действительно бесплатно?</summary>
-                        <p>Да. Код открыт под лицензией MIT, готовую сборку можно скачать без регистрации. Понадобится свой ключ Google Gemini — у бесплатного тарифа есть лимиты запросов.</p>
+                        <p>Да. Код открыт под лицензией MIT, готовую сборку можно скачать без регистрации. Понадобятся свои ключи Google Gemini и Fish Audio — у бесплатных тарифов есть лимиты запросов.</p>
                     </details>
                     <details class="faq-item">
                         <summary>Нужен ли мощный компьютер?</summary>
@@ -525,11 +529,11 @@
                     </details>
                     <details class="faq-item">
                         <summary>Куда уходят данные?</summary>
-                        <p>История диалога, память и настройки хранятся на твоём компьютере. В сеть уходит только запрос к Gemini и загрузка голосовых моделей.</p>
+                        <p>История диалога, память и настройки хранятся на твоём компьютере. В сеть уходят только запросы к Gemini и текст, который озвучивает Fish Audio.</p>
                     </details>
                     <details class="faq-item">
                         <summary>Что нужно для голоса?</summary>
-                        <p>Озвучка работает через TTS и RVC. При первом запуске нужные модели могут скачиваться — дальше голос отвечает быстрее.</p>
+                        <p>Озвучка работает через Fish Audio: нужен бесплатный API-ключ, а голос синтезируется в облаке. Локальные модели и тяжёлые веса не нужны.</p>
                     </details>
                     <details class="faq-item">
                         <summary>Можно ли поменять характер?</summary>
