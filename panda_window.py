@@ -6,6 +6,7 @@
 запуска GUI-цикла в главном потоке и не может сосуществовать с Tk mainloop в одном
 процессе.
 """
+from __future__ import annotations
 import logging
 import os
 import socket

@@ -10,5 +10,12 @@ if %errorlevel% neq 0 (
     echo ERROR: build failed
     pause
 ) else (
-    echo OK: exe in dist\
+    copy /Y "translations.json" "dist\main\translations.json" >nul
+    if errorlevel 1 (
+        echo ERROR: translations.json was not copied to dist\main\
+        pause
+        exit /b 1
+    ) else (
+        echo OK: exe in dist\main\
+    )
 )

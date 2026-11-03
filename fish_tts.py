@@ -6,7 +6,8 @@ RVC-модели и Hugging Face Space больше не используютс�
 задаются в .env:
 
     FISH_API_KEY=...
-    FISH_REFERENCE_ID=...   — id голосовой модели Fish Audio
+    FISH_REFERENCE_ID=...   — голос для русского
+    FISH_REFERENCE_ID_KK/UK/EN=... — голоса для остальных языков
     FISH_TTS_MODEL=s2.1-pro-free
 """
 from __future__ import annotations
@@ -32,6 +33,11 @@ load_env_file()
 DEFAULT_API_URL = "https://api.fish.audio/v1/tts"
 DEFAULT_TTS_MODEL = "s2.1-pro-free"
 DEFAULT_TIMEOUT = 120
+DEFAULT_LANGUAGE_VOICE_IDS = {
+    "kk": "6717a74323274cb296ea9a0da654c977",
+    "uk": "6717a74323274cb296ea9a0da654c977",
+    "en": "6717a74323274cb296ea9a0da654c977",
+}
 _MAX_INPUT_CHARS = 2000
 _MAX_ATTEMPTS = 3
 _RETRY_SLEEP_SEC = 1.2
@@ -61,7 +67,13 @@ def api_key() -> str:
     return _env("FISH_API_KEY")
 
 
-def reference_id() -> str:
+def reference_id(language: str = "ru") -> str:
+    language = (language or "ru").strip().lower()
+    if language in DEFAULT_LANGUAGE_VOICE_IDS:
+        return _env(
+            f"FISH_REFERENCE_ID_{language.upper()}",
+            DEFAULT_LANGUAGE_VOICE_IDS[language],
+        )
     return _env("FISH_REFERENCE_ID") or _env("FISH_VOICE_ID")
 
 
@@ -81,19 +93,21 @@ def _timeout() -> int:
     return max(10, min(600, n))
 
 
-def is_configured() -> bool:
+def is_configured(language: str = "ru") -> bool:
     key = api_key()
-    return bool(key and key.lower() not in _PLACEHOLDER_KEYS and reference_id())
+    return bool(
+        key and key.lower() not in _PLACEHOLDER_KEYS and reference_id(language)
+    )
 
 
-def configuration_error() -> str:
+def configuration_error(language: str = "ru") -> str:
     if not api_key() or api_key().lower() in _PLACEHOLDER_KEYS:
         return (
             "Fish Audio: не задан FISH_API_KEY. Добавь ключ в .env рядом "
             "с приложением (https://fish.audio/app/developers)."
         )
-    if not reference_id():
-        return "Fish Audio: не задан FISH_REFERENCE_ID в .env."
+    if not reference_id(language):
+        return f"Fish Audio: не задан голос для языка {language!r} в .env."
     return ""
 
 
@@ -218,17 +232,17 @@ def _download_to_file(resp: requests.Response) -> str:
         raise
 
 
-def _generate_miku_voice_unlocked(text: str) -> str:
+def _generate_miku_voice_unlocked(text: str, language: str = "ru") -> str:
     speech = _prepare_tts_text(text)
     if not speech:
         raise ValueError("Пустой текст для озвучки")
 
     key = api_key()
-    voice_id = reference_id()
+    voice_id = reference_id(language)
     if not key or key.lower() in _PLACEHOLDER_KEYS:
-        raise RuntimeError(configuration_error())
+        raise RuntimeError(configuration_error(language))
     if not voice_id:
-        raise RuntimeError(configuration_error())
+        raise RuntimeError(configuration_error(language))
 
     model = tts_model()
     payload = {
@@ -304,7 +318,9 @@ def _generate_miku_voice_unlocked(text: str) -> str:
     raise RuntimeError(f"Fish Audio: не удалось получить аудио ({last_error}).")
 
 
-def generate_miku_voice(text: str, voice: str | None = None) -> str:
+def generate_miku_voice(
+    text: str, voice: str | None = None, *, language: str = "ru"
+) -> str:
     """Синтезировать текст через Fish Audio и вернуть путь к временному .wav.
 
     ``voice`` оставлен для совместимости со старым API; голос задаётся
@@ -312,7 +328,7 @@ def generate_miku_voice(text: str, voice: str | None = None) -> str:
     """
     del voice
     with _synth_lock:
-        return _generate_miku_voice_unlocked(text)
+        return _generate_miku_voice_unlocked(text, language)
 
 
 def play_wav_file(path: str) -> None:
@@ -322,7 +338,9 @@ def play_wav_file(path: str) -> None:
     _play(path)
 
 
-def speak_text_as_miku(text: str, voice: str | None = None) -> None:
+def speak_text_as_miku(
+    text: str, voice: str | None = None, *, language: str = "ru"
+) -> None:
     """Синтез + последовательное воспроизведение текста (кнопка 🔊)."""
     del voice
     chunks = [c for c in split_for_tts(text) if clean_text_for_tts(c).strip()]
@@ -331,7 +349,7 @@ def speak_text_as_miku(text: str, voice: str | None = None) -> None:
 
     with _tts_chain_lock:
         if len(chunks) == 1:
-            wav = generate_miku_voice(chunks[0])
+            wav = generate_miku_voice(chunks[0], language=language)
             try:
                 play_wav_file(wav)
             finally:
@@ -348,7 +366,7 @@ def speak_text_as_miku(text: str, voice: str | None = None) -> None:
             try:
                 for chunk in chunks:
                     try:
-                        audio_q.put(generate_miku_voice(chunk))
+                        audio_q.put(generate_miku_voice(chunk, language=language))
                     except Exception as exc:
                         errors.append(exc)
                         logger.warning("Fish Audio: фраза не синтезирована: %s", exc)

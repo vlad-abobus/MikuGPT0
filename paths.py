@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Пути к ресурсам: dev и PyInstaller (sys._MEIPASS)."""
+from __future__ import annotations
 import json
 import logging
 import os

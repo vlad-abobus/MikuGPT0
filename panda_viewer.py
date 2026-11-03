@@ -4,6 +4,7 @@
 Запускается из main.py и общается с основным процессом по localhost TCP.
 Формат команд (по одной на строку): ``state:<name>``, ``speak:<ms>``, ``stop``, ``quit``.
 """
+from __future__ import annotations
 import argparse
 import logging
 import socket
