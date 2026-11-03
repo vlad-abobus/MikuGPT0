@@ -455,6 +455,11 @@ class ChatApp(ctk.CTk):
 
     def _prompt_user_name_on_startup(self):
         default = (self.user_name or "").strip()
+        initial_language = self.response_language
+        language_labels = {
+            code: locale["name"] for code, locale in self.locales.items()
+        }
+        language_codes = {label: code for code, label in language_labels.items()}
         dialog = ctk.CTkToplevel(self)
         dialog.title(self.t("startup_title"))
         dialog.resizable(False, False)
@@ -467,12 +472,30 @@ class ChatApp(ctk.CTk):
         dialog.lift(self)
         dialog.grab_set()
 
-        ctk.CTkLabel(
+        question = ctk.CTkLabel(
             dialog,
             text=self.t("startup_question"),
             font=(DEFAULT_FONT[0], DEFAULT_FONT[1] + 4, "bold"),
             text_color=TEXT_MAIN
-        ).pack(pady=(26, 12), padx=24)
+        )
+        question.pack(pady=(24, 12), padx=24)
+
+        language_var = ctk.StringVar(value=language_labels[initial_language])
+        language_label = ctk.CTkLabel(
+            dialog,
+            text=self.t("startup_language"),
+            font=DEFAULT_FONT,
+            text_color=TEXT_MAIN,
+        )
+        language_label.pack(anchor="w", padx=50, pady=(0, 4))
+        language_menu = ctk.CTkOptionMenu(
+            dialog,
+            values=list(language_codes),
+            variable=language_var,
+            width=320,
+            **self._menu_kwargs(),
+        )
+        language_menu.pack(padx=24, pady=(0, 12))
 
         name_var = ctk.StringVar(value=default)
         entry = ctk.CTkEntry(
@@ -485,16 +508,32 @@ class ChatApp(ctk.CTk):
         entry.select_range(0, "end")
 
         hint = ctk.CTkLabel(dialog, text="", text_color=TEXT_MUTED, font=(DEFAULT_FONT[0], 12))
-        hint.pack(padx=24, pady=(0, 4))
+        hint.pack(padx=24, pady=(0, 2))
 
-        result: dict[str, str | None] = {"name": None}
+        result: dict[str, str | None] = {"name": None, "language": None}
+
+        def update_dialog_language(choice: str) -> None:
+            language = language_codes.get(choice)
+            if language is None:
+                return
+            ui = self.locales[language]["ui"]
+            dialog.title(ui["startup_title"])
+            question.configure(text=ui["startup_question"])
+            language_label.configure(text=ui["startup_language"])
+            entry.configure(placeholder_text=ui["name_placeholder"])
+            hint.configure(text="")
+            continue_button.configure(text=ui["continue"])
 
         def apply_name() -> None:
             name = (name_var.get() or "").strip()
             if not name:
-                hint.configure(text=self.t("name_required"))
+                language = language_codes.get(language_var.get(), initial_language)
+                hint.configure(text=self.locales[language]["ui"]["name_required"])
                 return
             result["name"] = name
+            result["language"] = language_codes.get(
+                language_var.get(), initial_language
+            )
             try:
                 dialog.grab_release()
             except Exception:
@@ -507,13 +546,15 @@ class ChatApp(ctk.CTk):
                 pass
 
         entry.bind("<Return>", lambda _e: apply_name())
-        ctk.CTkButton(
+        language_menu.configure(command=update_dialog_language)
+        continue_button = ctk.CTkButton(
             dialog, text=self.t("continue"), width=200, corner_radius=12,
             command=apply_name, fg_color=ACCENT_BLUE, hover_color=ACCENT_BLUE_HOVER, text_color="#FFFFFF"
-        ).pack(pady=(8, 26))
+        )
+        continue_button.pack(pady=(8, 20))
 
         dialog.update_idletasks()
-        w, h = 420, 220
+        w, h = 420, 320
         x = self.winfo_x() + max(0, (self.winfo_width() - w) // 2)
         y = self.winfo_y() + max(0, (self.winfo_height() - h) // 2)
         dialog.geometry(f"{w}x{h}+{x}+{y}")
@@ -523,13 +564,20 @@ class ChatApp(ctk.CTk):
         name = (result.get("name") or "").strip()
         if not name:
             name = default or "Вы"
+        language = result.get("language") or initial_language
+        self.response_language = language
         self.user_name = name
         if hasattr(self, "user_name_var"):
             self.user_name_var.set(name)
         try:
-            update_config_json({"user_name": name})
-        except Exception:
-            pass
+            update_config_json({
+                "user_name": name,
+                "response_language": language,
+            })
+        except Exception as exc:
+            logger.exception("Failed to save startup profile: %s", exc)
+        if language != initial_language:
+            self._rebuild_ui_for_language()
 
     # ---------- UI BUILDER ----------
     def _build_ui(self):
